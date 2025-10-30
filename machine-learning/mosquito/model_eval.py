@@ -34,7 +34,7 @@ class DataImport:
             
             train_probes, _ = self.get_probes(train_dfs)
             test_probes, test_names = self.get_probes(test_dfs)
-            return train_probes, test_probes, test_names
+            return train_probes, test_probes, test_names #test_names is target labels?
 
         def import_data(self, data_path):
             """
@@ -113,7 +113,8 @@ class DataImport:
             all_probe_names = []
             for df in dfs:
                 probe_indices = self.probe_finder_method(df["labels"].values)
-                probes = [df.iloc[start:end].reset_index(drop=True).copy() 
+                #each row already has a label assigned (im assuming probe_finder_method is finding the indices of the probes)
+                probes = [df.iloc[start:end].reset_index(drop=True).copy() #where is start and end defined?
                           for start, end in probe_indices]
                 probe_names = [df["file"][0][:-4] + f"_{str(i)}" 
                                for i, df in enumerate(probes)]
@@ -302,7 +303,7 @@ def main():
                 )
 
                 # expected f1: 0.694895
-                kwargs['bottleneck_type'] = 'block'
+                kwargs['bottleneck_type'] = 'block' #kwargs?
                 kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 0.1, 'weight_decay': 1e-06, 'num_layers': 8, 'features': 32}
 
             if args.epochs:
