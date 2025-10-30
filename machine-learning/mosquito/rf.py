@@ -13,11 +13,12 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model():
     def __init__(self, save_path = None, trial = None):
-        self.chunk_seconds = 3
-        self.num_estimators = 128
+        self.chunk_seconds = 3 #the chunk size 100hz83 = 300hz
+        self.num_estimators = 128 #?
         self.num_freqs = 7
-        self.max_depth = 16
-        self.sample_rate = 100
+        #the number of largest frequencies in each window to extract as a feature
+        self.max_depth = 16 #where to stop splitting
+        self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate
         self.waveform_type = "post_rect"
         self.random_state = 42
@@ -39,32 +40,38 @@ class Model():
             if num_chunks == 0:
                 print(len(probe))
                 print(self.chunk_size)
-            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks)
+            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks
             columns = defaultdict(list)
             for chunk in chunks:
-                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2]
-                chunk_freqs = fftfreq(self.chunk_size, 1 / self.sample_rate)[1:self.chunk_size//2]
+                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] #fourier transform, gets largest frequences
+                chunk_freqs = fftfreq(self.chunk_size, 1 / self.sample_rate)[1:self.chunk_size//2] #gets the size of freq for each chunk?
+                # Skip index 0 (the DC component/zero frequency)
+                # Take only the positive frequencies up to the Nyquist frequency 
+                # (half the chunk size) (skips part of fourtier transform that is reversed, meaningless.)
+
                 
                 num_largest = self.num_freqs
                 indices = (-chunk_fft).argpartition(num_largest, axis=None)[:num_largest]
+                #gete the largest frequences (or the smallest negative ones)
                 indices = sorted(indices, key=lambda x: chunk_fft[x], reverse=True)
+                #sorts indices by frequency size
 
                 peak_freqs = chunk_freqs[indices]
 
                 for i in range(num_largest):
-                    columns[f"F{i}"].append(peak_freqs[i])
-                columns["mean"].append(np.mean(chunk[self.waveform_type]))
-                columns["std"].append(np.std(chunk[self.waveform_type]))
-                columns["resistance"].append(chunk["resistance"].values[0])
-                columns["volts"].append(chunk["voltage"].values[0])
-                columns["current"].append(0 if chunk["current"].values[0] == "AC" else 1)
+                    columns[f"F{i}"].append(peak_freqs[i]) #7, or x, largest frequences in chunk
+                columns["mean"].append(np.mean(chunk[self.waveform_type])) #mean postrec
+                columns["std"].append(np.std(chunk[self.waveform_type]))#std of postrec
+                columns["resistance"].append(chunk["resistance"].values[0]) #?, why [0]?
+                columns["volts"].append(chunk["voltage"].values[0]) #??, why [0]?s
+                columns["current"].append(0 if chunk["current"].values[0] == "AC" else 1) #AC (?) or not, binary?
                 if training: # In reality, we won't know what the labels are
-                    labels, label_counts = np.unique(chunk["labels"], return_counts=True)
+                    labels, label_counts = np.unique(chunk["labels"], return_counts=True) #probing labels
                     label = labels[np.argmax(label_counts)]
                     columns["label"].append(label)
 
             probe_out = pd.DataFrame(columns)
-            transformed_probes.append(probe_out)
+            transformed_probes.append(probe_out)#what is this?
         return transformed_probes
 
     def train(self, probes, test_data, fold):
@@ -76,16 +83,16 @@ class Model():
         self.model = rf.fit(X_train, Y_train)
     
     def predict(self, probes):
-        transformed_probes = self.transform_data(probes, training = False)
+        transformed_probes = self.transform_data(probes, training = False) #transformed_probes is just each probe (chunk?) with al the features attached
         predictions = []
         for transformed_probe, raw_probe in zip(transformed_probes, probes):
             test_probe = transformed_probe
             pred = self.model.predict(test_probe)
 
             # We need to expand the prediction based on the sample rate
-            pred = np.repeat(pred, self.chunk_seconds * self.sample_rate)
+            pred = np.repeat(pred, self.chunk_seconds * self.sample_rate) #what does this do?!
             # Expand until the end since probe is never exactly divisible by window size
-            pred = np.pad(pred, (0, len(raw_probe) - len(pred)), 'edge')
+            pred = np.pad(pred, (0, len(raw_probe) - len(pred)), 'edge') #would this alter our prediction?!
             predictions.append(pred)
         return predictions
 
