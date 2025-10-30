@@ -1,3 +1,6 @@
+from typing import Any
+
+
 import os
 import numpy as np
 import pandas as pd
@@ -14,11 +17,14 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 class Model():
     def __init__(self, save_path = None, trial = None):
         #chunk hyperparameters
-        self.chunk_seconds = 3 #the chunk size, number of seconds - size of the window you look at. 100hz*3 = 300hz
+        self.chunk_seconds = 1 #trying out second window (with three seconds (1 left, 1 right) for input feature isolatopm)
+         #the chunk size, number of seconds - size of the window you look at. 100hz*3 = 300hz
         self.num_estimators = 128 #?
         self.num_freqs = 7 #the number of largest frequencies in each window to extract as a feature
         self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate
+        # self.windowMultiplier = 3
+        self.window_size = self.chunk_seconds * self.sample_rate * self.chunk_size * 3 #multiplying chunk size by three here to incooperate overlapping features
 
         self.max_depth = 16 #where to stop splitting
         self.waveform_type = "post_rect" #better than pre
@@ -36,15 +42,20 @@ class Model():
 
     def transform_data(self, probes, training = True):
         transformed_probes = []
+        # chunksToWindow = dict[Any, Any]()
+        #maybe dont need dictionary actually
         for probe in probes:
             num_chunks = len(probe) // self.chunk_size
             if num_chunks == 0:
                 print("num_chunks is 0!")
                 print(len(probe))
                 print(self.chunk_size)
-            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of three seconds times 100 hz
+            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of a predefined number of seconds times 100 hz
+            
             columns = defaultdict(list)
             for chunk in chunks:
+                extra_context_size = (self.window_size - self.chunk_size)/2
+
                 chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] 
                 #fourier transform, gets largest frequencies. gets postrec values for each chunk, takes its abs value.
                 #the first element (index 0) of the FFT represents the DC component (zero frequency) - essentially the mean/average value of the signal
