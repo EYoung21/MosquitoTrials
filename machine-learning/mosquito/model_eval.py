@@ -1,10 +1,10 @@
 import os
-import glob
+import glob #?
 import numpy as np
 import pandas as pd
-import argparse
-from sklearn.preprocessing import normalize
-from sklearn.model_selection import KFold
+import argparse #helps with command line, dont remember how...
+from sklearn.preprocessing import normalize #normalizes
+from sklearn.model_selection import KFold #k-fold accuracy measure
 from sklearn.metrics import precision_recall_fscore_support, \
                             confusion_matrix, \
                             ConfusionMatrixDisplay, \
@@ -12,7 +12,7 @@ from sklearn.metrics import precision_recall_fscore_support, \
                             f1_score
 import importlib.util
 from matplotlib import pyplot as plt
-from itertools import groupby
+from itertools import groupby #itertools?
 import optuna
 from sklearn.model_selection import train_test_split
 
@@ -75,9 +75,10 @@ class DataImport:
                      array. Pre-rectified recordings are necessary as baseline is 
                      not 0 in post-rectified recordings.
                    window: Before NP regions can be identified, a rolling
-                     average filter is applied to remove noise in the NP regions.
+                     average filter is applied to remove noise in the NP regions. 
+                     #so regions are classified based on their average?
                      window is the size of this filter in samples.
-                   threshold: The maximum value of an NP sample.
+                   threshold: The maximum value of an NP sample. #so anything above this value is probing?
                    min_probe_length: The minimum acceptable length of a probe in
                      samples.
                    np_pad: the number of NP samples before and after each probe to
@@ -229,13 +230,14 @@ def optuna_objective(data, args, trial, **kwargs):
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
         train_data = [data.raw_dfs[i] for i in train_index]
         test_data = [data.raw_dfs[i] for i in test_index]
-        train_data, _ = data.get_probes(train_data)
+        train_data, _ = data.get_probes(train_data) #why are train names seemingly not defined here?
         test_data, test_names = data.get_probes(test_data)
 
         augment_factor = trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
 
         if args.augment:
             train_data = build_augmented_dataset(train_data, size = len(train_data) * augment_factor)
+            #making an augmented dataset?
 
         model_import = dynamic_importer(args.model_path)
         
@@ -279,12 +281,21 @@ def main():
     if args.optuna:
         study = optuna.create_study(direction='maximize')
         
-        kwargs = dict()
+        kwargs = dict() #kwargs?
         if args.model_path == "unet.py":
-            if args.attention:
+            if args.attention: #what is attention?
                 # expected f1: 0.7402015172114621
                 kwargs['bottleneck_type'] = 'windowed_attention'
-                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 1e-05, 'weight_decay': 1e-05, 'num_layers': 8, 'features': 64, 'transformer_window_size': 150, 'transformer_layers': 2}
+                kwargs = kwargs | {
+                    'epochs': 64, 
+                    'lr': 0.0005, 
+                    'dropout_rate': 1e-05, 
+                    'weight_decay': 1e-05, 
+                    'num_layers': 8, 
+                    'features': 64, 
+                    'transformer_window_size': 150, 
+                    'transformer_layers': 2
+                }
                 heads_per_channel = 32
                 kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
                 kwargs['embed_dim'] = kwargs['features']
@@ -303,7 +314,14 @@ def main():
 
                 # expected f1: 0.694895
                 kwargs['bottleneck_type'] = 'block'
-                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 0.1, 'weight_decay': 1e-06, 'num_layers': 8, 'features': 32}
+                kwargs = kwargs | {
+                    'epochs': 64, 
+                    'lr': 0.0005, 
+                    'dropout_rate': 0.1, 
+                    'weight_decay': 1e-06, 
+                    'num_layers': 8, 
+                    'features': 32
+                }
 
             if args.epochs:
                 kwargs['epochs'] = args.epochs
@@ -318,7 +336,7 @@ def main():
         plt.savefig(f"{args.model_name}_hyper.png")
         return
 
-    summary_data = []
+    summary_data = [] #?
     labels_true = []
     labels_pred = []
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
@@ -355,7 +373,7 @@ def main():
         print("Training Model...")
         
         if args.augment:
-            final_train_data = augmented_train_data
+            final_train_data = augmented_train_data #how does this work? resampling? or new data generated entirely somehow?
         else:
             final_train_data = train_data
         print(final_train_data[0].columns)
@@ -384,6 +402,7 @@ def main():
         else:
             print("Choose a valid (case insensitive) post-processing arguement: either V/Viterbi or S/Smooth. Terminating program")
             assert False #TODO: make this better
+            #make what batter? how?
             
         print("Generating Report...")
         true, pred, stats = generate_report(test_data, predicted_labels, test_names, args.save_path, args.model_name, fold)
@@ -394,6 +413,8 @@ def main():
     out_summary_data = pd.concat(summary_data)
 
     # Calculate statistics across every dataset
+
+    #by every dataset they mean every fold?
     labels = sorted(np.unique(labels_true))
     all_precision, all_recall, all_fscore, _ = precision_recall_fscore_support(labels_true, labels_pred, 
                                                             labels=labels, average = None, zero_division=0)

@@ -13,20 +13,20 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model():
     def __init__(self, save_path = None, trial = None):
-        self.chunk_seconds = 3
-        self.num_estimators = 128
-        self.num_freqs = 7
+        self.chunk_seconds = 3 #number of seconds - size of the window you look at.
+        self.num_estimators = 128 #?
+        self.num_freqs = 7 #?
         self.max_depth = 16
-        self.sample_rate = 100
-        self.chunk_size = self.chunk_seconds * self.sample_rate
-        self.waveform_type = "post_rect"
+        self.sample_rate = 100 #?
+        self.chunk_size = self.chunk_seconds * self.sample_rate #?
+        self.waveform_type = "post_rect" #better than pre
         self.random_state = 42
         dirname = os.path.dirname(__file__)
         self.model = None
         self.save_path = save_path
         self.model_path = "../ML/rf_pickle"
         
-        if trial:
+        if trial: #?
             self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 3)
             self.num_freqs = trial.suggest_int('num_freqs', 1, 10)
             self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128])
@@ -37,16 +37,31 @@ class Model():
         for probe in probes:
             num_chunks = len(probe) // self.chunk_size
             if num_chunks == 0:
+                print("num_chunks is 0!")
                 print(len(probe))
                 print(self.chunk_size)
-            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks)
+            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #so chunks is each probe split up into chunks of three seconds times 100 hz?
             columns = defaultdict(list)
             for chunk in chunks:
-                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2]
+                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] #gets postrec values for each chunk, takes its abs value, 
+                #The first element (index 0) of the FFT represents the DC component (zero frequency) - essentially the mean/average value of the signal
+                #So we omit that with 1:
                 chunk_freqs = fftfreq(self.chunk_size, 1 / self.sample_rate)[1:self.chunk_size//2]
-                
-                num_largest = self.num_freqs
+                """
+                The FFT of real-valued data is symmetric - the second half is a mirror image (complex conjugate) of the first half
+With chunk_size = 300 samples (3 seconds × 100 Hz), you get 300 FFT values, but:
+Indices 0 to 149 contain unique frequency information
+Indices 150 to 299 are redundant (mirrored)
+The Nyquist frequency is at chunk_size//2, which represents the maximum frequency you can detect (50 Hz in your case, which is half the 100 Hz sampling rate)
+Everything beyond chunk_size//2 is redundant for real-valued signals
+                """
+
+                num_largest = self.num_freqs #7?
                 indices = (-chunk_fft).argpartition(num_largest, axis=None)[:num_largest]
+                #argpartition returns the smallest numbers in the arr (which if negative, returns largest)
+                """It rearranges the indices so that the smallest k values are in the first k positions
+The remaining indices go in positions k onward
+It returns the entire rearranged array of indices"""
                 indices = sorted(indices, key=lambda x: chunk_fft[x], reverse=True)
 
                 peak_freqs = chunk_freqs[indices]
