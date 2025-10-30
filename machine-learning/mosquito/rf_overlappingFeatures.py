@@ -51,10 +51,16 @@ class Model():
                 print(len(probe))
                 print(self.chunk_size)
             chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of a predefined number of seconds times 100 hz
-            
+            #DICTIONARY FROM EACH CHUNK TO IT'S STARTING INDEX (NUMBER CHUNK TIMES LENGTH OF CHUNKS)
+            #THEN CALCULATE STARTING INDEX AND ENDING INDEX, AND EXTEND USING WINDOW
+
+
             columns = defaultdict(list)
             for chunk in chunks:
-                extra_context_size = (self.window_size - self.chunk_size)/2
+                extra_context_size = (self.window_size - self.chunk_size)//2
+
+
+
 
                 chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] 
                 #fourier transform, gets largest frequencies. gets postrec values for each chunk, takes its abs value.
