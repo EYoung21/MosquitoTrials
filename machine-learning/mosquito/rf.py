@@ -15,7 +15,7 @@ class Model():
     def __init__(self, save_path = None, trial = None):
         self.chunk_seconds = 3 #number of seconds - size of the window you look at.
         self.num_estimators = 128 #?
-        self.num_freqs = 7 #?
+        self.num_freqs = 7 # why 7? was this chosen by optuna?
         self.max_depth = 16
         self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate #?
@@ -62,15 +62,17 @@ Everything beyond chunk_size//2 is redundant for real-valued signals
                 """It rearranges the indices so that the smallest k values are in the first k positions
 The remaining indices go in positions k onward
 It returns the entire rearranged array of indices"""
-                indices = sorted(indices, key=lambda x: chunk_fft[x], reverse=True)
+                indices = sorted(indices, key=lambda x: chunk_fft[x], reverse=True) 
+                #sorts the indices from largest to smallest
 
-                peak_freqs = chunk_freqs[indices]
+                peak_freqs = chunk_freqs[indices] #gets the actual values of the largest 7 frequences.
 
                 for i in range(num_largest):
-                    columns[f"F{i}"].append(peak_freqs[i])
+                    columns[f"F{i}"].append(peak_freqs[i]) 
+                    #appending the ith largest frequency to it's column for each largest (for each chunk, as this is in a chunk's for loop)
                 columns["mean"].append(np.mean(chunk[self.waveform_type]))
                 columns["std"].append(np.std(chunk[self.waveform_type]))
-                columns["resistance"].append(chunk["resistance"].values[0])
+                columns["resistance"].append(chunk["resistance"].values[0]) #what is resistance?!
                 columns["volts"].append(chunk["voltage"].values[0])
                 columns["current"].append(0 if chunk["current"].values[0] == "AC" else 1)
                 if training: # In reality, we won't know what the labels are
