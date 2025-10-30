@@ -13,21 +13,20 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model():
     def __init__(self, save_path = None, trial = None):
-        self.chunk_seconds = 3 #the chunk size 100hz83 = 300hz
+        self.chunk_seconds = 3 #the chunk size, number of seconds - size of the window you look at. 100hz*3 = 300hz
         self.num_estimators = 128 #?
-        self.num_freqs = 7
-        #the number of largest frequencies in each window to extract as a feature
+        self.num_freqs = 7 #the number of largest frequencies in each window to extract as a feature
         self.max_depth = 16 #where to stop splitting
         self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate
-        self.waveform_type = "post_rect"
+        self.waveform_type = "post_rect" #better than pre
         self.random_state = 42
         dirname = os.path.dirname(__file__)
         self.model = None
         self.save_path = save_path
         self.model_path = "../ML/rf_pickle"
         
-        if trial:
+        if trial: #?
             self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 3)
             self.num_freqs = trial.suggest_int('num_freqs', 1, 10)
             self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128])
@@ -38,21 +37,37 @@ class Model():
         for probe in probes:
             num_chunks = len(probe) // self.chunk_size
             if num_chunks == 0:
+                print("num_chunks is 0!")
                 print(len(probe))
                 print(self.chunk_size)
-            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks
+            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of three seconds times 100 hz
             columns = defaultdict(list)
             for chunk in chunks:
-                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] #fourier transform, gets largest frequences
-                chunk_freqs = fftfreq(self.chunk_size, 1 / self.sample_rate)[1:self.chunk_size//2] #gets the size of freq for each chunk?
-                # Skip index 0 (the DC component/zero frequency)
-                # Take only the positive frequencies up to the Nyquist frequency 
-                # (half the chunk size) (skips part of fourtier transform that is reversed, meaningless.)
+                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] 
+                #fourier transform, gets largest frequencies. gets postrec values for each chunk, takes its abs value.
+                #the first element (index 0) of the FFT represents the DC component (zero frequency) - essentially the mean/average value of the signal
+                #so we omit that with 1:
+                chunk_freqs = fftfreq(self.chunk_size, 1 / self.sample_rate)[1:self.chunk_size//2] #gets the size of freq for each chunk
+                #skip index 0 (the DC component/zero frequency)
+                #take only the positive frequencies up to the Nyquist frequency 
+                #(half the chunk size) (skips part of fourier transform that is reversed, meaningless.)
+                """
+                the FFT of real-valued data is symmetric - the second half is a mirror image (complex conjugate) of the first half
+                with chunk_size = 300 samples (3 seconds × 100 Hz), you get 300 FFT values, but:
+                indices 0 to 149 contain unique frequency information
+                indices 150 to 299 are redundant (mirrored)
+                the Nyquist frequency is at chunk_size//2, which represents the maximum frequency you can detect (50 Hz in your case, which is half the 100 Hz sampling rate)
+                everything beyond chunk_size//2 is redundant for real-valued signals
+                """
 
                 
-                num_largest = self.num_freqs
+                num_largest = self.num_freqs #7
                 indices = (-chunk_fft).argpartition(num_largest, axis=None)[:num_largest]
-                #gete the largest frequences (or the smallest negative ones)
+                #get the largest frequencies (or the smallest negative ones)
+                #argpartition returns the smallest numbers in the arr (which if negative, returns largest)
+                """it rearranges the indices so that the smallest k values are in the first k positions
+                the remaining indices go in positions k onward
+                it returns the entire rearranged array of indices"""
                 indices = sorted(indices, key=lambda x: chunk_fft[x], reverse=True)
                 #sorts indices by frequency size
 
@@ -65,7 +80,7 @@ class Model():
                 columns["resistance"].append(chunk["resistance"].values[0]) #?, why [0]?
                 columns["volts"].append(chunk["voltage"].values[0]) #??, why [0]?s
                 columns["current"].append(0 if chunk["current"].values[0] == "AC" else 1) #AC (?) or not, binary?
-                if training: # In reality, we won't know what the labels are
+                if training: # in reality, we won't know what the labels are
                     labels, label_counts = np.unique(chunk["labels"], return_counts=True) #probing labels
                     label = labels[np.argmax(label_counts)]
                     columns["label"].append(label)
@@ -89,9 +104,9 @@ class Model():
             test_probe = transformed_probe
             pred = self.model.predict(test_probe)
 
-            # We need to expand the prediction based on the sample rate
+            # we need to expand the prediction based on the sample rate
             pred = np.repeat(pred, self.chunk_seconds * self.sample_rate) #what does this do?!
-            # Expand until the end since probe is never exactly divisible by window size
+            # expand until the end since probe is never exactly divisible by window size
             pred = np.pad(pred, (0, len(raw_probe) - len(pred)), 'edge') #would this alter our prediction?!
             predictions.append(pred)
         return predictions
