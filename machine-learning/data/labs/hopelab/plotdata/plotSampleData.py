@@ -19,7 +19,7 @@ os.makedirs(output_dir, exist_ok=True)
 # PART 1: Load the data
 # ============================================================================
 print("Loading data...")
-data_path = "/Users/eliyoung/hmc-epg-project/machine-learning/data/labs/hopelab/epg/tarsalis_data_clean"
+data_path = "/data/labs/hopelab/epg/tarsalis_data_clean"
 filenames = glob.glob(os.path.expanduser(f"{data_path}/*.csv"))
 print(f"Found {len(filenames)} data files:")
 for fname in filenames:
