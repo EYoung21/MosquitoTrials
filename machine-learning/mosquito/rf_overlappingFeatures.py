@@ -20,12 +20,12 @@ class Model():
         #chunk hyperparameters
         self.chunk_seconds = 1 #trying out second window (with three seconds (1 left, 1 right) for input feature isolatopm)
          #the chunk size, number of seconds - size of the window you look at. 100hz*3 = 300hz
-        self.num_estimators = 128 #?
-        self.num_freqs = 7 #the number of largest frequencies in each window to extract as a feature
+        self.num_estimators = 64 # OPTIMIZED: was 128
+        self.num_freqs = 10 # OPTIMIZED: was 7
         self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate
         # self.windowMultiplier = 3
-        self.window_seconds = 3
+        self.window_seconds = 5 # OPTIMIZED: was 3
         self.window_size = self.window_seconds * self.sample_rate #multiplying chunk size by three here to incooperate overlapping features
 
         self.max_depth = 16 #where to stop splitting
@@ -58,9 +58,6 @@ class Model():
                 print(len(probe))
                 print(self.chunk_size)
             chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of a predefined number of seconds times 100 hz
-            
-
-            
 
             columns = defaultdict(list)
             for i, chunk in enumerate(chunks):
