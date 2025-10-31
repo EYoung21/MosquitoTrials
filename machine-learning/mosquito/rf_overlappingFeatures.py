@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from scipy.fft import fft, fftfreq
 from collections import defaultdict
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LinearRegression
 import pickle
 import optuna
 import warnings
@@ -24,7 +25,8 @@ class Model():
         self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate
         # self.windowMultiplier = 3
-        self.window_size = self.chunk_seconds * self.sample_rate * self.chunk_size * 3 #multiplying chunk size by three here to incooperate overlapping features
+        self.window_seconds = 3
+        self.window_size = self.window_seconds * self.sample_rate #multiplying chunk size by three here to incooperate overlapping features
 
         self.max_depth = 16 #where to stop splitting
         self.waveform_type = "post_rect" #better than pre
@@ -39,6 +41,11 @@ class Model():
             self.num_freqs = trial.suggest_int('num_freqs', 1, 10)
             self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128])
             self.max_depth = trial.suggest_categorical('max_depth', [8, 16, 32, 64, 128])
+            self.window_seconds = trial.suggest_int('window_seconds', 2, 5)
+            
+            # Recalculate derived values based on trial suggestions
+            self.chunk_size = self.chunk_seconds * self.sample_rate
+            self.window_size = self.window_seconds * self.sample_rate
 
     def transform_data(self, probes, training = True):
         transformed_probes = []
@@ -54,19 +61,22 @@ class Model():
             #DICTIONARY FROM EACH CHUNK TO IT'S STARTING INDEX (NUMBER CHUNK TIMES LENGTH OF CHUNKS)
             #THEN CALCULATE STARTING INDEX AND ENDING INDEX, AND EXTEND USING WINDOW
 
+            
 
             columns = defaultdict(list)
-            for chunk in chunks:
+            for i, chunk in enumerate(chunks):
                 extra_context_size = (self.window_size - self.chunk_size)//2
 
+                chunkStartIndex = i * self.chunk_size
+                window_start = max(0, chunkStartIndex - extra_context_size)
+                window_end = min(len(probe), chunkStartIndex + self.chunk_size + extra_context_size)
+                currWindow = probe[window_start:window_end]
 
-
-
-                chunk_fft = np.abs(fft(chunk[self.waveform_type].values))[1:self.chunk_size//2] 
+                chunk_fft = np.abs(fft(currWindow[self.waveform_type].values))[1:self.window_size//2]  #changed to calculate featur on currWinodw
                 #fourier transform, gets largest frequencies. gets postrec values for each chunk, takes its abs value.
                 #the first element (index 0) of the FFT represents the DC component (zero frequency) - essentially the mean/average value of the signal
                 #so we omit that with 1:
-                chunk_freqs = fftfreq(self.chunk_size, 1 / self.sample_rate)[1:self.chunk_size//2] #gets the size of freq for each chunk
+                chunk_freqs = fftfreq(self.window_size, 1 / self.sample_rate)[1:self.window_size//2] #gets the size of freq for each chunk
                 #skip index 0 (the DC component/zero frequency)
                 #take only the positive frequencies up to the Nyquist frequency 
                 #(half the chunk size) (skips part of fourier transform that is reversed, meaningless.)
@@ -94,13 +104,22 @@ class Model():
 
                 for i in range(num_largest):
                     columns[f"F{i}"].append(peak_freqs[i]) #7, or x, largest frequences in chunk
-                columns["mean"].append(np.mean(chunk[self.waveform_type])) #mean postrec
-                columns["std"].append(np.std(chunk[self.waveform_type]))#std of postrec
-                columns["resistance"].append(chunk["resistance"].values[0]) #?, why [0]?
-                columns["volts"].append(chunk["voltage"].values[0]) #??, why [0]?s
-                columns["current"].append(0 if chunk["current"].values[0] == "AC" else 1) #AC (?) or not, binary?
+                columns["mean"].append(np.mean(currWindow[self.waveform_type])) #mean postrec
+                columns["std"].append(np.std(currWindow[self.waveform_type]))#std of postrec
+                
+                # Fit linear regression to capture signal trend
+                window_signal = currWindow[self.waveform_type].values
+                time_steps = np.arange(len(window_signal)).reshape(-1, 1)  # Time as feature
+                lr = LinearRegression()
+                lr.fit(time_steps, window_signal)
+                columns["trend_coef"].append(lr.coef_[0])  # Slope of the trend
+                columns["trend_intercept"].append(lr.intercept_)  # Intercept of the trend
+                
+                columns["resistance"].append(currWindow["resistance"].values[0]) #?, why [0]?
+                columns["volts"].append(currWindow["voltage"].values[0]) #??, why [0]?s
+                columns["current"].append(0 if currWindow["current"].values[0] == "AC" else 1) #AC (?) or not, binary?
                 if training: # in reality, we won't know what the labels are
-                    labels, label_counts = np.unique(chunk["labels"], return_counts=True) #probing labels
+                    labels, label_counts = np.unique(currWindow["labels"], return_counts=True) #probing labels
                     label = labels[np.argmax(label_counts)]
                     columns["label"].append(label)
 
