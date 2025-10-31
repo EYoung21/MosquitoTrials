@@ -21,3 +21,9 @@
 2025-10-30 23:15:53.282590 20 {'augment_factor': 8, 'chunk_seconds': 2, 'num_freqs': 8, 'num_estimators': 128, 'max_depth': 64, 'window_seconds': 4} 0.42111019042292
 2025-10-30 23:17:19.063362 21 {'augment_factor': 8, 'chunk_seconds': 1, 'num_freqs': 10, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 5} 0.43397204434194125
 2025-10-30 23:19:44.749630 22 {'augment_factor': 8, 'chunk_seconds': 1, 'num_freqs': 10, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 5} 0.4359700754204266
+2025-10-30 23:22:10.476326 23 {'augment_factor': 2, 'chunk_seconds': 1, 'num_freqs': 9, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 5} 0.43806364208296616
+2025-10-30 23:24:36.654061 24 {'augment_factor': 2, 'chunk_seconds': 1, 'num_freqs': 9, 'num_estimators': 64, 'max_depth': 16, 'window_seconds': 5} 0.44418299387014276
+2025-10-30 23:26:59.975479 25 {'augment_factor': 2, 'chunk_seconds': 1, 'num_freqs': 9, 'num_estimators': 8, 'max_depth': 16, 'window_seconds': 5} 0.41668874266047307
+2025-10-30 23:29:09.393085 26 {'augment_factor': 2, 'chunk_seconds': 1, 'num_freqs': 7, 'num_estimators': 64, 'max_depth': 16, 'window_seconds': 5} 0.44138347113672816
+2025-10-30 23:31:29.478558 27 {'augment_factor': 2, 'chunk_seconds': 1, 'num_freqs': 7, 'num_estimators': 64, 'max_depth': 16, 'window_seconds': 5} 0.43350540074191374
+2025-10-30 23:33:49.067300 28 {'augment_factor': 2, 'chunk_seconds': 2, 'num_freqs': 5, 'num_estimators': 64, 'max_depth': 16, 'window_seconds': 4} 0.42994333190324735

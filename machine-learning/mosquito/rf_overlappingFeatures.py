@@ -58,8 +58,7 @@ class Model():
                 print(len(probe))
                 print(self.chunk_size)
             chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of a predefined number of seconds times 100 hz
-            #DICTIONARY FROM EACH CHUNK TO IT'S STARTING INDEX (NUMBER CHUNK TIMES LENGTH OF CHUNKS)
-            #THEN CALCULATE STARTING INDEX AND ENDING INDEX, AND EXTEND USING WINDOW
+            
 
             
 
