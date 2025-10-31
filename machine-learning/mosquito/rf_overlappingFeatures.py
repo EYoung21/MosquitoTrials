@@ -37,11 +37,11 @@ class Model():
         self.model_path = "../ML/rf_pickle"
         
         if trial: #?
-            self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 3)
-            self.num_freqs = trial.suggest_int('num_freqs', 1, 10)
-            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128])
-            self.max_depth = trial.suggest_categorical('max_depth', [8, 16, 32, 64, 128])
-            self.window_seconds = trial.suggest_int('window_seconds', 2, 5)
+            self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 10)
+            self.num_freqs = trial.suggest_int('num_freqs', 1, 20)
+            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256])
+            self.max_depth = trial.suggest_categorical('max_depth', [4, 8, 16, 32, 64, 128, 256])
+            self.window_seconds = trial.suggest_int('window_seconds', 2, 10)
             
             # Recalculate derived values based on trial suggestions
             self.chunk_size = self.chunk_seconds * self.sample_rate

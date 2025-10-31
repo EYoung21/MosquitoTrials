@@ -29,6 +29,6 @@ echo "Running job ID: $SLURM_JOB_ID"
 
 # Run your Python script with Optuna hyperparameter optimization
 uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/eliIntroLabsResults/tarsalis_results_overlapping --model_path rf_overlappingFeatures.py --model_name=rf_overlappingFeatures --optuna
+    --save_path /home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/eliIntroLabsResults/tarsalis_results_overlapping2 --model_path rf_overlappingFeatures.py --model_name=rf_overlappingFeatures2 --optuna
 
 echo "Job finished at: $(date)"
