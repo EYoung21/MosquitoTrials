@@ -54,9 +54,8 @@ class Model():
         for probe in probes:
             num_chunks = len(probe) // self.chunk_size
             if num_chunks == 0:
-                print("num_chunks is 0!")
-                print(len(probe))
-                print(self.chunk_size)
+                print(f"Skipping probe: too short (len={len(probe)}, chunk_size={self.chunk_size})")
+                continue  # Skip probes that are too short
             chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of a predefined number of seconds times 100 hz
 
             columns = defaultdict(list)
@@ -135,13 +134,25 @@ class Model():
         transformed_probes = self.transform_data(probes, training = False) #transformed_probes is just each probe (chunk?) with al the features attached
         predictions = []
         for transformed_probe, raw_probe in zip(transformed_probes, probes):
+            # Handle probes that were too short and skipped during transform_data
+            if len(transformed_probe) == 0:
+                # Return default prediction (label 0) for the entire probe
+                pred = np.zeros(len(raw_probe), dtype=int)
+                predictions.append(pred)
+                continue
+            
             test_probe = transformed_probe
             pred = self.model.predict(test_probe)
 
             # we need to expand the prediction based on the sample rate
             pred = np.repeat(pred, self.chunk_seconds * self.sample_rate) #what does this do?!
             # expand until the end since probe is never exactly divisible by window size
-            pred = np.pad(pred, (0, len(raw_probe) - len(pred)), 'edge') #would this alter our prediction?!
+            pad_length = len(raw_probe) - len(pred)
+            if pad_length > 0:
+                pred = np.pad(pred, (0, pad_length), 'edge') #would this alter our prediction?!
+            elif pad_length < 0:
+                # Truncate if predictions are somehow longer
+                pred = pred[:len(raw_probe)]
             predictions.append(pred)
         return predictions
 

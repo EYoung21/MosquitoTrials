@@ -23,7 +23,7 @@ class Model():
         self.learning_rate = 0.1  # Learning rate shrinks the contribution of each tree
         self.num_freqs = 7  # Number of largest frequencies in each window to extract as a feature
         self.sample_rate = 100
-        self.chunk_size = self.chunk_seconds * self.sample_rate
+        self.chunk_size = int(self.chunk_seconds * self.sample_rate)  # Convert to int for array indexing
         self.window_seconds = 3
         self.window_size = self.window_seconds * self.sample_rate
 
@@ -39,9 +39,9 @@ class Model():
         self.model_path = "../ML/boosting_pickle"
         
         if trial:
-            self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 3)
-            self.num_freqs = trial.suggest_int('num_freqs', 1, 10)
-            self.num_estimators = trial.suggest_categorical('num_estimators', [50, 100, 200, 300])
+            self.chunk_seconds = trial.suggest_float('chunk_seconds', 0.01, 2.0)
+            self.num_freqs = trial.suggest_int('num_freqs', 1, 20)
+            self.num_estimators = trial.suggest_int('num_estimators', 50, 500)
             self.learning_rate = trial.suggest_float('learning_rate', 0.01, 0.3, log=True)
             self.max_depth = trial.suggest_int('max_depth', 3, 8)
             self.min_samples_split = trial.suggest_int('min_samples_split', 2, 20)
@@ -50,7 +50,7 @@ class Model():
             self.window_seconds = trial.suggest_int('window_seconds', 2, 5)
             
             # Recalculate derived values based on trial suggestions
-            self.chunk_size = self.chunk_seconds * self.sample_rate
+            self.chunk_size = int(self.chunk_seconds * self.sample_rate)  # Convert to int for array indexing
             self.window_size = self.window_seconds * self.sample_rate
 
     def transform_data(self, probes, training = True):
@@ -160,7 +160,7 @@ class Model():
             pred = self.model.predict(test_probe)
 
             # we need to expand the prediction based on the sample rate
-            pred = np.repeat(pred, self.chunk_seconds * self.sample_rate) #what does this do?!
+            pred = np.repeat(pred, int(self.chunk_seconds * self.sample_rate)) #what does this do?!
             # expand until the end since probe is never exactly divisible by window size
             pred = np.pad(pred, (0, len(raw_probe) - len(pred)), 'edge') #would this alter our prediction?!
             predictions.append(pred)
