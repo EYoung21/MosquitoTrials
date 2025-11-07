@@ -1,47 +1,0 @@
-[I 2025-11-07 10:08:48,829] A new study created in memory with name: no-name-1890e7ce-b8ff-4380-ae89-c5ae9af13049
-  0%|          | 0/100 [00:00<?, ?it/s]                                         0%|          | 0/100 [02:26<?, ?it/s]Best trial: 0. Best value: 0.348096:   0%|          | 0/100 [02:26<?, ?it/s]Best trial: 0. Best value: 0.348096:   1%|          | 1/100 [02:26<4:02:32, 147.00s/it]                                                                                       Best trial: 0. Best value: 0.348096:   1%|          | 1/100 [09:50<4:02:32, 147.00s/it]                                                                                       Best trial: 0. Best value: 0.348096:   1%|          | 1/100 [09:50<4:02:32, 147.00s/it]Best trial: 0. Best value: 0.348096:   1%|          | 1/100 [09:50<16:13:45, 590.16s/it]
-Traceback (most recent call last):
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 442, in <module>
-    main()
-    ~~~~^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 333, in main
-    study.optimize(lambda x : optuna_objective(data, args, x, **kwargs), n_trials = 100, show_progress_bar=True, )
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/study.py", line 490, in optimize
-    _optimize(
-    ~~~~~~~~~^
-        study=self,
-        ^^^^^^^^^^^
-    ...<7 lines>...
-        show_progress_bar=show_progress_bar,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 63, in _optimize
-    _optimize_sequential(
-    ~~~~~~~~~~~~~~~~~~~~^
-        study,
-        ^^^^^^
-    ...<8 lines>...
-        progress_bar=progress_bar,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 160, in _optimize_sequential
-    frozen_trial_id = _run_trial(study, func, catch)
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 258, in _run_trial
-    raise func_err
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
-    value_or_values = func(trial)
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 333, in <lambda>
-    study.optimize(lambda x : optuna_objective(data, args, x, **kwargs), n_trials = 100, show_progress_bar=True, )
-                              ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 246, in optuna_objective
-    model.train(train_data, test_data, fold)
-    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/boosting.py", line 137, in train
-    transformed_probes = self.transform_data(probes)
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/boosting.py", line 72, in transform_data
-    columns = defaultdict(list)
-              ^^^^^^^^^^^
-NameError: name 'defaultdict' is not defined
