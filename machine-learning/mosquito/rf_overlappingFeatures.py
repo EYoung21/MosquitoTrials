@@ -21,7 +21,7 @@ class Model():
         self.chunk_seconds = 1 #trying out second window (with three seconds (1 left, 1 right) for input feature isolatopm)
          #the chunk size, number of seconds - size of the window you look at. 100hz*3 = 300hz
         self.num_estimators = 64 # OPTIMIZED: was 128
-        self.num_freqs = 10 # OPTIMIZED: was 7
+        self.num_freqs = 17 # OPTIMIZED: was 7
         self.sample_rate = 100 #?
         self.chunk_size = self.chunk_seconds * self.sample_rate
         # self.windowMultiplier = 3

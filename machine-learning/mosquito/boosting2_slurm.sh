@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:l40s:4              # Request 4 L40S GPUs (newer, well-supported)
 #SBATCH --cpus-per-task=64             # Request 64 CPU cores (max for L40S nodes)
 #SBATCH --mem=480G                     # Request 480GB memory (safe margin below 505GB max)
-#SBATCH --time=7-00:00:00              # Max runtime: 7 days
+#SBATCH --time=2-00:00:00              # Max runtime: 2 days (reduced from 7)
 #SBATCH --nodes=1                      # Single node
 
 if ! command -v uv >/dev/null 2>&1; then
