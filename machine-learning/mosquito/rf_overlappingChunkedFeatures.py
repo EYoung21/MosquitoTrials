@@ -17,33 +17,31 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model():
     def __init__(self, save_path = None, trial = None):
-        #chunk hyperparameters
-        self.chunk_seconds = 1 #trying out second window (with three seconds (1 left, 1 right) for input feature isolatopm)
-         #the chunk size, number of seconds - size of the window you look at. 100hz*3 = 300hz
-        self.num_estimators = 64 # OPTIMIZED: was 128
-        self.num_freqs = 17 # OPTIMIZED: was 7
-        self.sample_rate = 100 #?
+        #chunk hyperparameters - OPTIMIZED FROM BEST TRIAL (Trial 46: F1=0.4904)
+        self.chunk_seconds = 1
+        self.num_estimators = 128  # OPTIMIZED: best trial value
+        self.num_freqs = 7  # OPTIMIZED: best trial value
+        self.sample_rate = 100
         self.chunk_size = self.chunk_seconds * self.sample_rate
-        # self.windowMultiplier = 3
-        self.window_seconds = 5 # OPTIMIZED: was 3
-        self.window_size = self.window_seconds * self.sample_rate #multiplying chunk size by three here to incooperate overlapping features
+        self.window_seconds = 8  # OPTIMIZED: best trial value
+        self.window_size = self.window_seconds * self.sample_rate
 
-        self.max_depth = 16 #where to stop splitting
-        self.waveform_type = "post_rect" #better than pre
+        self.max_depth = 16  # OPTIMIZED: best trial value
+        self.waveform_type = "post_rect"
         self.random_state = 42
         dirname = os.path.dirname(__file__)
         self.model = None
         self.save_path = save_path
         self.model_path = "../ML/rf_pickle"
 
-        self.num_subwindows = 10 #NEW FEATURE!
-        self.subwindow_freq = 10
+        self.num_subwindows = 4  # OPTIMIZED: best trial value
+        self.subwindow_freq = 8  # OPTIMIZED: best trial value
         self.subwindow_size = int(self.window_size / self.num_subwindows)
         #the size of each subwindow with in each overarching window
         
-        # Boolean flags for optional slope features
-        self.use_window_slope = True
-        self.use_subwindow_slope = True
+        # Boolean flags for optional slope features - OPTIMIZED: best trial values
+        self.use_window_slope = False  # OPTIMIZED: best trial value
+        self.use_subwindow_slope = True  # OPTIMIZED: best trial value
         
         if trial: #?
             self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 10)
