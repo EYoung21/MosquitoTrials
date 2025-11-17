@@ -1,0 +1,227 @@
+uv version: uv 0.9.5
+Running on host: gpu04.cluster
+Job started at: Fri Nov 14 01:00:43 EST 2025
+Running job ID: 508260
+Loading Data...
+[0.46855603 0.38414244 0.7501955  0.85394481 0.05503029 0.        ]
+[I 2025-11-14 01:08:21,120] Trial 0 finished with value: 0.41864484422489334 and parameters: {'augment_factor': 8, 'chunk_seconds': 3, 'num_freqs': 5, 'num_estimators': 16, 'max_depth': 8, 'window_seconds': 5, 'num_subwindows': 14, 'subwindow_freq': 3, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+[0.45464507 0.0765349  0.77043443 0.8432081  0.00440101 0.        ]
+[I 2025-11-14 01:10:02,962] Trial 1 finished with value: 0.3582039195777071 and parameters: {'augment_factor': 2, 'chunk_seconds': 6, 'num_freqs': 7, 'num_estimators': 32, 'max_depth': 256, 'window_seconds': 2, 'num_subwindows': 5, 'subwindow_freq': 3, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+[0.4759311  0.28009207 0.7724152  0.84693291 0.04941917 0.        ]
+[I 2025-11-14 01:13:30,282] Trial 2 finished with value: 0.4041317396171981 and parameters: {'augment_factor': 8, 'chunk_seconds': 4, 'num_freqs': 6, 'num_estimators': 16, 'max_depth': 16, 'window_seconds': 5, 'num_subwindows': 8, 'subwindow_freq': 7, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+[0.43076264 0.10584228 0.76348608 0.84033929 0.02523047 0.        ]
+[I 2025-11-14 01:15:52,188] Trial 3 finished with value: 0.36094345924319354 and parameters: {'augment_factor': 1, 'chunk_seconds': 6, 'num_freqs': 6, 'num_estimators': 8, 'max_depth': 64, 'window_seconds': 4, 'num_subwindows': 8, 'subwindow_freq': 12, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+[0.2058782  0.         0.78173302 0.84235312 0.01378954 0.        ]
+[I 2025-11-14 01:16:52,732] Trial 4 finished with value: 0.3072923128835087 and parameters: {'augment_factor': 8, 'chunk_seconds': 10, 'num_freqs': 1, 'num_estimators': 256, 'max_depth': 64, 'window_seconds': 3, 'num_subwindows': 8, 'subwindow_freq': 18, 'use_window_slope': False, 'use_subwindow_slope': False}. Best is trial 0 with value: 0.41864484422489334.
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+[0.37540785 0.09439821 0.7032932  0.80147549 0.05648018 0.        ]
+[I 2025-11-14 01:18:31,121] Trial 5 finished with value: 0.33850915368152684 and parameters: {'augment_factor': 8, 'chunk_seconds': 9, 'num_freqs': 12, 'num_estimators': 8, 'max_depth': 8, 'window_seconds': 3, 'num_subwindows': 8, 'subwindow_freq': 2, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+[0.24357893 0.34125334 0.69071554 0.85388668 0.33486152 0.        ]
+[I 2025-11-14 01:20:39,062] Trial 6 finished with value: 0.410716002204732 and parameters: {'augment_factor': 2, 'chunk_seconds': 7, 'num_freqs': 6, 'num_estimators': 32, 'max_depth': 4, 'window_seconds': 10, 'num_subwindows': 8, 'subwindow_freq': 15, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+[0.53233655 0.21669951 0.78627068 0.87031969 0.02153683 0.        ]
+[I 2025-11-14 01:21:59,134] Trial 7 finished with value: 0.4045272092375081 and parameters: {'augment_factor': 8, 'chunk_seconds': 6, 'num_freqs': 17, 'num_estimators': 16, 'max_depth': 128, 'window_seconds': 9, 'num_subwindows': 3, 'subwindow_freq': 20, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 0 with value: 0.41864484422489334.
+[0.45425244 0.1143307  0.79228875 0.87229014 0.00990875 0.        ]
+[I 2025-11-14 01:23:00,878] Trial 8 finished with value: 0.37384512914852414 and parameters: {'augment_factor': 2, 'chunk_seconds': 8, 'num_freqs': 10, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 4, 'num_subwindows': 5, 'subwindow_freq': 12, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 0 with value: 0.41864484422489334.
+[0.5567281  0.47280465 0.791213   0.85901246 0.00788685 0.        ]
+[I 2025-11-14 01:36:18,642] Trial 9 finished with value: 0.4479408435701184 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 19, 'num_estimators': 32, 'max_depth': 64, 'window_seconds': 8, 'num_subwindows': 18, 'subwindow_freq': 5, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 9 with value: 0.4479408435701184.
+[0.52688665 0.50339018 0.78456258 0.8486914  0.0072159  0.        ]
+[I 2025-11-14 01:48:30,796] Trial 10 finished with value: 0.44512445158549974 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 20, 'num_estimators': 32, 'max_depth': 64, 'window_seconds': 8, 'num_subwindows': 20, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 9 with value: 0.4479408435701184.
+[0.5109455  0.4991187  0.78954566 0.85432439 0.00724571 0.        ]
+[I 2025-11-14 02:01:07,894] Trial 11 finished with value: 0.4435299934873617 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 20, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 8, 'num_subwindows': 20, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 9 with value: 0.4479408435701184.
+[0.51061533 0.51430908 0.78976349 0.85512809 0.00544169 0.        ]
+[I 2025-11-14 02:13:17,009] Trial 12 finished with value: 0.4458762779137074 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 17, 'num_estimators': 32, 'max_depth': 64, 'window_seconds': 7, 'num_subwindows': 20, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 9 with value: 0.4479408435701184.
+[0.59061915 0.35302649 0.79007615 0.87039291 0.01853537 0.        ]
+[I 2025-11-14 02:16:58,991] Trial 13 finished with value: 0.43710834333883053 and parameters: {'augment_factor': 4, 'chunk_seconds': 3, 'num_freqs': 15, 'num_estimators': 32, 'max_depth': 64, 'window_seconds': 7, 'num_subwindows': 16, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 9 with value: 0.4479408435701184.
+[0.50891687 0.45038808 0.80035346 0.86727059 0.00802398 0.        ]
+[I 2025-11-14 02:22:17,662] Trial 14 finished with value: 0.4391588310061767 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 16, 'num_estimators': 32, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 16, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 9 with value: 0.4479408435701184.
+[0.26959385 0.19571501 0.66351356 0.87253154 0.36005491 0.        ]
+[I 2025-11-14 02:25:15,220] Trial 15 finished with value: 0.39356814436097726 and parameters: {'augment_factor': 4, 'chunk_seconds': 4, 'num_freqs': 13, 'num_estimators': 128, 'max_depth': 4, 'window_seconds': 6, 'num_subwindows': 17, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 9 with value: 0.4479408435701184.
+[0.57636754 0.49202023 0.74818707 0.84500901 0.06190874 0.        ]
+[I 2025-11-14 02:46:27,527] Trial 16 finished with value: 0.45391542970074555 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 18, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 12, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.63150553 0.20191754 0.77414364 0.87192582 0.05829256 0.        ]
+[I 2025-11-14 02:52:15,691] Trial 17 finished with value: 0.42296418077247916 and parameters: {'augment_factor': 1, 'chunk_seconds': 4, 'num_freqs': 19, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 13, 'subwindow_freq': 2, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.54850253 0.49077243 0.75537876 0.84754567 0.06755255 0.        ]
+[I 2025-11-14 03:02:52,455] Trial 18 finished with value: 0.4516253254422084 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 14, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 12, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.55124565 0.48415648 0.75546618 0.84451628 0.06356851 0.        ]
+[I 2025-11-14 03:12:50,190] Trial 19 finished with value: 0.4498255147918511 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 10, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 11, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.57562496 0.3066943  0.77148065 0.86069117 0.06085842 0.        ]
+[I 2025-11-14 03:19:33,869] Trial 20 finished with value: 0.4292249182156647 and parameters: {'augment_factor': 1, 'chunk_seconds': 3, 'num_freqs': 14, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 11, 'subwindow_freq': 4, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.54093479 0.50580498 0.75799375 0.84425094 0.0639458  0.        ]
+[I 2025-11-14 03:30:09,993] Trial 21 finished with value: 0.45215504310202154 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 10, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 12, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.53095691 0.50313312 0.75976302 0.85059211 0.06249934 0.        ]
+[I 2025-11-14 03:41:35,730] Trial 22 finished with value: 0.45115741776420437 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 12, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 13, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 16 with value: 0.45391542970074555.
+[0.65614619 0.38435556 0.77585761 0.86192244 0.06232048 0.        ]
+[I 2025-11-14 03:45:23,682] Trial 23 finished with value: 0.45676704723894956 and parameters: {'augment_factor': 1, 'chunk_seconds': 5, 'num_freqs': 9, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 10, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 23 with value: 0.45676704723894956.
+[0.64569913 0.23530858 0.78803321 0.87902192 0.06165018 0.        ]
+[I 2025-11-14 03:49:15,426] Trial 24 finished with value: 0.43495217091404353 and parameters: {'augment_factor': 1, 'chunk_seconds': 5, 'num_freqs': 8, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 10, 'subwindow_freq': 5, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 23 with value: 0.45676704723894956.
+[0.63755613 0.39937128 0.78983101 0.85800425 0.00953971 0.        ]
+[I 2025-11-14 03:52:41,458] Trial 25 finished with value: 0.44905039586722945 and parameters: {'augment_factor': 1, 'chunk_seconds': 5, 'num_freqs': 3, 'num_estimators': 64, 'max_depth': 128, 'window_seconds': 8, 'num_subwindows': 10, 'subwindow_freq': 3, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 23 with value: 0.45676704723894956.
+[0.58862288 0.24382344 0.80167148 0.88254919 0.01829595 0.        ]
+[I 2025-11-14 03:56:18,934] Trial 26 finished with value: 0.4224938226475423 and parameters: {'augment_factor': 1, 'chunk_seconds': 7, 'num_freqs': 9, 'num_estimators': 256, 'max_depth': 256, 'window_seconds': 9, 'num_subwindows': 14, 'subwindow_freq': 4, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 23 with value: 0.45676704723894956.
+[0.52807669 0.50606925 0.75569831 0.84338088 0.04998816 0.        ]
+[I 2025-11-14 04:21:44,333] Trial 27 finished with value: 0.4472022138785617 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 11, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 15, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 23 with value: 0.45676704723894956.
+[0.63750338 0.41765276 0.77344865 0.86771195 0.0594459  0.        ]
+[I 2025-11-14 04:25:30,628] Trial 28 finished with value: 0.45929377235108015 and parameters: {'augment_factor': 1, 'chunk_seconds': 3, 'num_freqs': 8, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 6, 'num_subwindows': 5, 'subwindow_freq': 9, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 28 with value: 0.45929377235108015.
+[0.53628259 0.35069402 0.74405316 0.85954406 0.06906146 0.        ]
+[I 2025-11-14 04:27:36,418] Trial 29 finished with value: 0.4266058831830403 and parameters: {'augment_factor': 2, 'chunk_seconds': 3, 'num_freqs': 8, 'num_estimators': 256, 'max_depth': 8, 'window_seconds': 6, 'num_subwindows': 2, 'subwindow_freq': 13, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 28 with value: 0.45929377235108015.
+[0.60300812 0.36987236 0.76892947 0.85929484 0.05660759 0.        ]
+[I 2025-11-14 04:30:07,985] Trial 30 finished with value: 0.44295206340295934 and parameters: {'augment_factor': 1, 'chunk_seconds': 4, 'num_freqs': 4, 'num_estimators': 64, 'max_depth': 16, 'window_seconds': 6, 'num_subwindows': 5, 'subwindow_freq': 9, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 28 with value: 0.45929377235108015.
+[0.61620812 0.48010049 0.78465604 0.87769855 0.06700927 0.        ]
+[I 2025-11-14 04:34:35,969] Trial 31 finished with value: 0.47094541240806437 and parameters: {'augment_factor': 1, 'chunk_seconds': 3, 'num_freqs': 8, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 7, 'num_subwindows': 6, 'subwindow_freq': 15, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.50610026 0.29800744 0.78136856 0.87792014 0.03948209 0.        ]
+[I 2025-11-14 04:37:21,870] Trial 32 finished with value: 0.4171464168867624 and parameters: {'augment_factor': 1, 'chunk_seconds': 5, 'num_freqs': 8, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 5, 'num_subwindows': 6, 'subwindow_freq': 16, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.52765002 0.34023064 0.78512945 0.85619037 0.00978185 0.        ]
+[I 2025-11-14 04:40:58,990] Trial 33 finished with value: 0.4198303879730832 and parameters: {'augment_factor': 1, 'chunk_seconds': 3, 'num_freqs': 7, 'num_estimators': 16, 'max_depth': 256, 'window_seconds': 5, 'num_subwindows': 6, 'subwindow_freq': 15, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.59548047 0.34002133 0.75224041 0.84633206 0.06543281 0.        ]
+[I 2025-11-14 04:43:16,842] Trial 34 finished with value: 0.43325118060685397 and parameters: {'augment_factor': 1, 'chunk_seconds': 3, 'num_freqs': 9, 'num_estimators': 8, 'max_depth': 16, 'window_seconds': 7, 'num_subwindows': 3, 'subwindow_freq': 17, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.5719049  0.28182103 0.78322883 0.8759794  0.03943789 0.        ]
+[I 2025-11-14 04:47:50,952] Trial 35 finished with value: 0.4253953424545223 and parameters: {'augment_factor': 2, 'chunk_seconds': 4, 'num_freqs': 4, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 6, 'num_subwindows': 9, 'subwindow_freq': 20, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.53076969 0.34437304 0.76017546 0.86261582 0.06055073 0.        ]
+[I 2025-11-14 04:50:14,350] Trial 36 finished with value: 0.4264141223237116 and parameters: {'augment_factor': 8, 'chunk_seconds': 5, 'num_freqs': 5, 'num_estimators': 128, 'max_depth': 8, 'window_seconds': 4, 'num_subwindows': 6, 'subwindow_freq': 13, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.29813333 0.17399072 0.61105186 0.8314253  0.27660681 0.        ]
+[I 2025-11-14 04:51:03,456] Trial 37 finished with value: 0.36520133835921054 and parameters: {'augment_factor': 1, 'chunk_seconds': 7, 'num_freqs': 7, 'num_estimators': 256, 'max_depth': 4, 'window_seconds': 8, 'num_subwindows': 1, 'subwindow_freq': 18, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.49035868 0.38692034 0.76007217 0.8239767  0.02423072 0.        ]
+[I 2025-11-14 04:55:07,154] Trial 38 finished with value: 0.41425976913032736 and parameters: {'augment_factor': 8, 'chunk_seconds': 3, 'num_freqs': 2, 'num_estimators': 8, 'max_depth': 128, 'window_seconds': 7, 'num_subwindows': 7, 'subwindow_freq': 14, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.5495135  0.19689737 0.77184878 0.85318427 0.03106741 0.        ]
+[I 2025-11-14 04:57:11,961] Trial 39 finished with value: 0.4004185542034968 and parameters: {'augment_factor': 1, 'chunk_seconds': 4, 'num_freqs': 11, 'num_estimators': 16, 'max_depth': 32, 'window_seconds': 5, 'num_subwindows': 4, 'subwindow_freq': 11, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.52006298 0.31702066 0.78562205 0.8794706  0.04052367 0.        ]
+[I 2025-11-14 05:00:13,547] Trial 40 finished with value: 0.42378332583358497 and parameters: {'augment_factor': 2, 'chunk_seconds': 6, 'num_freqs': 5, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 6, 'num_subwindows': 9, 'subwindow_freq': 9, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.54833698 0.47498454 0.76999534 0.85025009 0.0544046  0.        ]
+[I 2025-11-14 05:10:53,024] Trial 41 finished with value: 0.4496619251253555 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 9, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 12, 'subwindow_freq': 3, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.55955806 0.49445938 0.76341386 0.84297826 0.06205257 0.        ]
+[I 2025-11-14 05:27:41,527] Trial 42 finished with value: 0.45374368800860615 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 12, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 9, 'subwindow_freq': 2, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.67070266 0.48857685 0.74577335 0.84118028 0.06835354 0.        ]
+[I 2025-11-14 05:41:38,493] Trial 43 finished with value: 0.4690977812409038 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 12, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 7, 'subwindow_freq': 2, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 31 with value: 0.47094541240806437.
+[0.66092634 0.50003284 0.75874581 0.8526216  0.06168111 0.        ]
+[I 2025-11-14 05:55:52,100] Trial 44 finished with value: 0.4723346164515134 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 6, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 7, 'subwindow_freq': 6, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 44 with value: 0.4723346164515134.
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+Skipping probe: too short (len=824, chunk_size=900)
+[0.46136014 0.04606517 0.77142897 0.83318743 0.03852138 0.        ]
+[I 2025-11-14 05:57:37,769] Trial 45 finished with value: 0.3584271821962178 and parameters: {'augment_factor': 8, 'chunk_seconds': 9, 'num_freqs': 6, 'num_estimators': 256, 'max_depth': 256, 'window_seconds': 3, 'num_subwindows': 7, 'subwindow_freq': 6, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 44 with value: 0.4723346164515134.
+[0.6835867  0.58933203 0.75262147 0.84797775 0.06897462 0.        ]
+[I 2025-11-14 06:06:05,867] Trial 46 finished with value: 0.49041542819092054 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 7, 'num_estimators': 128, 'max_depth': 16, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 8, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.27153948 0.25020364 0.65186971 0.84830119 0.34998575 0.        ]
+[I 2025-11-14 06:11:13,821] Trial 47 finished with value: 0.3953166279113469 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 7, 'num_estimators': 128, 'max_depth': 4, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 46 with value: 0.49041542819092054.
+[0.60546633 0.57385858 0.7764344  0.84586143 0.02923198 0.        ]
+[I 2025-11-14 06:19:48,651] Trial 48 finished with value: 0.47180878684461774 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 6, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 4, 'subwindow_freq': 8, 'use_window_slope': False, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.65458125 0.53374173 0.77242383 0.84415881 0.03856036 0.        ]
+[I 2025-11-14 06:27:55,929] Trial 49 finished with value: 0.47391099773670414 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 6, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 3, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.62905675 0.35237794 0.7464413  0.81438173 0.0066555  0.        ]
+[I 2025-11-14 06:31:50,175] Trial 50 finished with value: 0.42481886960717263 and parameters: {'augment_factor': 2, 'chunk_seconds': 1, 'num_freqs': 6, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 1, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 46 with value: 0.49041542819092054.
+[0.65775316 0.52552121 0.76746845 0.83744726 0.03821645 0.        ]
+[I 2025-11-14 06:39:56,739] Trial 51 finished with value: 0.471067753457578 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 4, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 3, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.66180252 0.53372773 0.76838173 0.837644   0.03590241 0.        ]
+[I 2025-11-14 06:48:03,725] Trial 52 finished with value: 0.4729097318909827 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 4, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 3, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.71061257 0.50345372 0.76850253 0.84032613 0.03603103 0.        ]
+[I 2025-11-14 06:56:16,223] Trial 53 finished with value: 0.47648766307969476 and parameters: {'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 3, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.66455373 0.49357658 0.75977025 0.83067364 0.01644826 0.        ]
+[I 2025-11-14 06:59:38,493] Trial 54 finished with value: 0.4608370756865026 and parameters: {'augment_factor': 1, 'chunk_seconds': 2, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 2, 'subwindow_freq': 6, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.73146964 0.48836814 0.78590525 0.85846569 0.02507539 0.        ]
+[I 2025-11-14 07:04:32,856] Trial 55 finished with value: 0.4815473513169006 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.66701503 0.51170976 0.7611077  0.83199647 0.0204524  0.        ]
+[I 2025-11-14 07:07:54,855] Trial 56 finished with value: 0.4653802264589235 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 2, 'subwindow_freq': 6, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.6994686  0.4964933  0.78772643 0.86304145 0.03024524 0.        ]
+[I 2025-11-14 07:12:53,376] Trial 57 finished with value: 0.47949583757511643 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 11, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.69522122 0.4217095  0.80134604 0.87482123 0.02463828 0.        ]
+[I 2025-11-14 07:15:56,520] Trial 58 finished with value: 0.46962271292247154 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 11, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 46 with value: 0.49041542819092054.
+[0.6924225  0.4314233  0.79089518 0.86285834 0.03473366 0.        ]
+[I 2025-11-14 07:20:09,787] Trial 59 finished with value: 0.4687221651008286 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 3, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.68806433 0.5254349  0.77074863 0.84091276 0.02504396 0.        ]
+[I 2025-11-14 07:31:06,879] Trial 60 finished with value: 0.4750340972671599 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.70582001 0.52087994 0.76871913 0.83708872 0.02382329 0.        ]
+[I 2025-11-14 07:42:04,882] Trial 61 finished with value: 0.4760551818862868 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.67729067 0.52589051 0.77135244 0.83912418 0.02433369 0.        ]
+[I 2025-11-14 07:53:01,543] Trial 62 finished with value: 0.47299858194809247 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.67215228 0.49613661 0.77150648 0.84787412 0.03140185 0.        ]
+[I 2025-11-14 07:56:27,847] Trial 63 finished with value: 0.46984522385297134 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 2, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.7420127  0.49547976 0.77077531 0.84071991 0.03405481 0.        ]
+[I 2025-11-14 08:06:08,031] Trial 64 finished with value: 0.4805070811186858 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.71188201 0.43843297 0.78138098 0.84911062 0.0203343  0.        ]
+[I 2025-11-14 08:11:46,276] Trial 65 finished with value: 0.4668568135905847 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 5, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.72406008 0.49804727 0.76590249 0.8348013  0.03454156 0.        ]
+[I 2025-11-14 08:21:19,100] Trial 66 finished with value: 0.47622544923188254 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.71328756 0.50423813 0.77564705 0.85080632 0.03587242 0.        ]
+[I 2025-11-14 08:26:12,540] Trial 67 finished with value: 0.4799752485129589 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.71240102 0.4559821  0.77845443 0.85070458 0.03468967 0.        ]
+[I 2025-11-14 08:29:10,171] Trial 68 finished with value: 0.47203863410501995 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 4, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 46 with value: 0.49041542819092054.
+[0.60538579 0.3063645  0.70329905 0.75674773 0.00791263 0.        ]
+[I 2025-11-14 08:31:46,501] Trial 69 finished with value: 0.39661828218191214 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 1, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.69070699 0.47313776 0.78523169 0.85746928 0.03333914 0.        ]
+[I 2025-11-14 08:36:28,281] Trial 70 finished with value: 0.47331414426051205 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 12, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.6899374  0.47175274 0.76304883 0.83840463 0.04370068 0.        ]
+[I 2025-11-14 08:43:09,634] Trial 71 finished with value: 0.4678073816029145 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 2, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.68826844 0.41743183 0.75713657 0.82578326 0.02768911 0.        ]
+[I 2025-11-14 08:51:17,086] Trial 72 finished with value: 0.45271820267587937 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 3, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.6280012  0.54860566 0.77663187 0.84174464 0.01803036 0.        ]
+[I 2025-11-14 09:03:48,042] Trial 73 finished with value: 0.4688356230500852 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 128, 'window_seconds': 8, 'num_subwindows': 6, 'subwindow_freq': 6, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.58391681 0.52042949 0.7512045  0.85592938 0.06848356 0.        ]
+[I 2025-11-14 09:08:16,165] Trial 74 finished with value: 0.4633272898344812 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 32, 'max_depth': 8, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 11, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+Skipping probe: too short (len=824, chunk_size=1000)
+[0.54107738 0.12293053 0.78654152 0.84510653 0.00673149 0.        ]
+[I 2025-11-14 09:09:37,236] Trial 75 finished with value: 0.38373124092116884 and parameters: {'augment_factor': 4, 'chunk_seconds': 10, 'num_freqs': 4, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.55894591 0.43482132 0.75824909 0.81508488 0.04114195 0.        ]
+[I 2025-11-14 09:16:49,213] Trial 76 finished with value: 0.4347071884947869 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 1, 'num_estimators': 8, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 3, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.52029615 0.37979356 0.7792749  0.84324685 0.00702903 0.        ]
+[I 2025-11-14 09:31:09,664] Trial 77 finished with value: 0.42160674791278213 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 2, 'num_estimators': 16, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 19, 'subwindow_freq': 4, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.67901676 0.28749205 0.79041851 0.87198838 0.04287987 0.        ]
+[I 2025-11-14 09:35:36,429] Trial 78 finished with value: 0.44529926097552947 and parameters: {'augment_factor': 4, 'chunk_seconds': 3, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 10, 'num_subwindows': 6, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.25586147 0.09064202 0.65017076 0.8363608  0.32061545 0.        ]
+[I 2025-11-14 09:36:54,083] Trial 79 finished with value: 0.35894175092795017 and parameters: {'augment_factor': 4, 'chunk_seconds': 8, 'num_freqs': 5, 'num_estimators': 128, 'max_depth': 4, 'window_seconds': 2, 'num_subwindows': 4, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.68724425 0.46305893 0.75048874 0.82028987 0.01043851 0.        ]
+[I 2025-11-14 09:43:36,421] Trial 80 finished with value: 0.4552533851125998 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 5, 'num_estimators': 128, 'max_depth': 256, 'window_seconds': 9, 'num_subwindows': 2, 'subwindow_freq': 6, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.73823619 0.50836369 0.77324652 0.84045708 0.02438205 0.        ]
+[I 2025-11-14 09:54:34,909] Trial 81 finished with value: 0.48078092130798006 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.69202459 0.49925048 0.7662735  0.83624563 0.02469529 0.        ]
+[I 2025-11-14 10:05:32,997] Trial 82 finished with value: 0.4697482463614114 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.72491224 0.42866459 0.77543899 0.84410399 0.02878695 0.        ]
+[I 2025-11-14 10:16:44,345] Trial 83 finished with value: 0.4669844613441175 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 5, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.6937389  0.48496678 0.78613093 0.86041973 0.02603332 0.        ]
+[I 2025-11-14 10:21:40,083] Trial 84 finished with value: 0.47521494313439144 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.68770088 0.5283884  0.75938295 0.82706102 0.02393678 0.        ]
+[I 2025-11-14 10:29:11,626] Trial 85 finished with value: 0.4710783400759834 and parameters: {'augment_factor': 8, 'chunk_seconds': 1, 'num_freqs': 4, 'num_estimators': 64, 'max_depth': 128, 'window_seconds': 7, 'num_subwindows': 3, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.58742708 0.51510067 0.75801396 0.86286267 0.06766908 0.        ]
+[I 2025-11-14 10:33:20,939] Trial 86 finished with value: 0.4651789096878607 and parameters: {'augment_factor': 4, 'chunk_seconds': 3, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 8, 'window_seconds': 8, 'num_subwindows': 6, 'subwindow_freq': 7, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.70570473 0.39669987 0.7859458  0.85382729 0.01979285 0.        ]
+[I 2025-11-14 10:41:23,103] Trial 87 finished with value: 0.4603284222453219 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 8, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': False}. Best is trial 46 with value: 0.49041542819092054.
+[0.66743698 0.4700703  0.77061024 0.83820747 0.02081318 0.        ]
+[I 2025-11-14 10:46:33,052] Trial 88 finished with value: 0.4611896967352609 and parameters: {'augment_factor': 2, 'chunk_seconds': 2, 'num_freqs': 2, 'num_estimators': 32, 'max_depth': 64, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 4, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.55091642 0.40415752 0.75347125 0.80896588 0.02626054 0.        ]
+[I 2025-11-14 10:55:02,332] Trial 89 finished with value: 0.4239619341065353 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 4, 'num_estimators': 8, 'max_depth': 32, 'window_seconds': 9, 'num_subwindows': 4, 'subwindow_freq': 6, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.61295276 0.32211034 0.76533197 0.84204459 0.00891805 0.        ]
+[I 2025-11-14 10:57:39,129] Trial 90 finished with value: 0.4252262857757807 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 5, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 1, 'subwindow_freq': 12, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.71790225 0.48569544 0.78895371 0.86414705 0.02692656 0.        ]
+[I 2025-11-14 11:02:34,337] Trial 91 finished with value: 0.48060416743259293 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.70703742 0.43116511 0.78198869 0.85295338 0.03281728 0.        ]
+[I 2025-11-14 11:06:47,979] Trial 92 finished with value: 0.46766031337433717 and parameters: {'augment_factor': 4, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 3, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.65036528 0.40286951 0.79283896 0.86138419 0.01879043 0.        ]
+[I 2025-11-14 11:11:07,210] Trial 93 finished with value: 0.4543747288540849 and parameters: {'augment_factor': 4, 'chunk_seconds': 3, 'num_freqs': 1, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 6, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.61897387 0.52885805 0.7641665  0.82839587 0.03125779 0.        ]
+[I 2025-11-14 11:19:38,520] Trial 94 finished with value: 0.46194201367792104 and parameters: {'augment_factor': 4, 'chunk_seconds': 1, 'num_freqs': 2, 'num_estimators': 16, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 8, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.68709985 0.58011888 0.7615512  0.83448449 0.03682645 0.        ]
+[I 2025-11-14 11:26:12,720] Trial 95 finished with value: 0.48334680960231435 and parameters: {'augment_factor': 8, 'chunk_seconds': 1, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 2, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.66338616 0.54576998 0.77771483 0.85231283 0.02938423 0.        ]
+[I 2025-11-14 11:29:37,888] Trial 96 finished with value: 0.4780946722788569 and parameters: {'augment_factor': 8, 'chunk_seconds': 2, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 2, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.67711566 0.53100119 0.77952313 0.85374601 0.01394464 0.        ]
+[I 2025-11-14 11:33:02,896] Trial 97 finished with value: 0.4758884380192278 and parameters: {'augment_factor': 8, 'chunk_seconds': 2, 'num_freqs': 4, 'num_estimators': 128, 'max_depth': 256, 'window_seconds': 7, 'num_subwindows': 2, 'subwindow_freq': 11, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.2437576  0.19895663 0.61617919 0.80767661 0.29786155 0.        ]
+[I 2025-11-14 11:34:43,502] Trial 98 finished with value: 0.3607385970291244 and parameters: {'augment_factor': 8, 'chunk_seconds': 3, 'num_freqs': 3, 'num_estimators': 128, 'max_depth': 4, 'window_seconds': 7, 'num_subwindows': 1, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+[0.68129717 0.55869606 0.77979612 0.85340984 0.03450046 0.        ]
+[I 2025-11-14 11:38:05,668] Trial 99 finished with value: 0.484616609120305 and parameters: {'augment_factor': 8, 'chunk_seconds': 2, 'num_freqs': 5, 'num_estimators': 128, 'max_depth': 32, 'window_seconds': 6, 'num_subwindows': 2, 'subwindow_freq': 9, 'use_window_slope': True, 'use_subwindow_slope': True}. Best is trial 46 with value: 0.49041542819092054.
+{'augment_factor': 1, 'chunk_seconds': 1, 'num_freqs': 7, 'num_estimators': 128, 'max_depth': 16, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 8, 'use_window_slope': False, 'use_subwindow_slope': True}
+Job finished at: Fri Nov 14 11:38:06 EST 2025
