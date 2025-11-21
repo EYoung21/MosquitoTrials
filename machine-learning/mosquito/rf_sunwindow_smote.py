@@ -47,7 +47,7 @@ class Model():
         # SMOTE hyperparameters
         self.use_smote = True
         self.smote_k_neighbors = 5  # Number of nearest neighbors for SMOTE
-        self.smote_sampling_strategy = 'auto'  # 'auto' balances all classes, or can be a float ratio
+        self.smote_sampling_strategy = 'auto'  # 'auto' balances all classes (required for multi-class classification)
         
         if trial: #?
             self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 10)
@@ -75,9 +75,8 @@ class Model():
             self.use_smote = trial.suggest_categorical('use_smote', [True, False])
             if self.use_smote:
                 self.smote_k_neighbors = trial.suggest_int('smote_k_neighbors', 1, 10)
-                # sampling_strategy: 'auto' or a float ratio (0.5 to 1.0)
-                sampling_strategy_choice = trial.suggest_categorical('smote_sampling_strategy', ['auto', 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
-                self.smote_sampling_strategy = sampling_strategy_choice
+                # sampling_strategy: 'auto' for multi-class (float only works for binary classification)
+                self.smote_sampling_strategy = 'auto'
 
     def transform_data(self, probes, training = True):
         transformed_probes = []

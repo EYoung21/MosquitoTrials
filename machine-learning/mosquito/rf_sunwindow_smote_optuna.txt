@@ -1,0 +1,1 @@
+2025-11-17 08:49:11.256177 0 {'augment_factor': 1, 'chunk_seconds': 7, 'num_freqs': 8, 'num_estimators': 256, 'max_depth': 128, 'window_seconds': 6, 'num_subwindows': 17, 'subwindow_freq': 1, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': False} 0.39826462543080204
