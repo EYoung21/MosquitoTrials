@@ -317,7 +317,7 @@ def main():
             pbar = tqdm(total=total_trials, desc="Optuna Trials", position=0)
             return lambda s, t: pbar.update(1)
         
-        trial_count = 25
+        trial_count = 100
 
         study = optuna.create_study(study_name=f"{args.model_name}_hyperparameter_tuning", direction='maximize')
 

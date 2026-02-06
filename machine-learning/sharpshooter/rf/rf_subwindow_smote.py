@@ -28,7 +28,8 @@ class Model():
         self.window_size = self.window_seconds * self.sample_rate
 
         self.max_depth = 64  # OPTIMIZED: best trial value
-        self.waveform_type = "post_rect"
+        # Sharpshooter data has "voltage" (from pre_rect); mosquito has "post_rect"
+        self.waveform_type = "voltage"
         self.random_state = 42
         dirname = os.path.dirname(__file__)
         self.model = None
@@ -150,9 +151,13 @@ class Model():
                     columns["slope"].append(lr.coef_[0])  # Slope of the trend
                     columns["trend_intercept"].append(lr.intercept_)  # Intercept of the trend
                 
-                columns["resistance"].append(currWindow["resistance"].values[0]) #?, why [0]?
-                columns["volts"].append(currWindow["voltage"].values[0]) #??, why [0]?s
-                columns["current"].append(0 if currWindow["current"].values[0] == "AC" else 1) #AC (?) or not, binary?
+                # Sharpshooter data has only time, voltage, labels; resistance/current use 0 if missing
+                _res = currWindow["resistance"].values[0] if "resistance" in currWindow.columns else 0.0
+                _volts = currWindow["voltage"].values[0]
+                _cur = (0 if currWindow["current"].values[0] == "AC" else 1) if "current" in currWindow.columns else 0
+                columns["resistance"].append(_res)
+                columns["volts"].append(_volts)
+                columns["current"].append(_cur)
                 
                 
                 subwindows = np.array_split(currWindow, self.num_subwindows)
@@ -192,9 +197,12 @@ class Model():
                         columns[f"subwindow_{idx}_slope"].append(lr.coef_[0])  # Slope of the trend
                         columns[f"subwindow_{idx}_trend_intercept"].append(lr.intercept_)  # Intercept of the trend
                     
-                    columns[f"subwindow_{idx}_resistance"].append(subwindow["resistance"].values[0]) #?, why [0]?
-                    columns[f"subwindow_{idx}_volts"].append(subwindow["voltage"].values[0]) #??, why [0]?s
-                    columns[f"subwindow_{idx}_current"].append(0 if subwindow["current"].values[0] == "AC" else 1) #AC (?) or not, binary?
+                    _sr = subwindow["resistance"].values[0] if "resistance" in subwindow.columns else 0.0
+                    _sv = subwindow["voltage"].values[0]
+                    _sc = (0 if subwindow["current"].values[0] == "AC" else 1) if "current" in subwindow.columns else 0
+                    columns[f"subwindow_{idx}_resistance"].append(_sr)
+                    columns[f"subwindow_{idx}_volts"].append(_sv)
+                    columns[f"subwindow_{idx}_current"].append(_sc)
                 
                 if training: # in reality, we won't know what the labels are
                     labels, label_counts = np.unique(currWindow["labels"], return_counts=True) #probing labels

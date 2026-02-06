@@ -18,16 +18,16 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model():
     def __init__(self, save_path = None, trial = None):
-        #chunk hyperparameters - OPTIMIZED FROM BEST TRIAL (Trial 95: F1=0.5444)
+        #chunk hyperparameters - OPTIMIZED FROM BEST TRIAL (Trial 46: F1=0.4904)
         self.chunk_seconds = 1
-        self.num_estimators = 64  # OPTIMIZED: best trial value
-        self.num_freqs = 5  # OPTIMIZED: best trial value
+        self.num_estimators = 128  # OPTIMIZED: best trial value
+        self.num_freqs = 7  # OPTIMIZED: best trial value
         self.sample_rate = 100
         self.chunk_size = self.chunk_seconds * self.sample_rate
         self.window_seconds = 8  # OPTIMIZED: best trial value
         self.window_size = self.window_seconds * self.sample_rate
 
-        self.max_depth = 64  # OPTIMIZED: best trial value
+        self.max_depth = 16  # OPTIMIZED: best trial value
         self.waveform_type = "post_rect"
         self.random_state = 42
         dirname = os.path.dirname(__file__)
@@ -35,18 +35,18 @@ class Model():
         self.save_path = save_path
         self.model_path = "../ML/rf_pickle"
 
-        self.num_subwindows = 7  # OPTIMIZED: best trial value
-        self.subwindow_freq = 10  # OPTIMIZED: best trial value
+        self.num_subwindows = 4  # OPTIMIZED: best trial value
+        self.subwindow_freq = 8  # OPTIMIZED: best trial value
         self.subwindow_size = int(self.window_size / self.num_subwindows)
         #the size of each subwindow with in each overarching window
         
         # Boolean flags for optional slope features - OPTIMIZED: best trial values
-        self.use_window_slope = True  # OPTIMIZED: best trial value
-        self.use_subwindow_slope = False  # OPTIMIZED: best trial value
+        self.use_window_slope = False  # OPTIMIZED: best trial value
+        self.use_subwindow_slope = True  # OPTIMIZED: best trial value
         
         # SMOTE hyperparameters
         self.use_smote = True
-        self.smote_k_neighbors = 10  # Number of nearest neighbors for SMOTE
+        self.smote_k_neighbors = 5  # Number of nearest neighbors for SMOTE
         self.smote_sampling_strategy = 'auto'  # 'auto' balances all classes (required for multi-class classification)
         
         if trial: #?
