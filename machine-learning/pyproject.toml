@@ -12,9 +12,9 @@ dependencies = [
     "pandas>=2.3.2",
     "plotly>=6.3.0",
     "positional-encodings>=6.0.4",
-    "pyarrow>=21.0.0",
     "scikit-learn>=1.7.2",
     "seaborn>=0.13.2",
+    "torch-struct",
     "tqdm>=4.67.1",
 ]
 
@@ -48,6 +48,8 @@ torchaudio = [
   { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
   { index = "pytorch-cu129", extra = "cu129", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]
+torch-struct = { git = "https://github.com/harvardnlp/pytorch-struct" }
+
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
@@ -68,3 +70,8 @@ explicit = true
 name = "pytorch-cu129"
 url = "https://download.pytorch.org/whl/cu129"
 explicit = true
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.1.0",
+]

@@ -25,6 +25,15 @@ class Model():
         self.model = None
         self.save_path = save_path
         self.model_path = "../ML/rf_pickle"
+
+        self.label_map = {
+            "J"  : 0,
+            "K"  : 1,
+            "L"  : 2,
+            "M"  : 3,
+            "N"  : 4,
+            "W"  : 5
+        }
         
         if trial:
             self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 3)
@@ -71,13 +80,15 @@ class Model():
         transformed_probes = self.transform_data(probes)
         train = pd.concat(transformed_probes)
         X_train = train.drop(["label"], axis=1)
-        Y_train = train["label"]
-        rf = RandomForestClassifier(self.num_estimators, class_weight="balanced", max_depth = self.max_depth)
+        Y_train = train["label"].map(self.label_map)
+        print("Y_train value counts:", Y_train.value_counts())
+        rf = RandomForestClassifier(self.num_estimators, class_weight="balanced", max_depth=self.max_depth)
         self.model = rf.fit(X_train, Y_train)
-    
-    def predict(self, probes):
+        
+    def predict(self, probes, return_logits = False):
         transformed_probes = self.transform_data(probes, training = False)
         predictions = []
+        all_logits = []
         for transformed_probe, raw_probe in zip(transformed_probes, probes):
             test_probe = transformed_probe
             pred = self.model.predict(test_probe)
@@ -86,8 +97,24 @@ class Model():
             pred = np.repeat(pred, self.chunk_seconds * self.sample_rate)
             # Expand until the end since probe is never exactly divisible by window size
             pred = np.pad(pred, (0, len(raw_probe) - len(pred)), 'edge')
-            predictions.append(pred)
-        return predictions
+            inverse_label_map = {v: k for k, v in self.label_map.items()}
+            predictions.append([inverse_label_map[p] for p in pred])
+
+            if return_logits:
+                unused = list(set(self.label_map.values()) - set(self.model.classes_)) 
+                classes = list(self.model.classes_) + unused
+                order = np.argsort(classes)
+                probs = np.concatenate([self.model.predict_proba(test_probe), np.zeros((test_probe.shape[0], len(unused)))], axis=1)[:, order]
+                logits = np.log(probs + 1e-9)  # Adding a small value to avoid log(0)
+                
+                logits = np.repeat(logits, self.chunk_seconds * self.sample_rate, axis=0)
+                logits = np.pad(logits, ((0, len(raw_probe) - len(logits)), (0,0)), 'edge')
+                all_logits.append(logits)
+
+        if return_logits:
+            return predictions, all_logits
+        else:
+            return predictions
 
     def save(self):
         with open(self.model_path, 'ab') as model_save:

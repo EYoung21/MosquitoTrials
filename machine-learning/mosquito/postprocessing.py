@@ -181,7 +181,7 @@ def find_path_viterbi(probabilities, starting_probs, transition_matrix, lambdas,
     log_transition_matrix = np.log(mod_trans_mat + EPS)
     # initialize
     for s in range(N):
-        vitberi[s, 0] = log_starting_probs[s] + log_prob[s, 0]
+        vitberi[s, 0] = log_starting_probs[s] + alpha * log_prob[s, 0]
         backpointer[s, 0] = 0
 
 
@@ -196,7 +196,7 @@ def find_path_viterbi(probabilities, starting_probs, transition_matrix, lambdas,
     # termination
     best_path_pointer = np.argmax(vitberi[:, -1])
     best_path = [best_path_pointer]
-    for t in reversed(range(T-1)):
+    for t in range(T-1, 0, -1):
         best_path_pointer = backpointer[best_path_pointer, t]
         best_path.append(best_path_pointer)
 

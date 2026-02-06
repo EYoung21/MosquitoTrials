@@ -14,6 +14,7 @@ import tqdm
 from matplotlib import pyplot as plt
 from positional_encodings.torch_encodings import PositionalEncoding1D
 from focal_loss import FocalLoss
+from torch_struct import LinearChainCRF
 
 class Model():
     def __init__(self, epochs=128, 
@@ -31,11 +32,13 @@ class Model():
                  ignore_N=None, 
                  transformer_window_size=200, 
                  embed_dim=64,
-                 loss_gamma=0,
+                 loss_gamma=1.5,
                  loss_alpha=None, 
                  transformer_layers=2, 
-                 transformer_nhead=4, save_path=None, trial = None):
-        random.seed(57) # random.seed(42)  
+                 transformer_nhead=4, 
+                 shared_transition = False,
+                 save_path=None, trial = None):
+        random.seed(42)  
         # Going to have to make this explicit for the time being...
         self.label_map = {
             "J"  : 0,
@@ -66,6 +69,7 @@ class Model():
         self.ignore_N = ignore_N
         self.loss_gamma = loss_gamma
         self.loss_alpha = loss_alpha
+        self.shared_transition = shared_transition
         
         
         if embed_dim is None:
@@ -102,6 +106,7 @@ class Model():
             self.dropout_rate = 0.0 if use_dropout0 else trial.suggest_float("dropout_pos", 0.05, 0.5)
             use_wd0          = False # trial.suggest_categorical("weight_decay_is_zero", [True, False])
             self.weight_decay = 0.0 if use_wd0 else trial.suggest_float("weight_decay_pos", 1e-8, 1e-4, log=True)
+            self.shared_transition = trial.suggest_categorical("shared_transition", [True, False])
 
             if self.bottleneck_type == "windowed_attention":
                 self.transformer_window_size = trial.suggest_int("transformer_window_size", 100, 400, step=100)
@@ -147,10 +152,104 @@ class Model():
                             transformer_window_size=self.transformer_window_size, 
                             embed_dim=self.embed_dim, 
                             transformer_layers=self.transformer_layers, 
-                            transformer_nhead=self.transformer_nhead) 
+                            transformer_nhead=self.transformer_nhead,
+                            shared_transition=self.shared_transition) 
 
         dirname = os.path.dirname(__file__)
         self.save_path = save_path
+
+    def to_parts(self, sequence: torch.Tensor, extra: int, lengths: torch.Tensor | None = None) -> torch.Tensor:
+        """
+        Convert a sequence representation to Markov edge indicators.
+
+        Parameters
+        ----------
+        sequence : LongTensor of shape (B, N)
+            Each entry in [0, C-1], where C = extra.
+        extra : int
+            Number of states (C).
+        lengths : LongTensor of shape (B,), optional
+            True sequence lengths for each batch element. If None, all are length N.
+
+        Returns
+        -------
+        labels : LongTensor of shape (B, N-1, C, C)
+            Markov edge indicators: labels[b, t, z_t, z_{t-1}] = 1 for valid transitions,
+            0 elsewhere. Positions at or beyond lengths[b]-1 are zero.
+        """
+        C = extra
+        device = sequence.device
+        B, N = sequence.shape
+
+        if lengths is None:
+            lengths = sequence.new_full((B,), N, dtype=torch.long)
+        else:
+            lengths = lengths.to(device=device, dtype=torch.long)
+
+        # Initialize all zeros on same device/dtype as sequence
+        labels = sequence.new_zeros(B, N - 1, C, C)
+
+        # Previous and next labels for all possible transitions
+        prev_labels = sequence[:, :-1]   # (B, N-1)
+        next_labels = sequence[:,  1:]   # (B, N-1)
+
+        # Batch indices and time indices
+        b_idx = torch.arange(B, device=device).unsqueeze(1).expand(B, N - 1)   # (B, N-1)
+        t_idx = torch.arange(N - 1, device=device).unsqueeze(0).expand(B, N - 1)  # (B, N-1)
+
+        # Valid transitions are t < lengths[b] - 1
+        valid_transitions = t_idx < (lengths - 1).unsqueeze(1)  # (B, N-1) bool
+
+        # Flatten only the valid positions
+        b_flat = b_idx[valid_transitions]
+        t_flat = t_idx[valid_transitions]
+        next_flat = next_labels[valid_transitions]
+        prev_flat = prev_labels[valid_transitions]
+
+        # Set indicators for valid edges
+        labels[b_flat, t_flat, next_flat, prev_flat] = 1
+
+        return labels.contiguous()
+    
+    def from_parts(self, edge: torch.Tensor):
+        """
+        Convert edges to sequence representation.
+
+        Parameters
+        ----------
+        edge : Tensor of shape (B, N-1, C, C)
+            Markov indicators: edge[b, t, z_t, z_{t-1}] = 1.
+
+        Returns
+        -------
+        labels : LongTensor of shape (B, N)
+            Reconstructed label sequences in [0, C-1].
+        C : int
+            Number of states.
+        """
+        B, N_1, C, _ = edge.shape
+        N = N_1 + 1
+        device = edge.device
+
+        # edge[b, t, z_t, z_{t-1}] = 1
+        # Sum over z_t → one-hot over previous state (z_{t-1})
+        prev_onehot = edge.sum(dim=2)      # (B, N-1, C)
+        # Sum over z_{t-1} → one-hot over next state (z_t)
+        next_onehot = edge.sum(dim=3)      # (B, N-1, C)
+
+        # Convert one-hot to label indices
+        prev_labels = prev_onehot.argmax(dim=-1)  # (B, N-1)
+        next_labels = next_onehot.argmax(dim=-1)  # (B, N-1)
+
+        # Allocate output on same device, but long dtype
+        labels = torch.zeros(B, N, device=device, dtype=torch.long)
+
+        # At t = 0, label is previous state from first edge
+        labels[:, 0] = prev_labels[:, 0]
+        # For t >= 1, labels come from the "next" states of each edge
+        labels[:, 1:] = next_labels
+
+        return labels.contiguous(), C
 
     def train(self, probes, test_probes, fold = None, save_train_curve=False, show_train_curve=False):
         self.model = self.model.to(self.device)
@@ -183,9 +282,11 @@ class Model():
 
                 optimizer.zero_grad()
                 #print(x.shape)
-                outputs = self.model(x.permute(0,2,1))
+                #outputs = self.model(x.permute(0,2,1)).permute(0,2,1).reshape(1, -1, self.num_classes, self.num_classes)[:, 1:].contiguous()
                 
-                loss = criterion(outputs, y)
+                crf = self.model(x.permute(0,2,1))
+                y_event = self.to_parts(y, self.num_classes)
+                loss = -crf.log_prob(y_event)
 
                 weighted_loss = (loss) * weights
                 weighted_loss = weighted_loss.mean()
@@ -205,8 +306,11 @@ class Model():
                         x, y, weights = batch
                         x, y, weights = x.to(self.device), y.to(self.device), \
                                         weights.to(self.device)
-                        outputs = self.model(x.permute(0,2,1))
-                        loss = criterion(outputs, y)
+                        
+                        #outputs = self.model(x.permute(0,2,1)).permute(0,2,1).reshape(1, -1, self.num_classes, self.num_classes)[:, 1:].contiguous()
+                        crf = self.model(x.permute(0,2,1))
+                        y_event = self.to_parts(y, self.num_classes)
+                        loss = -crf.log_prob(y_event)
                         
                         weighted_loss = loss * weights
                         weighted_loss = weighted_loss.mean()
@@ -238,10 +342,17 @@ class Model():
                 x, _, _ = probe
                 x = x.to(self.device)
 
-                outputs = self.model.forward(x.permute(0,2,1))
+                #outputs = self.model(x.permute(0,2,1)).permute(0,2,1).reshape(1, -1, self.num_classes, self.num_classes)[:, 1:].contiguous()
+                crf = self.model(x.permute(0,2,1))
                 if return_logits:
-                    all_logits.append(outputs.squeeze(0).permute(1,0).detach().cpu().numpy())
-                outputs = outputs.argmax(dim=1).view(-1).cpu().tolist()
+                    node_marginals = torch.zeros(x.shape[0], x.shape[1], self.num_classes, device=x.device)
+                    edge_marginals = crf.marginals   # shape (batch, N-1, num_classes, num_classes)
+                    node_marginals[:, :-1, :] = edge_marginals.sum(-1)   # sum over next-state j
+                    node_marginals[:, 1:, :] += edge_marginals.sum(-2)   # sum over prev-state i
+                    node_marginals /= node_marginals.sum(-1, keepdim=True)  # normalize
+                    all_logits.append(torch.log(node_marginals).cpu())
+
+                outputs = self.from_parts(crf.argmax)[0].view(-1).cpu().tolist()
                 output_labels = [self.inv_label_map[x] for x in outputs]
                 all_predictions.append(output_labels)
             if return_logits:
@@ -403,7 +514,7 @@ def pad_or_crop(tensor, dim, target_size):
 
 
 class UNet1D(nn.Module):
-    def __init__(self, input_size, output_size, growth_factor, features, num_layers, n_conv_steps_per_block, dropout_rate, block_kernel_size, up_down_sample_kernel_size, block_padding, bottleneck_type, transformer_window_size, embed_dim, transformer_layers, transformer_nhead):
+    def __init__(self, input_size, output_size, growth_factor, features, num_layers, n_conv_steps_per_block, dropout_rate, block_kernel_size, up_down_sample_kernel_size, block_padding, bottleneck_type, transformer_window_size, embed_dim, transformer_layers, transformer_nhead, shared_transition = False):
         super(UNet1D, self).__init__()
         self.num_layers = num_layers
         self.features = features
@@ -413,6 +524,7 @@ class UNet1D(nn.Module):
         self.embed_dim = embed_dim
         self.transformer_layers = transformer_layers
         self.transformer_nhead = transformer_nhead
+        self.shared_transition = shared_transition
 
 
         # input layer
@@ -450,7 +562,13 @@ class UNet1D(nn.Module):
             features //= growth_factor  # Decrease feature size
 
         # output layer
-        self.out_conv = nn.Conv1d(in_channels=features, out_channels=output_size, kernel_size=1)
+        if self.shared_transition:
+            self.out_conv = nn.Conv1d(in_channels=features, out_channels=output_size, kernel_size=1)
+        else:
+            self.out_conv = nn.Conv1d(in_channels=features, out_channels=output_size * output_size, kernel_size=1)
+        self.transition = nn.Parameter(torch.randn(output_size, output_size))
+        self.init = nn.Parameter(torch.randn(output_size))
+        
 
     def forward(self, x):
         # Encoding path
@@ -480,7 +598,18 @@ class UNet1D(nn.Module):
         # pad up to the inital size
         x = pad_or_crop(x, dim=2, target_size=initial_size)
         x = self.out_conv(x)
-        return x
+        if self.shared_transition:
+            scores = x.permute(0,2,1).unsqueeze(-2) # shape (batch, seq_len, 1, num_classes)
+            init = scores[:, :1].permute(0, 1, 3, 2).squeeze(1) # shape (batch, 1, num_classes)
+            scores = torch.nn.functional.log_softmax(self.transition, dim=-1).unsqueeze(0).unsqueeze(0) + scores[:, 1:] # shape (batch, seq_len-1, num_classes, num_classes)
+            scores[:, 0] += torch.nn.functional.log_softmax(self.init, dim=-1).unsqueeze(0).unsqueeze(-1) + init # shape (batch, num_classes, 1) x (batch, 1, num_classes)
+        else:
+            batch_size, seq_len, _ = x.permute(0,2,1).shape
+            scores = x.permute(0,2,1).reshape(batch_size, seq_len, self.transition.shape[0], self.transition.shape[1])[:, 1:, :, :] # shape (batch, seq_len-1, num_classes, num_classes)
+
+        scores = scores.contiguous()
+        crf = LinearChainCRF(scores)
+        return crf
     
     
     def predict_batch(self, batch, device):

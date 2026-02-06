@@ -37,7 +37,7 @@ class Model():
             self.epochs = trial.suggest_categorical("epochs", [2, 4, 8])
             self.dropout = trial.suggest_categorical("dropout", [0.0001, 0.001, 0.01, 0.1])
         else:
-            self.epochs = 8
+            self.epochs = 1
             self.dropout = 0.001
 
         """
@@ -138,8 +138,9 @@ class Model():
         plt.savefig(f"{self.save_path}/loss_curve_fold{fold}.png")
             """
 
-    def predict(self, probes):
+    def predict(self, probes, return_logits = False):
         all_predictions = []
+        all_logits = []
         for probe in tqdm.tqdm(probes):
             test_dfs, test_df = self.load_probes([probe])
             test_dataset = TimeSeriesDataset(test_df, self.label_map, self.ticks_before, 
@@ -147,18 +148,29 @@ class Model():
                                              self.skip_num)
             test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
             all_preds = []
+            all_ls = []
             with torch.no_grad():
                 for batch_X, _ in test_dataloader:
                     batch_X = batch_X.permute(0, 2, 1).to(self.device)
                     outputs = self.model(batch_X)
+                    print("Outputs shape:", outputs.shape)
                     output_list = outputs.argmax(dim=1).reshape(-1).cpu().tolist()
                     output_labels = [self.inv_label_map[x] for x in output_list]
                     all_preds.extend(output_labels)
+                    all_ls.append(outputs.squeeze(0).permute(1,0).detach().cpu().numpy())
             # Expand the data to be the size of the original input
             all_preds = np.repeat(all_preds, self.skip_num)
             all_preds = np.pad(all_preds, (0, len(probe) - len(all_preds)), 'edge')
             all_predictions.append(all_preds)
-        return all_predictions
+            if return_logits:
+                all_ls = np.concatenate(all_ls, axis=0)
+                all_ls = np.repeat(all_ls, self.skip_num, axis=0)
+                all_ls = np.pad(all_ls, ((0, len(probe) - len(all_ls)), (0,0)), 'edge')
+                all_logits.append(all_ls)
+        if return_logits:
+            return all_predictions, all_logits
+        else:
+            return all_predictions
 
     def apply_stft_to_df(self, df, target_column):
         # Perform STFT on the target column data

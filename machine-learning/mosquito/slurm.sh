@@ -26,8 +26,33 @@ echo "Job started at: $(date)"
 echo "Running job ID: $SLURM_JOB_ID"
 
 
+
+#echo "Random forest evaluation"
+#uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/nested_model_evaluation_forest --model_path rf.py --model_name=rf --optuna # --post_process v
+# # --optuna
+
 # Run your Python script
+echo "UNET attention evaluation"
 uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /data/labs/hopelab/epg/outputs/tarsalis_results --model_path rf.py --model_name=rf
+    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention --model_path unet.py --model_name=unet --attention  --optuna # --post_process v
+# --optuna
+
+echo "UNET evaluation"
+uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet --model_path unet.py --model_name=unet  --optuna 
+
+echo "TCN evaluation"
+uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_tcn --model_path tcn.py --model_name=tcn  --optuna # --post_process v
+echo "Transformer evaluation"
+uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer --model_path transformer.py --model_name=transformer  --optuna # --post_process v
+
+
+
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/model_evaluation_crf --model_path unet_crf.py --model_name=unet --attention
+
 
 echo "Job finished at: $(date)"

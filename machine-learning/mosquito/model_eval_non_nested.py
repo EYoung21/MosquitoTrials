@@ -434,80 +434,38 @@ def generate_roc(
     else:
         plt.show()
 
-def apply_best_params_to_kwargs(best_params: dict, kwargs: dict) -> dict:
-    """
-    Overwrite model kwargs with Optuna best_params, with a small amount of
-    key-aliasing to match your non-optuna kwargs naming.
-    """
-    new_kwargs = dict(kwargs)
 
-    # direct overwrite when keys already exist in kwargs
-    for k, v in best_params.items():
-        if k in new_kwargs:
-            new_kwargs[k] = v
-
-    # common aliases between optuna params and your kwargs naming
-    if "dropout" in best_params and "dropout_rate" in new_kwargs:
-        new_kwargs["dropout_rate"] = best_params["dropout"]
-    if "dropout_rate" in best_params and "dropout" in new_kwargs:
-        new_kwargs["dropout"] = best_params["dropout_rate"]
-
-    return new_kwargs
-
-def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_folds=5, **kwargs):
-    """
-    Nested CV objective:
-      - outer_train_index is the *outer* fold train split (indices into data.raw_dfs)
-      - runs an inner KFold over outer_train_index
-      - returns macro-F1 aggregated across inner validation folds
-    """
+def optuna_objective(data, args, trial, **kwargs):
     labels_true = []
     labels_pred = []
+    for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
+        train_data = [data.raw_dfs[i] for i in train_index]
+        test_data = [data.raw_dfs[i] for i in test_index]
+        train_data, _ = data.get_probes(train_data)
+        test_data, test_names = data.get_probes(test_data)
 
-    augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
-
-    # Inner CV over the outer-train set only
-    inner_kf = KFold(
-        n_splits=inner_folds,
-        random_state=data.random_state + outer_fold,  # deterministic per outer fold
-        shuffle=True,
-    )
-
-    outer_train_index = np.array(list(outer_train_index))
-    model_import = dynamic_importer(args.model_path)
-
-    for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
-        inner_train_idx = outer_train_index[inner_train_pos]
-        inner_val_idx   = outer_train_index[inner_val_pos]
-
-        train_dfs = [data.raw_dfs[i] for i in inner_train_idx]
-        val_dfs   = [data.raw_dfs[i] for i in inner_val_idx]
-
-        train_data, _ = data.get_probes(train_dfs)
-        val_data, _   = data.get_probes(val_dfs)
+        augment_factor = trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
 
         if args.augment:
-            train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
+            train_data = build_augmented_dataset(train_data, size = len(train_data) * augment_factor)
 
-        model = model_import.Model(trial=trial, **kwargs)
-        model.train(train_data, val_data, inner_fold)
+        model_import = dynamic_importer(args.model_path)
+        
+        model = model_import.Model(trial = trial, **kwargs)
+        model.train(train_data, test_data, fold)
+            
+        predicted_labels = model.predict(test_data)
 
-        predicted_labels = model.predict(val_data)
-
-        # Flatten everything (same as your original objective)
-        for df, preds in zip(val_data, predicted_labels):
+        # Flatten everything
+        for df, preds in zip(test_data, predicted_labels):
             labels_true.extend(df["labels"].values)
             labels_pred.extend(preds)
-        break
 
     f1 = f1_score(labels_true, labels_pred, average="macro")
     print(f1_score(labels_true, labels_pred, average=None))
-
     with open(f"{args.model_name}_optuna.txt", "a") as f:
-        print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
-
+        print(trial.datetime_start, trial.number, trial.params, f1, file=f)
     return f1
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -525,12 +483,52 @@ def main():
     parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
     parser.add_argument("--epochs", type = int, required=False)
     parser.add_argument("--optuna", action="store_true")
-    parser.add_argument("--attention", action="store_true") # can only be used with UNet
-    parser.add_argument("--fold", type = int, required = False, default = -1) 
+    parser.add_argument("--attention", action="store_true") # can only be used with UNet 
     args = parser.parse_args()
 
     print("Loading Data...")
     data = DataImport(args.data_path, 5)
+    if args.optuna:
+        study = optuna.create_study(direction='maximize')
+        
+        kwargs = dict()
+        if args.model_path == "unet.py":
+            if args.attention:
+                # expected f1: 0.7402015172114621
+                kwargs['bottleneck_type'] = 'windowed_attention'
+                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 1e-05, 'weight_decay': 1e-05, 'num_layers': 8, 'features': 64, 'transformer_window_size': 150, 'transformer_layers': 2}
+                heads_per_channel = 32
+                kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
+                kwargs['embed_dim'] = kwargs['features']
+            else:
+                study.enqueue_trial(
+                    {
+                        "epochs" : 64,
+                        "lr": 5e-4,
+                        "dropout": 0.1,
+                        "weight_decay": 1e-6,
+                        "num_layers": 8,
+                        "features": 32,
+                        "augment_factor": 1
+                    }
+                )
+
+                # expected f1: 0.694895
+                kwargs['bottleneck_type'] = 'block'
+                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 0.1, 'weight_decay': 1e-06, 'num_layers': 8, 'features': 32}
+
+            if args.epochs:
+                kwargs['epochs'] = args.epochs
+
+        else:
+            kwargs = {}
+
+        study.optimize(lambda x : optuna_objective(data, args, x, **kwargs), n_trials = 100, show_progress_bar=True, )
+
+        print(study.best_params)
+        optuna.visualization.matplotlib.plot_optimization_history(study)
+        plt.savefig(f"{args.model_name}_hyper.png")
+        return
 
     summary_data = []
     labels_true = []
@@ -538,161 +536,47 @@ def main():
     logits_pred = []
     all_test = []
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
-        if args.fold != -1 and fold != args.fold:
-            continue
         print(f"Evaluating Fold {fold}")
+        train_data = [data.raw_dfs[i] for i in train_index]
+        test_data = [data.raw_dfs[i] for i in test_index]
+        train_data, _ = data.get_probes(train_data)
+        test_data, test_names = data.get_probes(test_data)
 
+        if args.augment:
+            augmented_train_data = build_augmented_dataset(train_data)
+            print(f"{len(augmented_train_data)} Training Probes with Augment")
+        
         model_import = dynamic_importer(args.model_path)
-
-        # ---- base kwargs: KEEP EXACTLY YOUR NON-OPTUNA DEFAULTS ----
+        
         kwargs = dict()
         if args.model_path == "unet.py":
             if args.attention:
                 # expected f1: 0.7402015172114621
                 kwargs['bottleneck_type'] = 'windowed_attention'
-                kwargs = kwargs | {
-                    'epochs': 128,
-                    'lr': 0.0005,
-                    'dropout_rate': 0.,
-                    'weight_decay': 1e-07,
-                    'num_layers': 8,
-                    'features': 64,
-                    'transformer_window_size': 200,
-                    'transformer_layers': 2,
-                    'loss_gamma': 1.5
-                }
+                kwargs = kwargs | {'epochs': 128, 'lr': 0.0005, 'dropout_rate': 0., 'weight_decay': 1e-07, 'num_layers': 8, 'features': 64, 'transformer_window_size': 200, 'transformer_layers': 2, 'loss_gamma': 1.5}
                 heads_per_channel = 16
                 kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
                 kwargs['embed_dim'] = kwargs['features']
             else:
                 # expected f1: 0.694895
                 kwargs['bottleneck_type'] = 'block'
-                kwargs = kwargs | {
-                    'epochs': 64,
-                    'lr': 0.0005,
-                    'dropout_rate': 0.1,
-                    'weight_decay': 1e-06,
-                    'num_layers': 8,
-                    'features': 32
-                }
+                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 0.1, 'weight_decay': 1e-06, 'num_layers': 8, 'features': 32}
 
             if args.epochs:
                 kwargs['epochs'] = args.epochs
-        else:
-            kwargs = {}
 
-        # ---- NESTED OPTUNA: inner 5-fold CV on outer-train to overwrite kwargs ----
-        augment_factor = 1
-        if args.optuna:
-            print(f"Running nested Optuna for outer fold {fold} (inner 5-fold on outer-train)...")
-            study = optuna.create_study(direction='maximize')
-
-            # Keep your old "good starting point" enqueue for UNet (non-attention)
-            if args.model_path == "unet.py" and (not args.attention):
-                study.enqueue_trial(
-                    {
-                        "epochs": kwargs.get("epochs", 64),
-                        "lr": kwargs.get("lr", 5e-4),
-                        "dropout": kwargs.get("dropout_rate", 0.1),  # enqueue uses "dropout"
-                        "weight_decay": kwargs.get("weight_decay", 1e-6),
-                        "num_layers": kwargs.get("num_layers", 8),
-                        "features": kwargs.get("features", 32),
-                        "augment_factor": 1
-                    }
-                )
-            if args.model_path == "unet.py" and (args.attention):
-                study.enqueue_trial(
-                    {
-                        "epochs": 128,
-                        "lr": 5e-4,
-                        "dropout_rate": 0.,  # enqueue uses "dropout"
-                        "weight_decay": 1e-7,
-                        "num_layers": 8,
-                        "features": 64,
-                        "transformer_window_size": 200,
-                        "transformer_layers": 2,
-                        "loss_gamma": 0,
-                        "heads_per_channel": 16,
-                        "augment_factor": 1
-                    }
-                )
-                study.enqueue_trial(
-                {
-                    'epochs': 128,
-                    'lr': 0.0005,
-                    'dropout_rate': 0.,
-                    'weight_decay': 1e-07,
-                    'num_layers': 8,
-                    'features': 64,
-                    'transformer_window_size': 200,
-                    'transformer_layers': 2,
-                    'loss_gamma': 0,
-                    "heads_per_channel": 16,
-                    "augment_factor": 1
-                })
-
-            study.optimize(
-                lambda t: optuna_objective(
-                    data,
-                    args,
-                    t,
-                    outer_train_index=train_index,
-                    outer_fold=fold,
-                    inner_folds=5,
-                    **kwargs
-                ),
-                n_trials=100,
-                show_progress_bar=True,
-            )
-
-            print(f"[Fold {fold}] Best params:", study.best_params)
-            augment_factor = study.best_params.get("augment_factor", 1)
-
-            # Overwrite kwargs used for the REAL outer-fold training/eval
-            kwargs = apply_best_params_to_kwargs(study.best_params, kwargs)
-
-            # If attention case changes features (etc), recompute dependent args
-            if args.model_path == "unet.py" and args.attention:
-                heads_per_channel = 16
-                kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
-                kwargs['embed_dim'] = kwargs['features']
-
-            # Save per-fold hyperparam search plot (avoid overwrite)
-            optuna.visualization.matplotlib.plot_optimization_history(study)
-            plt.savefig(f"{args.model_name}_hyper_outer{fold}.png")
-            plt.close()
-
-        #kwargs = {'epochs': 128, 'num_layers': 6, 'n_conv_steps_per_block': 3, 'features': 96, 'embed_dim': 96, 'lr': 0.0001528325773887917, 'dropout_rate': 0.2546315931008927, 'weight_decay': 4.1530388051130336e-08, 'transformer_window_size': 200, 'transformer_layers': 2, 'transformer_nhead': 96 // 16}
-
-        # ---- Now do your ORIGINAL outer fold train/test split + probes ----
-        train_data = [data.raw_dfs[i] for i in train_index]
-        test_data  = [data.raw_dfs[i] for i in test_index]
-        train_data, _ = data.get_probes(train_data)
-        test_data, test_names = data.get_probes(test_data)
-
-        # ---- augmentation: keep original behavior, but in optuna-mode respect tuned augment_factor ----
-        if args.augment:
-            if args.optuna:
-                augmented_train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
-            else:
-                augmented_train_data = build_augmented_dataset(train_data)
-            print(f"{len(augmented_train_data)} Training Probes with Augment")
-
-        # ---- Create model with (possibly overwritten) kwargs and run your original training ----
-        model = model_import.Model(save_path=args.save_path, **kwargs)
+        model = model_import.Model(save_path = args.save_path, **kwargs)
         print("Training Model...")
-
+        
         if args.augment:
             final_train_data = augmented_train_data
         else:
             final_train_data = train_data
-
         print(final_train_data[0].columns)
         model.train(final_train_data, test_data, fold)
-
-        # ---- EVERYTHING BELOW HERE: keep your original evaluation/report code unchanged ----
+            
         print("Evaluating Model...")
-
+        
         if args.post_process is None:
             predicted_labels = model.predict(test_data)
 
@@ -713,19 +597,18 @@ def main():
             predicted_labels = [post_process.postprocess_smooth(logit) for logit in logits]
         else:
             print("Choose a valid (case insensitive) post-processing arguement: either V/Viterbi or S/Smooth. Terminating program")
-            assert False
+            assert False #TODO: make this better
 
         _, logits = model.predict(test_data, return_logits=True)
         print("Logits shape:", logits[0].shape)
         logits_pred.extend([l for l in logits])
         all_test.extend(test_data)
-
+            
         print("Generating Report...")
         true, pred, stats = generate_report(test_data, predicted_labels, test_names, args.save_path, args.model_name, fold)
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
-
         
     out_summary_data = pd.concat(summary_data)
     out_summary_data.to_csv(f"{args.save_path}/{args.model_name}_SummaryStats_by_fold.csv")

@@ -107,7 +107,7 @@ class Model:
             
             outputs = self.model(x)
             if return_logits:
-                all_logits.append(outputs.cpu())
+                all_logits.append(outputs.squeeze(0).permute(1,0).detach().cpu().numpy())
             outputs = outputs.argmax(dim=1).view(-1).cpu().tolist()
             output_labels = [dataset.inv_label_map[x] for x in outputs]
             all_predictions.append(output_labels)
