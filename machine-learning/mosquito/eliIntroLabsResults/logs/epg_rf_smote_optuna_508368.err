@@ -1,48 +1,0 @@
-[I 2025-11-16 11:47:58,178] A new study created in memory with name: no-name-3c36efbb-2eda-41c5-9d76-91d02eeaa1e7
-  0%|          | 0/100 [00:00<?, ?it/s]                                         0%|          | 0/100 [00:01<?, ?it/s]                                         0%|          | 0/100 [00:01<?, ?it/s]  0%|          | 0/100 [00:01<?, ?it/s]
-Traceback (most recent call last):
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 442, in <module>
-    main()
-    ~~~~^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 333, in main
-    study.optimize(lambda x : optuna_objective(data, args, x, **kwargs), n_trials = 100, show_progress_bar=True, )
-    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/study.py", line 490, in optimize
-    _optimize(
-    ~~~~~~~~~^
-        study=self,
-        ^^^^^^^^^^^
-    ...<7 lines>...
-        show_progress_bar=show_progress_bar,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 63, in _optimize
-    _optimize_sequential(
-    ~~~~~~~~~~~~~~~~~~~~^
-        study,
-        ^^^^^^
-    ...<8 lines>...
-        progress_bar=progress_bar,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 160, in _optimize_sequential
-    frozen_trial_id = _run_trial(study, func, catch)
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 258, in _run_trial
-    raise func_err
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
-    value_or_values = func(trial)
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 333, in <lambda>
-    study.optimize(lambda x : optuna_objective(data, args, x, **kwargs), n_trials = 100, show_progress_bar=True, )
-                              ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 243, in optuna_objective
-    model_import = dynamic_importer(args.model_path)
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 131, in dynamic_importer
-    spec.loader.exec_module(model)
-    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
-  File "<frozen importlib._bootstrap_external>", line 1027, in exec_module
-  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/rf_sunwindow_smote.py", line 12, in <module>
-    from imblearn.over_sampling import SMOTE
-ModuleNotFoundError: No module named 'imblearn'
