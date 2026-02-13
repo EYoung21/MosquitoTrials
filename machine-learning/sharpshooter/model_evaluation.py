@@ -37,7 +37,7 @@ class DataImport:
     cross_val_iter : list[tuple]
         A list of (train_index, test_index) tuples for K-fold cross-validation splits.
     """
-    def __init__(self, data_path, filetype: str, exclude=[], folds=5):
+    def __init__(self, data_path, filetype: str, exclude=[], folds=5, binary=False):
         """
         Initializes the DataImport class.
 
@@ -51,8 +51,16 @@ class DataImport:
             Substrings; any file whose name contains one will be excluded.
         folds : int, optional
             Number of folds to use for K-fold cross-validation (default is 5).
+        binary : bool, optional
+            If True, map labels to P (probing) vs NP (non-probing) for probe-splitter use.
+            N and Z become NP; all other labels become P.
         """
         self.df_list = import_data(data_path, filetype, exclude)
+        self.binary = binary
+        if binary:
+            for df in self.df_list:
+                upper = df["labels"].astype(str).str.upper()
+                df["labels"] = np.where(upper.isin(["N", "Z"]), "NP", "P")
         self.random_state = 42
         kf = KFold(n_splits=folds, random_state=self.random_state, shuffle=True)
         self.cross_val_iter = list(kf.split(self.df_list))
@@ -107,7 +115,7 @@ class DataImport:
         Returns (start, end) index tuples for contiguous probe segments
         with labels not in NON_PROBING_LABELS.
         """
-        NON_PROBING_LABELS = {"N", "Z"}
+        NON_PROBING_LABELS = {"NP"} if self.binary else {"N", "Z"}
 
         upper_labels = np.char.upper(labels.astype(str))
         mask = ~np.isin(upper_labels, list(NON_PROBING_LABELS))
@@ -146,8 +154,9 @@ def optuna_objective(data, args, trial, **kwargs):
         show_msg(f"Initializing Trial {trial.number} Fold {fold}")
         train_data = [data.df_list[i] for i in train_index]
         test_data = [data.df_list[i] for i in test_index]
-        train_data, _ = data.get_probes(train_data)
-        test_data, _ = data.get_probes(test_data)
+        if not getattr(data, "binary", False):
+            train_data, _ = data.get_probes(train_data)
+            test_data, _ = data.get_probes(test_data)
         clear_msg()
 
         show_msg(f"Training Trial {trial.number} Fold {fold}")
@@ -162,6 +171,10 @@ def optuna_objective(data, args, trial, **kwargs):
 
         labels_true = np.concatenate([df["labels"].values for df in test_data])
         labels_pred = np.concatenate(predicted_labels)
+
+    # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+    labels_true = np.asarray(labels_true).astype(str)
+    labels_pred = np.asarray(labels_pred).astype(str)
 
     show_msg(f"Evaluating Trial {trial.number}...")
     weighted_f1 = f1_score(labels_true, labels_pred, average="weighted")
@@ -238,6 +251,10 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
         labels_true.extend(df["labels"].values)
         labels_pred.extend(preds)
 
+    # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+    labels_true = np.asarray(labels_true).astype(str).tolist()
+    labels_pred = np.asarray(labels_pred).astype(str).tolist()
+
     # Make sure we have a place to save everything
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
@@ -300,6 +317,7 @@ def main():
     #parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
     parser.add_argument("--epochs", type = int, required=False)
     parser.add_argument("--optuna", action="store_true")
+    parser.add_argument("--binary", action="store_true", help="P (probing) vs NP (non-probing) only for probe splitter")
     parser.add_argument("--attention", action="store_true") # can only be used with UNet 
     args = parser.parse_args()
 
@@ -310,7 +328,7 @@ def main():
         "d01", "d03", "d056", "d058", "d12",
     }
 
-    data = DataImport(args.data_path, filetype = ".parquet", exclude=EXCLUDE, folds = 5)
+    data = DataImport(args.data_path, filetype = ".parquet", exclude=EXCLUDE, folds = 5, binary=args.binary)
 
     if args.optuna:
         def progress_bar_callback(total_trials):
@@ -371,8 +389,11 @@ def main():
         print(f"=== Evaluating Fold {fold} ===")
         train_data = [data.df_list[i] for i in train_index]
         test_data = [data.df_list[i] for i in test_index]
-        train_data, _ = data.get_probes(train_data)
-        test_data, test_names = data.get_probes(test_data)
+        if not getattr(data, "binary", False):
+            train_data, _ = data.get_probes(train_data)
+            test_data, test_names = data.get_probes(test_data)
+        else:
+            test_names = [Path(df.attrs["file"]).stem for df in test_data]
 
         model_import = dynamic_importer(args.model_path)
 
@@ -409,6 +430,10 @@ def main():
         labels_pred.extend(pred)
         
     out_summary_data = pd.concat(summary_data)
+
+    # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+    labels_true = np.asarray(labels_true).astype(str)
+    labels_pred = np.asarray(labels_pred).astype(str)
 
     # Calculate statistics across every dataset
     labels = sorted(np.unique(labels_true))

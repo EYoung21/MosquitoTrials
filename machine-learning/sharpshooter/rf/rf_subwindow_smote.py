@@ -86,20 +86,32 @@ class Model():
         for probe in probes:
             num_chunks = len(probe) // self.chunk_size
             if num_chunks == 0:
-                print(f"Skipping probe: too short (len={len(probe)}, chunk_size={self.chunk_size})")
-                continue  # Skip probes that are too short
-            chunks = np.array_split(probe[:num_chunks * self.chunk_size], num_chunks) #for each probe, split it up into chunks of a predefined number of seconds times 100 hz
+                # Use one chunk if probe is long enough for at least one window (reduces skips)
+                if len(probe) < self.window_size:
+                    print(f"Skipping probe: too short (len={len(probe)}, chunk_size={self.chunk_size})")
+                    if not training:
+                        transformed_probes.append(pd.DataFrame())  # Keep 1:1 alignment for predict()
+                    continue
+                num_chunks = 1
+                effective_chunk_size = len(probe)
+            else:
+                effective_chunk_size = self.chunk_size
+            chunks = np.array_split(probe[:num_chunks * effective_chunk_size], num_chunks)  # for each probe, split into chunks
 
             columns = defaultdict(list)
             for i, chunk in enumerate(chunks):
-                extra_context_size = (self.window_size - self.chunk_size)//2
+                extra_context_size = (self.window_size - effective_chunk_size) // 2
 
-                chunkStartIndex = i * self.chunk_size
+                chunkStartIndex = i * effective_chunk_size
                 window_start = max(0, chunkStartIndex - extra_context_size)
-                window_end = min(len(probe), chunkStartIndex + self.chunk_size + extra_context_size)
+                window_end = min(len(probe), chunkStartIndex + effective_chunk_size + extra_context_size)
                 currWindow = probe[window_start:window_end]
 
-                chunk_fft = np.abs(fft(currWindow[self.waveform_type].values))[1:self.window_size//2]  #changed to calculate featur on currWinodw
+                # Pad waveform to window_size when short so FFT and feature dims are consistent
+                waveform = currWindow[self.waveform_type].values.astype(float)
+                if len(waveform) < self.window_size:
+                    waveform = np.pad(waveform, (0, self.window_size - len(waveform)), mode="constant", constant_values=0)
+                chunk_fft = np.abs(fft(waveform))[1:self.window_size//2]  #changed to calculate featur on currWinodw
                 #fourier transform, gets largest frequencies. gets postrec values for each chunk, takes its abs value.
                 #the first element (index 0) of the FFT represents the DC component (zero frequency) - essentially the mean/average value of the signal
                 #so we omit that with 1:
@@ -163,7 +175,10 @@ class Model():
                 subwindows = np.array_split(currWindow, self.num_subwindows)
                 for idx, subwindow in enumerate(subwindows): 
                     #CALCULATE ALL THE SAME FEATURES ABOVE, BUT FOR EACH SUBWINDOW!
-                    chunk_fft = np.abs(fft(subwindow[self.waveform_type].values))[1:self.subwindow_size//2]  #changed to calculate featur on currWinodw
+                    subwindow_waveform = subwindow[self.waveform_type].values.astype(float)
+                    if len(subwindow_waveform) < self.subwindow_size:
+                        subwindow_waveform = np.pad(subwindow_waveform, (0, self.subwindow_size - len(subwindow_waveform)), mode="constant", constant_values=0)
+                    chunk_fft = np.abs(fft(subwindow_waveform))[1:self.subwindow_size//2]
                     
                     chunk_freqs = fftfreq(self.subwindow_size, 1 / self.sample_rate)[1:self.subwindow_size//2] #gets the size of freq for each chunk
                    
