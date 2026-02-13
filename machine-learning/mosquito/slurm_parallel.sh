@@ -8,6 +8,7 @@
 #SBATCH --mem=16G
 #SBATCH --time=24:00:00
 #SBATCH --partition=gpu
+#SBATCH --nodelist=gpu06
 
 set -euo pipefail
 
@@ -15,7 +16,13 @@ set -euo pipefail
 # Make sure this exists BEFORE submitting:
 #   mkdir -p /data/labs/hopelab/epg/logs
 
+# Make fold-specific save path to avoid collisions between array tasks
+SAVE_BASE="/home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/results"
+DATA_PATH="/data/labs/hopelab/epg/tarsalis_data_clean"
+CUDA_VERSION="cu129"
+MODEL_PATH="${1}"
 FOLD="${SLURM_ARRAY_TASK_ID}"
+FLAGS="${@:2}"
 
 # Print info for debugging
 echo "Running on host: $(hostname)"
@@ -25,7 +32,7 @@ echo "SLURM array job ID: ${SLURM_ARRAY_JOB_ID:-unset}"
 echo "SLURM array task ID (fold): ${SLURM_ARRAY_TASK_ID:-unset}"
 
 # Optional: speed up uv on shared filesystems
-export UV_CACHE_DIR="${SLURM_TMPDIR:-/tmp}/${USER}/uv-cache"
+export UV_CACHE_DIR="/data/labs/hopelab/uv_cache"
 mkdir -p "$UV_CACHE_DIR"
 
 if ! command -v uv >/dev/null 2>&1; then
@@ -37,59 +44,22 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 echo "uv version: $(uv --version)"
 
-echo "UNET attention evaluation (fold ${FOLD})"
+echo "${MODEL_PATH} evaluation (fold ${FOLD})"
+MODEL_DIR="${MODEL_PATH}${FLAGS// /_}"
+MODEL_DIR="${MODEL_DIR//--/_}"
 
-# Make fold-specific save path to avoid collisions between array tasks
-SAVE_BASE="/home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention"
-SAVE_PATH="${SAVE_BASE}/fold_${FOLD}"
+echo "Flags: ${FLAGS}"
+echo "Model dir: ${MODEL_DIR}"
+echo "Save path: ${SAVE_BASE}/${MODEL_DIR}/fold_${FOLD}"
+echo "Data path: ${DATA_PATH}"
+echo "Running command: "
+echo "uv run --extra ${CUDA_VERSION} model_eval.py --data_path ${DATA_PATH} \
+    --save_path ${SAVE_BASE}/${MODEL_DIR}/fold_${FOLD} --model_path ${MODEL_PATH}.py --model_name=${MODEL_PATH} ${FLAGS}  --optuna --fold \"${FOLD}\""
 
-# uv run --extra cu129 model_eval.py \
-#   --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#   --save_path "$SAVE_PATH" \
-#   --model_path unet.py \
-#   --model_name unet \
-#   --attention \
-#   --optuna \
-#   --fold "${FOLD}"
-
-
-echo "UNET CRF evaluation"
-mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_crf
-mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_crf/fold_${FOLD}
-uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_crf/fold_${FOLD} --model_path unet_crf.py --model_name=unet_crf  --optuna --fold "${FOLD}"
-
-echo "UNET CRF attention evaluation"
-mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention_crf
-mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention_crf/fold_${FOLD}
-uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention_crf/fold_${FOLD} --model_path unet_crf.py --model_name=unet_crf --attention  --optuna --fold "${FOLD}"
-
-# echo "Random forest evaluation"
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_forest
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_forest/fold_${FOLD}
-# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_forest/fold_${FOLD} --model_path rf.py --model_name=rf --optuna --fold "${FOLD}" # --post_process v
-# # # --optuna
-
-# echo "UNET evaluation"
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet/fold_${FOLD}
-# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet/fold_${FOLD} --model_path unet.py --model_name=unet  --optuna --fold "${FOLD}"
-
-# echo "TCN evaluation"
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_tcn
-# mkdir -p  /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_tcn/fold_${FOLD}
-# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_tcn/fold_${FOLD} --model_path tcn.py --model_name=tcn  --optuna --fold "${FOLD}"# --post_process v
-
-# echo "Transformer evaluation"
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer
-# mkdir -p /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer/fold_${FOLD}
-# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer/fold_${FOLD} --model_path transformer.py --model_name=transformer  --optuna --fold "${FOLD}"# --post_process v
-
-
+mkdir -p ${SAVE_BASE}/${MODEL_DIR}
+mkdir -p ${SAVE_BASE}/${MODEL_DIR}/fold_${FOLD}
+uv run --extra ${CUDA_VERSION} model_eval.py --data_path ${DATA_PATH} \
+    --save_path ${SAVE_BASE}/${MODEL_DIR}/fold_${FOLD} --model_path ${MODEL_PATH}.py --model_name=${MODEL_PATH} ${FLAGS}  --optuna --fold "${FOLD}"
+uv run summarize_folds.py --save_path ${SAVE_BASE}/${MODEL_DIR} --model_name=${MODEL_PATH} ${FLAGS} --num_folds 5
 
 echo "Job finished at: $(date)"

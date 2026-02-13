@@ -96,7 +96,7 @@ class Model():
             self.num_layers  = trial.suggest_int("num_layers", 6, 8, step=2)
             self.n_conv_steps_per_block = trial.suggest_int("n_conv_steps_per_block", 1, 3, step=1)
             self.features    = trial.suggest_int("features", 32, 128, step=32)
-            self.lr          = trial.suggest_float("lr", 5e-5, 5e-4, log=True)
+            self.lr          = trial.suggest_float("lr", 5e-5, 5e-3, log=True)
             self.loss_gamma  = 0.0 #trial.suggest_float("loss_gamma", 0.0, 5.0, step=0.5)
             use_dropout0     = False # trial.suggest_categorical("dropout_is_zero", [True, False])
             self.dropout_rate = 0.0 if use_dropout0 else trial.suggest_float("dropout_pos", 0.05, 0.5)
@@ -106,24 +106,12 @@ class Model():
             if self.bottleneck_type == "windowed_attention":
                 self.transformer_window_size = trial.suggest_int("transformer_window_size", 100, 400, step=100)
                 self.embed_dim = self.features  # tie to features
-                self.transformer_layers = trial.suggest_int("transformer_layers", 1, 3, step=1)
+                self.transformer_layers = trial.suggest_int("transformer_layers", 0, 3, step=1)
                 heads_per_channel = trial.suggest_categorical("heads_per_channel", [16, 32])
                 self.transformer_nhead = max(self.features // heads_per_channel, 1)
             else:
                 self.bottleneck_type = "block"
 
-            """
-            self.growth_factor = trial.suggest_categorical("growth_factor", [1, 2])
-            self.bottleneck_type = trial.suggest_categorical("bottleneck_type", ["windowed_attention", "attention", "block"])
-            self.transformer_window_size = trial.suggest_categorical("transformer_window_size", [100, 150])
-            self.transformer_layers = trial.suggest_categorical("transformer_layers", [1, 2, 4])
-            self.transformer_nhead = trial.suggest_categorical("transformer_nhead", [1, 2, 4])
-            self.features = trial.suggest_categorical("features", [16, 32])
-            if self.bottleneck_type == "attention" or self.bottleneck_type == "windowed_attention":
-                self.embed_dim = self.features * (self.growth_factor**self.num_layers)
-            else:
-                self.embed_dim = trial.suggest_categorical("embed_dim", [16, 32])
-            """
         # if not a block, i.e actually used, make sure divisible 
         if self.bottleneck_type != "block":
             assert self.embed_dim % self.transformer_nhead == 0
@@ -173,7 +161,8 @@ class Model():
 
         train_losses = []
         test_losses = []
-        for epoch in tqdm.tqdm(range(self.epochs)):
+        pbar = tqdm.tqdm(range(self.epochs), desc=f"Fold {fold} Training")
+        for epoch in pbar:
             self.model.train()
             running_loss = 0.0
             for batch in tr_dataloader:
@@ -213,6 +202,8 @@ class Model():
                         running_loss += weighted_loss.item()
                     test_loss = running_loss / len(test_dataloader)
                     test_losses.append(test_loss)
+                pbar.set_postfix({"train_loss": f"{train_loss:.4f}", "test_loss": f"{test_loss:.4f}" if test_probes else "N/A"})
+
         if save_train_curve:
             plt.plot(train_losses, label = "Train")
             plt.plot(test_losses, label = "Test")
@@ -428,7 +419,7 @@ class UNet1D(nn.Module):
             features *= growth_factor  # Increase feature size
 
         # Bottleneck
-        if self.bottleneck_type == "block":
+        if self.bottleneck_type == "block" or self.transformer_layers == 0:
             # in the bottleneck, we don't do any growth and just map features-->features
             self.bottleneck = EncoderBlock(features, features, n_conv_steps_per_block=n_conv_steps_per_block, dropout_rate=dropout_rate, block_kernel_size=block_kernel_size, block_padding=block_padding, growth_factor=1)
         elif self.bottleneck_type == "windowed_attention":

@@ -546,10 +546,10 @@ def main():
 
         # ---- base kwargs: KEEP EXACTLY YOUR NON-OPTUNA DEFAULTS ----
         kwargs = dict()
-        if args.model_path == "unet.py":
+        if args.model_path == "unet.py" or args.model_path == "unet_crf.py":
             if args.attention:
                 # expected f1: 0.7402015172114621
-                kwargs['bottleneck_type'] = 'windowed_attention'
+                kwargs['bottleneck_type'] = 'attention'
                 kwargs = kwargs | {
                     'epochs': 128,
                     'lr': 0.0005,
@@ -587,50 +587,6 @@ def main():
             print(f"Running nested Optuna for outer fold {fold} (inner 5-fold on outer-train)...")
             study = optuna.create_study(direction='maximize')
 
-            # Keep your old "good starting point" enqueue for UNet (non-attention)
-            if args.model_path == "unet.py" and (not args.attention):
-                study.enqueue_trial(
-                    {
-                        "epochs": kwargs.get("epochs", 64),
-                        "lr": kwargs.get("lr", 5e-4),
-                        "dropout": kwargs.get("dropout_rate", 0.1),  # enqueue uses "dropout"
-                        "weight_decay": kwargs.get("weight_decay", 1e-6),
-                        "num_layers": kwargs.get("num_layers", 8),
-                        "features": kwargs.get("features", 32),
-                        "augment_factor": 1
-                    }
-                )
-            if args.model_path == "unet.py" and (args.attention):
-                study.enqueue_trial(
-                    {
-                        "epochs": 128,
-                        "lr": 5e-4,
-                        "dropout_rate": 0.,  # enqueue uses "dropout"
-                        "weight_decay": 1e-7,
-                        "num_layers": 8,
-                        "features": 64,
-                        "transformer_window_size": 200,
-                        "transformer_layers": 2,
-                        "loss_gamma": 0,
-                        "heads_per_channel": 16,
-                        "augment_factor": 1
-                    }
-                )
-                study.enqueue_trial(
-                {
-                    'epochs': 128,
-                    'lr': 0.0005,
-                    'dropout_rate': 0.,
-                    'weight_decay': 1e-07,
-                    'num_layers': 8,
-                    'features': 64,
-                    'transformer_window_size': 200,
-                    'transformer_layers': 2,
-                    'loss_gamma': 0,
-                    "heads_per_channel": 16,
-                    "augment_factor": 1
-                })
-
             study.optimize(
                 lambda t: optuna_objective(
                     data,
@@ -641,7 +597,7 @@ def main():
                     inner_folds=5,
                     **kwargs
                 ),
-                n_trials=100,
+                n_trials=50,
                 show_progress_bar=True,
             )
 
@@ -760,7 +716,7 @@ def main():
     all_data = pd.DataFrame({'labels_true': labels_true,
                              'labels_pred': labels_pred})
     all_data.to_csv(f"{args.save_path}/{args.model_name}_allpredictions.csv")
-    generate_roc(all_test, logits_pred, args.save_path, args.model_name, "Overall")
+    #generate_roc(all_test, logits_pred, args.save_path, args.model_name, "Overall")
 
 if __name__ == "__main__":
     main()

@@ -1,15 +1,12 @@
+from pyexpat import features
 import pandas as pd
-import numpy as np
 import os
 import torch
 from torch import nn
 import torch.optim as optim
 import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, TensorDataset
+from torch.utils.data import Dataset, DataLoader
 import random
-from torch.nn.utils import weight_norm
-from torch.nn.utils.rnn import pad_sequence
-import subprocess
 import tqdm
 from matplotlib import pyplot as plt
 from positional_encodings.torch_encodings import PositionalEncoding1D
@@ -28,7 +25,7 @@ class Model():
                  block_padding=1, 
                  weight_decay=1e-7, 
                  dropout_rate=0., 
-                 bottleneck_type="windowed_attention", 
+                 bottleneck_type="block", 
                  ignore_N=None, 
                  transformer_window_size=200, 
                  embed_dim=64,
@@ -36,9 +33,15 @@ class Model():
                  loss_alpha=None, 
                  transformer_layers=2, 
                  transformer_nhead=4, 
-                 shared_transition = False,
-                 save_path=None, trial = None):
-        random.seed(42)  
+                 crf_type = 'none',
+                 skip_start_layer=0,
+                 block_type = "resnet",
+                 upsample_type = "nearest",
+                 downsample_type = "conv",
+                 skip_before_downsample = False,
+                 norm_affine = False,
+                 save_path=None, trial = None, seed=42):
+        random.seed(seed)  
         # Going to have to make this explicit for the time being...
         self.label_map = {
             "J"  : 0,
@@ -69,75 +72,54 @@ class Model():
         self.ignore_N = ignore_N
         self.loss_gamma = loss_gamma
         self.loss_alpha = loss_alpha
-        self.shared_transition = shared_transition
+        self.embed_dim = embed_dim
+        self.transformer_nhead = transformer_nhead
+        self.crf_type = crf_type
+        self.skip_start_layer = skip_start_layer
+        self.block_type = block_type
+        self.upsample_type = upsample_type
+        self.downsample_type = downsample_type
+        self.skip_before_downsample = skip_before_downsample
+        self.norm_affine = norm_affine
         
-        
-        if embed_dim is None:
-            if self.bottleneck_type == "windowed_attention":
-                self.embed_dim = self.features * (self.growth_factor**self.num_layers)
-            elif self.bottleneck_type == "attention":
-                self.embed_dim = self.features * (self.growth_factor**self.num_layers)
-            else:
-                self.embed_dim = None
-        else:
-            self.embed_dim = embed_dim
+        if self.embed_dim is None:
+            self.embed_dim = self.features * (self.growth_factor**self.num_layers)
 
         self.transformer_layers = transformer_layers
 
-        if transformer_nhead is None:
-            if self.bottleneck_type == "windowed_attention":
-                self.transformer_nhead = self.embed_dim // 32
-            elif self.bottleneck_type == "attention":
-                self.transformer_nhead = self.transformer_window_size // 32
-            else:
-                self.transformer_nhead = None
-        else:
-            self.transformer_nhead = transformer_nhead
+        if self.transformer_nhead is None:
+            self.transformer_nhead = 4
 
         if trial:
             # integers from a power-of-two grid
-            self.epochs      = trial.suggest_int("epochs", 64, 128, step=16)
-            self.num_layers  = trial.suggest_int("num_layers", 6, 8, step=2)
-            self.n_conv_steps_per_block = trial.suggest_int("n_conv_steps_per_block", 1, 3, step=1)
-            self.features    = trial.suggest_int("features", 32, 128, step=32)
-            self.lr          = trial.suggest_float("lr", 5e-5, 5e-4, log=True)
-            self.loss_gamma  = 0.0 #trial.suggest_float("loss_gamma", 0.0, 5.0, step=0.5)
+            self.epochs      = 96 #trial.suggest_int("epochs", 64, 128, step=16)
+            self.num_layers  = trial.suggest_int("num_layers", 6, 8, step=1)
+            self.n_conv_steps_per_block = 2 # trial.suggest_int("n_conv_steps_per_block", 1, 3, step=1)
+            self.features    = 64 #trial.suggest_int("features", 32, 128, step=32)
+            self.lr          = trial.suggest_float("lr", 5e-5, 5e-3, log=True)
             use_dropout0     = False # trial.suggest_categorical("dropout_is_zero", [True, False])
-            self.dropout_rate = 0.0 if use_dropout0 else trial.suggest_float("dropout_pos", 0.05, 0.5)
+            self.dropout_rate = 0.0 if use_dropout0 else trial.suggest_float("dropout_pos", 1e-2, 0.5, log=True)
             use_wd0          = False # trial.suggest_categorical("weight_decay_is_zero", [True, False])
-            self.weight_decay = 0.0 if use_wd0 else trial.suggest_float("weight_decay_pos", 1e-8, 1e-4, log=True)
-            self.shared_transition = trial.suggest_categorical("shared_transition", [True, False])
+            self.weight_decay = 0.0 if use_wd0 else trial.suggest_float("weight_decay_pos", 1e-8, 1e-3, log=True)
+            self.crf_type = trial.suggest_categorical("crf_type", ['crf', 'shared_transition_crf'])
+            self.skip_start_layer = trial.suggest_int("skip_start_layer", 0, 4, step=1)
+            self.block_type = 'resnet' # trial.suggest_categorical("block_type", ['resnet', 'simple'])
+            self.upsample_type = 'nearest' # trial.suggest_categorical("upsample_type", ['convtranspose', 'nearest', 'linear'])
+            self.downsample_type = 'maxpool' # trial.suggest_categorical("downsample_type", ['conv', 'avgpool', 'maxpool'])
+            self.growth_factor = 1 # trial.suggest_categorical("growth_factor", [1, 2])
+            self.skip_before_downsample = True # trial.suggest_categorical("skip_before_downsample", [True, False])
+            self.norm_affine = True # trial.suggest_categorical("norm_affine", [True, False])
 
-            if self.bottleneck_type == "windowed_attention":
-                self.transformer_window_size = trial.suggest_int("transformer_window_size", 100, 400, step=100)
+            if self.bottleneck_type == "attention" or self.bottleneck_type == "windowed_attention":
+                self.transformer_window_size = -1 # trial.suggest_int("transformer_window_size", 100, 400, step=100)
                 self.embed_dim = self.features  # tie to features
                 self.transformer_layers = trial.suggest_int("transformer_layers", 1, 3, step=1)
-                heads_per_channel = trial.suggest_categorical("heads_per_channel", [16, 32])
-                self.transformer_nhead = max(self.features // heads_per_channel, 1)
+                self.transformer_nhead = trial.suggest_categorical("heads_per_channel", [4, 8, 16])
             else:
                 self.bottleneck_type = "block"
 
-            """
-            self.growth_factor = trial.suggest_categorical("growth_factor", [1, 2])
-            self.bottleneck_type = trial.suggest_categorical("bottleneck_type", ["windowed_attention", "attention", "block"])
-            self.transformer_window_size = trial.suggest_categorical("transformer_window_size", [100, 150])
-            self.transformer_layers = trial.suggest_categorical("transformer_layers", [1, 2, 4])
-            self.transformer_nhead = trial.suggest_categorical("transformer_nhead", [1, 2, 4])
-            self.features = trial.suggest_categorical("features", [16, 32])
-            if self.bottleneck_type == "attention" or self.bottleneck_type == "windowed_attention":
-                self.embed_dim = self.features * (self.growth_factor**self.num_layers)
-            else:
-                self.embed_dim = trial.suggest_categorical("embed_dim", [16, 32])
-            """
-        # if not a block, i.e actually used, make sure divisible 
-        if self.bottleneck_type != "block":
-            assert self.embed_dim % self.transformer_nhead == 0
-
-
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
         self.num_classes = len(self.label_map)
-            
         self.model = UNet1D(input_size=len(self.data_columns), 
                             output_size=self.num_classes,
                             growth_factor=self.growth_factor,
@@ -153,103 +135,18 @@ class Model():
                             embed_dim=self.embed_dim, 
                             transformer_layers=self.transformer_layers, 
                             transformer_nhead=self.transformer_nhead,
-                            shared_transition=self.shared_transition) 
+                            crf_type=self.crf_type,
+                            skip_start_layer=self.skip_start_layer,
+                            block_type=self.block_type,
+                            upsample_type=self.upsample_type,
+                            downsample_type=self.downsample_type,
+                            skip_before_downsample=self.skip_before_downsample,
+                            norm_affine=self.norm_affine
+                            ) 
 
-        dirname = os.path.dirname(__file__)
         self.save_path = save_path
-
-    def to_parts(self, sequence: torch.Tensor, extra: int, lengths: torch.Tensor | None = None) -> torch.Tensor:
-        """
-        Convert a sequence representation to Markov edge indicators.
-
-        Parameters
-        ----------
-        sequence : LongTensor of shape (B, N)
-            Each entry in [0, C-1], where C = extra.
-        extra : int
-            Number of states (C).
-        lengths : LongTensor of shape (B,), optional
-            True sequence lengths for each batch element. If None, all are length N.
-
-        Returns
-        -------
-        labels : LongTensor of shape (B, N-1, C, C)
-            Markov edge indicators: labels[b, t, z_t, z_{t-1}] = 1 for valid transitions,
-            0 elsewhere. Positions at or beyond lengths[b]-1 are zero.
-        """
-        C = extra
-        device = sequence.device
-        B, N = sequence.shape
-
-        if lengths is None:
-            lengths = sequence.new_full((B,), N, dtype=torch.long)
-        else:
-            lengths = lengths.to(device=device, dtype=torch.long)
-
-        # Initialize all zeros on same device/dtype as sequence
-        labels = sequence.new_zeros(B, N - 1, C, C)
-
-        # Previous and next labels for all possible transitions
-        prev_labels = sequence[:, :-1]   # (B, N-1)
-        next_labels = sequence[:,  1:]   # (B, N-1)
-
-        # Batch indices and time indices
-        b_idx = torch.arange(B, device=device).unsqueeze(1).expand(B, N - 1)   # (B, N-1)
-        t_idx = torch.arange(N - 1, device=device).unsqueeze(0).expand(B, N - 1)  # (B, N-1)
-
-        # Valid transitions are t < lengths[b] - 1
-        valid_transitions = t_idx < (lengths - 1).unsqueeze(1)  # (B, N-1) bool
-
-        # Flatten only the valid positions
-        b_flat = b_idx[valid_transitions]
-        t_flat = t_idx[valid_transitions]
-        next_flat = next_labels[valid_transitions]
-        prev_flat = prev_labels[valid_transitions]
-
-        # Set indicators for valid edges
-        labels[b_flat, t_flat, next_flat, prev_flat] = 1
-
-        return labels.contiguous()
-    
-    def from_parts(self, edge: torch.Tensor):
-        """
-        Convert edges to sequence representation.
-
-        Parameters
-        ----------
-        edge : Tensor of shape (B, N-1, C, C)
-            Markov indicators: edge[b, t, z_t, z_{t-1}] = 1.
-
-        Returns
-        -------
-        labels : LongTensor of shape (B, N)
-            Reconstructed label sequences in [0, C-1].
-        C : int
-            Number of states.
-        """
-        B, N_1, C, _ = edge.shape
-        N = N_1 + 1
-        device = edge.device
-
-        # edge[b, t, z_t, z_{t-1}] = 1
-        # Sum over z_t → one-hot over previous state (z_{t-1})
-        prev_onehot = edge.sum(dim=2)      # (B, N-1, C)
-        # Sum over z_{t-1} → one-hot over next state (z_t)
-        next_onehot = edge.sum(dim=3)      # (B, N-1, C)
-
-        # Convert one-hot to label indices
-        prev_labels = prev_onehot.argmax(dim=-1)  # (B, N-1)
-        next_labels = next_onehot.argmax(dim=-1)  # (B, N-1)
-
-        # Allocate output on same device, but long dtype
-        labels = torch.zeros(B, N, device=device, dtype=torch.long)
-
-        # At t = 0, label is previous state from first edge
-        labels[:, 0] = prev_labels[:, 0]
-        # For t >= 1, labels come from the "next" states of each edge
-        labels[:, 1:] = next_labels
-
-        return labels.contiguous(), C
+        if self.save_path is not None:
+            os.makedirs(self.save_path, exist_ok=True)
 
     def train(self, probes, test_probes, fold = None, save_train_curve=False, show_train_curve=False):
         self.model = self.model.to(self.device)
@@ -265,14 +162,12 @@ class Model():
                                              class_column = "labels",ignore_N=self.ignore_N)
             test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
 
-        criterion = nn.CrossEntropyLoss()
-        if self.loss_gamma != 0. or self.loss_alpha is not None:
-            criterion = FocalLoss(alpha=self.loss_alpha, gamma=self.loss_gamma, reduction='mean')
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, capturable=False)
 
         train_losses = []
         test_losses = []
-        for epoch in tqdm.tqdm(range(self.epochs)):
+        pbar = tqdm.tqdm(range(self.epochs), desc=f"Fold {fold} Training")
+        for epoch in pbar:
             self.model.train()
             running_loss = 0.0
             for batch in tr_dataloader:
@@ -281,12 +176,8 @@ class Model():
                                 weights.to(self.device)
 
                 optimizer.zero_grad()
-                #print(x.shape)
-                #outputs = self.model(x.permute(0,2,1)).permute(0,2,1).reshape(1, -1, self.num_classes, self.num_classes)[:, 1:].contiguous()
-                
                 crf = self.model(x.permute(0,2,1))
-                y_event = self.to_parts(y, self.num_classes)
-                loss = -crf.log_prob(y_event)
+                loss = crf.nll(y)
 
                 weighted_loss = (loss) * weights
                 weighted_loss = weighted_loss.mean()
@@ -307,16 +198,16 @@ class Model():
                         x, y, weights = x.to(self.device), y.to(self.device), \
                                         weights.to(self.device)
                         
-                        #outputs = self.model(x.permute(0,2,1)).permute(0,2,1).reshape(1, -1, self.num_classes, self.num_classes)[:, 1:].contiguous()
                         crf = self.model(x.permute(0,2,1))
-                        y_event = self.to_parts(y, self.num_classes)
-                        loss = -crf.log_prob(y_event)
+                        loss = crf.nll(y)
                         
                         weighted_loss = loss * weights
                         weighted_loss = weighted_loss.mean()
                         running_loss += weighted_loss.item()
                     test_loss = running_loss / len(test_dataloader)
                     test_losses.append(test_loss)
+                pbar.set_postfix({"train_loss": f"{train_loss:.4f}", "test_loss": f"{test_loss:.4f}" if test_probes else "N/A"})
+
         if save_train_curve:
             plt.plot(train_losses, label = "Train")
             plt.plot(test_losses, label = "Test")
@@ -345,14 +236,9 @@ class Model():
                 #outputs = self.model(x.permute(0,2,1)).permute(0,2,1).reshape(1, -1, self.num_classes, self.num_classes)[:, 1:].contiguous()
                 crf = self.model(x.permute(0,2,1))
                 if return_logits:
-                    node_marginals = torch.zeros(x.shape[0], x.shape[1], self.num_classes, device=x.device)
-                    edge_marginals = crf.marginals   # shape (batch, N-1, num_classes, num_classes)
-                    node_marginals[:, :-1, :] = edge_marginals.sum(-1)   # sum over next-state j
-                    node_marginals[:, 1:, :] += edge_marginals.sum(-2)   # sum over prev-state i
-                    node_marginals /= node_marginals.sum(-1, keepdim=True)  # normalize
-                    all_logits.append(torch.log(node_marginals).cpu())
+                    all_logits.append(crf.logits().cpu())
 
-                outputs = self.from_parts(crf.argmax)[0].view(-1).cpu().tolist()
+                outputs = crf.argmax().view(-1).cpu().tolist()
                 output_labels = [self.inv_label_map[x] for x in outputs]
                 all_predictions.append(output_labels)
             if return_logits:
@@ -371,9 +257,8 @@ class Model():
                 x, _, _ = probe
                 x = x.to(self.device)
 
-                outputs = self.model.forward(x.permute(0,2,1))
-                probabilities = nn.Softmax(dim=1)(outputs)
-                all_probabilities.append(probabilities.cpu())
+                crf = self.model.forward(x.permute(0,2,1))
+                all_probabilities.append(crf.marginals().cpu())
         return all_probabilities
 
     def load_probes(self, probes):
@@ -398,7 +283,9 @@ class Model():
                             transformer_window_size=self.transformer_window_size, 
                             embed_dim=self.embed_dim, 
                             transformer_layers=self.transformer_layers, 
-                            transformer_nhead=self.transformer_nhead) 
+                            transformer_nhead=self.transformer_nhead,
+
+                            ) 
         self.model.load_state_dict(torch.load(path, weights_only=True, map_location = self.device))
         self.model = self.model.to(self.device)
 
@@ -512,9 +399,162 @@ def pad_or_crop(tensor, dim, target_size):
     return tensor
 
 
+class UNetOutput:
+    def __init__(self, scores):
+        self.scores = scores
+        self.num_classes = scores.size(-1)
+
+    def nll(self, labels):
+        return nn.CrossEntropyLoss()(self.scores.view(-1, self.num_classes), labels.view(-1))
+    
+    def marginals(self):
+        return torch.softmax(self.scores, dim=-1)
+    
+    def argmax(self):
+        return self.scores.argmax(dim=-1)
+    
+    def logits(self):
+        return self.scores
+    
+class UNetCRFOutput(UNetOutput):
+    def __init__(self, scores):
+        super(UNetCRFOutput, self).__init__(scores)
+        self.crf = LinearChainCRF(scores)
+
+    def nll(self, labels):
+        y_event = self.to_parts(labels, self.num_classes)
+        return -self.crf.log_prob(y_event)
+    
+    def marginals(self):
+        node_marginals = torch.zeros(self.scores.shape[0], self.scores.shape[1], self.num_classes, device=self.scores.device)
+        edge_marginals = self.crf.marginals   # shape (batch, N-1, num_classes, num_classes)
+        node_marginals[:, :-1, :] = edge_marginals.sum(-2)   # sum over next-state j
+        node_marginals[:, 1:, :] += edge_marginals.sum(-1)   # sum over prev-state i
+        node_marginals /= node_marginals.sum(-1, keepdim=True)  # normalize
+        return node_marginals
+    
+    def argmax(self):
+        return self.from_parts(self.crf.argmax)[0]
+    
+    def logits(self):
+        return torch.log(self.marginals() + 1e-8)  # add small constant for numerical stability
+    
+    def to_parts(self, sequence: torch.Tensor, extra: int, lengths: torch.Tensor | None = None) -> torch.Tensor:
+        """
+        Convert a sequence representation to Markov edge indicators.
+
+        Parameters
+        ----------
+        sequence : LongTensor of shape (B, N)
+            Each entry in [0, C-1], where C = extra.
+        extra : int
+            Number of states (C).
+        lengths : LongTensor of shape (B,), optional
+            True sequence lengths for each batch element. If None, all are length N.
+
+        Returns
+        -------
+        labels : LongTensor of shape (B, N-1, C, C)
+            Markov edge indicators: labels[b, t, z_t, z_{t-1}] = 1 for valid transitions,
+            0 elsewhere. Positions at or beyond lengths[b]-1 are zero.
+        """
+        C = extra
+        device = sequence.device
+        B, N = sequence.shape
+
+        if lengths is None:
+            lengths = sequence.new_full((B,), N, dtype=torch.long)
+        else:
+            lengths = lengths.to(device=device, dtype=torch.long)
+
+        # Initialize all zeros on same device/dtype as sequence
+        labels = sequence.new_zeros(B, N - 1, C, C)
+
+        # Previous and next labels for all possible transitions
+        prev_labels = sequence[:, :-1]   # (B, N-1)
+        next_labels = sequence[:,  1:]   # (B, N-1)
+
+        # Batch indices and time indices
+        b_idx = torch.arange(B, device=device).unsqueeze(1).expand(B, N - 1)   # (B, N-1)
+        t_idx = torch.arange(N - 1, device=device).unsqueeze(0).expand(B, N - 1)  # (B, N-1)
+
+        # Valid transitions are t < lengths[b] - 1
+        valid_transitions = t_idx < (lengths - 1).unsqueeze(1)  # (B, N-1) bool
+
+        # Flatten only the valid positions
+        b_flat = b_idx[valid_transitions]
+        t_flat = t_idx[valid_transitions]
+        next_flat = next_labels[valid_transitions]
+        prev_flat = prev_labels[valid_transitions]
+
+        # Set indicators for valid edges
+        labels[b_flat, t_flat, next_flat, prev_flat] = 1
+
+        return labels.contiguous()
+    
+    def from_parts(self, edge: torch.Tensor):
+        """
+        Convert edges to sequence representation.
+
+        Parameters
+        ----------
+        edge : Tensor of shape (B, N-1, C, C)
+            Markov indicators: edge[b, t, z_t, z_{t-1}] = 1.
+
+        Returns
+        -------
+        labels : LongTensor of shape (B, N)
+            Reconstructed label sequences in [0, C-1].
+        C : int
+            Number of states.
+        """
+        B, N_1, C, _ = edge.shape
+        N = N_1 + 1
+        device = edge.device
+
+        # edge[b, t, z_t, z_{t-1}] = 1
+        # Sum over z_t → one-hot over previous state (z_{t-1})
+        prev_onehot = edge.sum(dim=2)      # (B, N-1, C)
+        # Sum over z_{t-1} → one-hot over next state (z_t)
+        next_onehot = edge.sum(dim=3)      # (B, N-1, C)
+
+        # Convert one-hot to label indices
+        prev_labels = prev_onehot.argmax(dim=-1)  # (B, N-1)
+        next_labels = next_onehot.argmax(dim=-1)  # (B, N-1)
+
+        # Allocate output on same device, but long dtype
+        labels = torch.zeros(B, N, device=device, dtype=torch.long)
+
+        # At t = 0, label is previous state from first edge
+        labels[:, 0] = prev_labels[:, 0]
+        # For t >= 1, labels come from the "next" states of each edge
+        labels[:, 1:] = next_labels
+
+        return labels.contiguous(), C
 
 class UNet1D(nn.Module):
-    def __init__(self, input_size, output_size, growth_factor, features, num_layers, n_conv_steps_per_block, dropout_rate, block_kernel_size, up_down_sample_kernel_size, block_padding, bottleneck_type, transformer_window_size, embed_dim, transformer_layers, transformer_nhead, shared_transition = False):
+    def __init__(self, input_size, 
+                 output_size, 
+                 growth_factor, 
+                 features, 
+                 num_layers, 
+                 n_conv_steps_per_block, 
+                 dropout_rate, 
+                 block_kernel_size, 
+                 up_down_sample_kernel_size, 
+                 block_padding, 
+                 bottleneck_type, 
+                 transformer_window_size, 
+                 embed_dim, 
+                 transformer_layers, 
+                 transformer_nhead,
+                 block_type = "resnet",
+                 upsample_type = "nearest",
+                 downsample_type = "conv", 
+                 crf_type = 'none',
+                 skip_before_downsample = False,
+                 norm_affine = False, 
+                 skip_start_layer=0):
         super(UNet1D, self).__init__()
         self.num_layers = num_layers
         self.features = features
@@ -524,45 +564,89 @@ class UNet1D(nn.Module):
         self.embed_dim = embed_dim
         self.transformer_layers = transformer_layers
         self.transformer_nhead = transformer_nhead
-        self.shared_transition = shared_transition
-
+        self.crf_type = crf_type
+        self.skip_start_layer = skip_start_layer
+        self.block_type = block_type
+        self.upsample_type = upsample_type
+        self.downsample_type = downsample_type
+        self.skip_before_downsample = skip_before_downsample
+        self.norm_affine = norm_affine
 
         # input layer
         self.in_conv = nn.Conv1d(in_channels=input_size, out_channels=features, kernel_size=1)
 
         # Encoding layers
         self.encoders = nn.ModuleList()
-        self.pools = nn.ModuleList()
         for i in range(num_layers):
-            encoder = EncoderBlock(features, growth_factor*features, n_conv_steps_per_block=n_conv_steps_per_block, dropout_rate=dropout_rate, block_kernel_size=block_kernel_size, block_padding=block_padding, growth_factor=growth_factor)
+            encoder = EncoderBlock( 
+                n_conv_steps_per_block,
+                in_channels=features,
+                out_channels=growth_factor*features,
+                kernel_size=block_kernel_size,
+                stride=2,
+                dilation=1,
+                dropout=dropout_rate,
+                block_type=self.block_type,
+                downsample_type=self.downsample_type,
+                norm_affine=self.norm_affine,
+                skip_before_downsample=self.skip_before_downsample
+            )
             self.encoders.append(encoder)
-            self.pools.append(nn.MaxPool1d(kernel_size=up_down_sample_kernel_size, stride=2))
             features *= growth_factor  # Increase feature size
 
         # Bottleneck
-        if self.bottleneck_type == "block":
+        if self.bottleneck_type == "block" or self.transformer_layers == 0:
             # in the bottleneck, we don't do any growth and just map features-->features
-            self.bottleneck = EncoderBlock(features, features, n_conv_steps_per_block=n_conv_steps_per_block, dropout_rate=dropout_rate, block_kernel_size=block_kernel_size, block_padding=block_padding, growth_factor=1)
-        elif self.bottleneck_type == "windowed_attention":
-            self.bottleneck = WindowedTransformerBotleneck(features, self.transformer_window_size, self.embed_dim, self.transformer_layers, self.transformer_nhead)
+            
+            self.bottleneck = EncoderBlock( 
+                n_conv_steps_per_block,
+                in_channels=features,
+                out_channels=features,
+                kernel_size=block_kernel_size,
+                stride=1,
+                dilation=1,
+                dropout=dropout_rate,
+                block_type=self.block_type,
+                downsample_type=self.downsample_type,
+                norm_affine=self.norm_affine
+            )
         elif self.bottleneck_type == "attention":
-            self.bottleneck = TransformerBotleneck(self.embed_dim, self.transformer_layers, self.transformer_nhead)
+            self.to_embed = nn.Conv1d(features, embed_dim, 1)
+            self.from_embed = nn.Conv1d(embed_dim, features, 1)
+            self.transfomer = TransformerBotleneck(self.transformer_layers, self.embed_dim,
+                    nhead=self.transformer_nhead,
+                    window_size=self.transformer_window_size,
+                    dim_feedforward=-1,
+                    dropout=dropout_rate,
+                    activation="gelu")
+            self.bottleneck = nn.Sequential(self.to_embed,
+                                            self.transfomer,
+                                            self.from_embed)
         else:
             assert False
         
 
         # Decoding layers
-        self.upconvs = nn.ModuleList()
         self.decoders = nn.ModuleList()
         for i in range(num_layers):
-            upconv = nn.ConvTranspose1d(features, features, kernel_size=up_down_sample_kernel_size, stride=up_down_sample_kernel_size)
-            self.upconvs.append(upconv)
-            decoder = DecoderBlock(features, features // growth_factor, n_conv_steps_per_block=n_conv_steps_per_block, dropout_rate=dropout_rate, block_kernel_size=block_kernel_size, block_padding=block_padding, growth_factor=growth_factor)
+            decoder = DecoderBlock( 
+                n_conv_steps_per_block,
+                in_channels=features,
+                out_channels=features // growth_factor,
+                kernel_size=block_kernel_size,
+                stride=2,
+                dilation=1,
+                dropout=0.0,
+                block_type=self.block_type,
+                upsample_type=self.upsample_type,
+                norm_affine=self.norm_affine,
+                skip_before_downsample=self.skip_before_downsample
+            )
             self.decoders.append(decoder)
             features //= growth_factor  # Decrease feature size
 
         # output layer
-        if self.shared_transition:
+        if self.crf_type != 'crf':
             self.out_conv = nn.Conv1d(in_channels=features, out_channels=output_size, kernel_size=1)
         else:
             self.out_conv = nn.Conv1d(in_channels=features, out_channels=output_size * output_size, kernel_size=1)
@@ -573,218 +657,525 @@ class UNet1D(nn.Module):
     def forward(self, x):
         # Encoding path
         encodings = []
-        paddings = []
         x = self.in_conv(x)
 
         initial_size = x.shape[2]
 
         for i in range(self.num_layers):
-            x = self.encoders[i](x)
+            x, skip = self.encoders[i](x, return_skip=True)
+            if i < self.skip_start_layer:
+                skip = torch.zeros_like(skip)
             # if growth factor is not 1, then downconv
-            x = self.pools[i](x)
-            encodings.append(x)
-
+            encodings.append(skip)
+            
         # Bottleneck
+        residual = x
         x = self.bottleneck(x)
+        x = x + pad_or_crop(residual, dim=2, target_size=x.shape[2])  # Residual connection
 
         # Decoding path
         for i in range(self.num_layers):
             prev_encoding = encodings[-(i+1)]
-            x = pad_or_crop(x, dim=2, target_size=prev_encoding.shape[2])
-            x = torch.add(x, prev_encoding)
-            x = self.upconvs[i](x)
-            x = self.decoders[i](x)
+            x = self.decoders[i](x, prev_encoding)
 
         # pad up to the inital size
         x = pad_or_crop(x, dim=2, target_size=initial_size)
         x = self.out_conv(x)
-        if self.shared_transition:
-            scores = x.permute(0,2,1).unsqueeze(-2) # shape (batch, seq_len, 1, num_classes)
-            init = scores[:, :1].permute(0, 1, 3, 2).squeeze(1) # shape (batch, 1, num_classes)
-            scores = torch.nn.functional.log_softmax(self.transition, dim=-1).unsqueeze(0).unsqueeze(0) + scores[:, 1:] # shape (batch, seq_len-1, num_classes, num_classes)
-            scores[:, 0] += torch.nn.functional.log_softmax(self.init, dim=-1).unsqueeze(0).unsqueeze(-1) + init # shape (batch, num_classes, 1) x (batch, 1, num_classes)
-        else:
+        if self.crf_type == 'shared_transition_crf':
+            scores = x.permute(0,2,1) # shape (batch, seq_len, num_classes, 1)
+            edge = self.transition[None, None, :, :] + scores[:, 1:, :, None]
+            prev_term = (self.init[None, None, :] + scores[:, 0:1, :])  # (B, 1, C)
+            edge[:, 0, :, :] = edge[:, 0, :, :] + prev_term[:, 0:1, :]      # broadcast over current state
+                
+            # shape (batch, seq_len-1, num_classes, num_classes)
+            scores = edge
+        elif self.crf_type == 'crf':
             batch_size, seq_len, _ = x.permute(0,2,1).shape
-            scores = x.permute(0,2,1).reshape(batch_size, seq_len, self.transition.shape[0], self.transition.shape[1])[:, 1:, :, :] # shape (batch, seq_len-1, num_classes, num_classes)
+            scores = x.permute(0,2,1).contiguous().reshape(batch_size, seq_len, self.transition.shape[0], self.transition.shape[1])
+            edge = scores[:, 1:, :, :] + self.transition[None, None, :, :] # shape (batch, seq_len-1, num_classes, num_classes)
+            edge[:, 0, :, :] = edge[:, 0, :, :] + torch.logsumexp(scores[:, 0, :, :], dim=2, keepdim=False)[:, None, :] + self.init[None, None, :]  # add initial term to first edge
+            scores = edge
+        else:
+            scores = x.permute(0,2,1) # shape (batch, seq_len, num_classes)
 
         scores = scores.contiguous()
-        crf = LinearChainCRF(scores)
-        return crf
+
+        if self.crf_type == 'none':
+            return UNetOutput(scores)
+        else:
+            return UNetCRFOutput(scores)
     
+
+def make_activation(activation: str):
+    act = activation.lower()
+    if act == "relu":
+        return nn.ReLU(inplace=True)
+    elif act in ("leaky_relu", "leakyrelu"):
+        return nn.LeakyReLU(negative_slope=0.01, inplace=True)
+    elif act == "gelu":
+        return nn.GELU()
+    elif act in ("silu", "swish"):
+        return nn.SiLU(inplace=True)
+    elif act == "tanh":
+        return nn.Tanh()
+    elif act in ("identity", "none"):
+        return nn.Identity()
+    else:
+        raise ValueError(
+            f"Unknown activation '{activation}'. "
+            "Choose from: relu, leaky_relu, gelu, silu/swish, tanh, identity/none."
+        )
     
-    def predict_batch(self, batch, device):
-        self.model.eval()
-        with torch.no_grad():
-            x, y, weights = batch
-            x = x.unsqueeze(0).to(device)
-            y = y.unsqueeze(0).to(device)
-
-            outputs = self.forward(x.permute(0,2,1))
-
-            masked_preds = outputs.argmax(dim=1).view(-1).cpu().tolist()
-            masked_labels = y.cpu().view(-1).tolist()
-            return masked_preds, masked_labels
-        
-    def predict(self, test_dataloader, device):
-        all_preds = []
-        all_labels = []
-        self.model.eval()
-        with torch.no_grad():
-            for batch in test_dataloader:
-                masked_preds, masked_labels = self.predict_batch(batch, device=device)
-
-                all_preds.extend(masked_preds)
-                all_labels.extend(masked_labels)
-
-        return all_labels, all_preds
+def make_gn(num_channels: int, max_groups: int = 8, eps: float = 1e-5, affine: bool = False):
+    g = min(max_groups, num_channels)
+    while g > 1 and (num_channels % g) != 0:
+        g -= 1
+    #   return nn.GroupNorm(g, num_channels, eps=eps, affine=affine) 
+    return nn.GroupNorm(num_channels, num_channels, eps=eps, affine=affine)
 
 class EncoderBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, n_conv_steps_per_block, dropout_rate, block_kernel_size, block_padding, growth_factor):
+    def __init__(self, 
+        layers: int,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        dilation: int = 1,
+        groups: int = 1,
+        dropout: float = 0.0,
+        activation: str = "gelu",
+        norm_affine: bool = True,
+        eps: float = 1e-5,
+        downsample_type: str = "conv",
+        downsample_kernel_size: int = 3,
+        block_type: str = "resnet",
+        skip_before_downsample: bool = False,
+    ):
         """
-        Defines a single encoding block consisting of nX: Conv1d, InstanceNorm1d, GELU, dropout.
+        Defines a single encoding block consisting of nX: Conv1d, GroupNorm, and GELU.
         """
         super(EncoderBlock, self).__init__()
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.growth_factor = growth_factor
+        self.skip_before_downsample = skip_before_downsample
+        self.block_type = {'resnet': ResNet1DBlock, 'simple': Simple1DBlock}[block_type]
         self.block = nn.Sequential()
+        for _ in range(layers):
+            self.block.append(self.block_type(
+                in_channels=in_channels,
+                out_channels=in_channels,
+                kernel_size=kernel_size,
+                stride=1,
+                dilation=dilation,
+                groups=groups,
+                dropout=dropout,
+                activation=activation,
+                norm_affine=norm_affine,
+                eps=eps,
+            ))
 
-        self.block.append(nn.Conv1d(in_channels, out_channels, kernel_size=block_kernel_size, padding=block_padding))
-        self.block.append(nn.InstanceNorm1d(out_channels))
-        self.block.append(nn.GELU())
-        self.block.append(nn.Dropout(p=dropout_rate))
         
-        for _ in range(n_conv_steps_per_block-1):
-            self.block.append(nn.Conv1d(out_channels, out_channels, kernel_size=block_kernel_size, padding=block_padding))
-            self.block.append(nn.InstanceNorm1d(out_channels))
-            self.block.append(nn.GELU())
-            self.block.append(nn.Dropout(p=dropout_rate))
-
-    def forward(self, x):
-        if self.growth_factor == 1:
-            return self.block(x) + x # add skip connection
-        elif self.growth_factor == 2:
-            return self.block(x)
-
-    def __repr__(self):
-        return f"EncoderBlock({self.in_channels}, {self.out_channels})" + super(EncoderBlock, self).__repr__()[12:]
-
+        padding = ((downsample_kernel_size - 1) // 2)
+        if downsample_type == "conv":
+            self.output = nn.Sequential(
+                nn.Conv1d(in_channels, out_channels, kernel_size=downsample_kernel_size,
+                stride=stride, padding=padding),
+                make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine),
+                make_activation(activation),
+            )
+        elif downsample_type == "avgpool":
+            self.output = nn.Sequential(
+                nn.AvgPool1d(kernel_size=stride, stride=stride),
+                nn.Conv1d(in_channels, out_channels, kernel_size=1),
+            )
+        elif downsample_type == "maxpool":
+            self.output = nn.Sequential(
+                nn.MaxPool1d(kernel_size=stride, stride=stride),
+                nn.Conv1d(in_channels, out_channels, kernel_size=1),
+            )
+        else:
+            raise ValueError(f"Unknown downsample_type '{downsample_type}'. Choose from: conv, avgpool, maxpool.")
+            
+    def forward(self, x, return_skip=False):
+        x = self.block(x) 
+        padded = x #torch.nn.functional.pad(x, (0, x.shape[2] % 2))  # Pad to even length if necessary
+        output = self.output(padded)
+        if return_skip:
+            return output, (x if self.skip_before_downsample else output)
+        return output
 
 class DecoderBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, n_conv_steps_per_block, dropout_rate, block_kernel_size, block_padding, growth_factor):
+    def __init__(self, 
+        layers: int,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        dilation: int = 1,
+        groups: int = 1,
+        dropout: float = 0.0,
+        activation: str = "gelu",
+        norm_affine: bool = True,
+        eps: float = 1e-5,
+        upsample_type: str = "nearest",
+        upsample_kernel_size: int = 3,
+        block_type: str = "resnet",
+        skip_before_downsample: bool = False,
+    ):
         """
-        Defines a single decoding block consisting of nX: Conv1d, InstanceNorm1d, and GELU.
+        Defines a single decoding block consisting of nX: Conv1d, GroupNorm, and GELU.
         """
         super(DecoderBlock, self).__init__()
-        self.growth_factor = growth_factor
+        self.skip_before_downsample = skip_before_downsample
+        self.block_type = {'resnet': ResNet1DBlock, 'simple': Simple1DBlock}[block_type]
         self.block = nn.Sequential()
 
-        self.block.append(nn.Conv1d(in_channels, out_channels, kernel_size=block_kernel_size, padding=block_padding))
-        self.block.append(nn.InstanceNorm1d(out_channels))
-        self.block.append(nn.GELU())
-        for _ in range(n_conv_steps_per_block-1):
-            self.block.append(nn.Conv1d(out_channels, out_channels, kernel_size=block_kernel_size, padding=block_padding))
-            self.block.append(nn.InstanceNorm1d(out_channels))
-            self.block.append(nn.GELU())
+        padding = ((upsample_kernel_size - 1) // 2)
+        if upsample_type == "nearest":
+            self.input = nn.Sequential(
+                nn.Upsample(scale_factor=stride, mode='nearest'),
+                nn.Conv1d(in_channels, out_channels, kernel_size=upsample_kernel_size, padding=padding),
+                make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine),
+                make_activation(activation),
+            )
+        elif upsample_type == "linear":
+            self.input = nn.Sequential(
+                nn.Upsample(scale_factor=stride, mode='linear', align_corners=True),
+                nn.Conv1d(in_channels, out_channels, kernel_size=upsample_kernel_size, padding=padding),
+                make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine),
+                make_activation(activation),
+            )
+        elif upsample_type == "convtranspose":
+            self.input = nn.Sequential(
+                nn.ConvTranspose1d(in_channels, out_channels, kernel_size=upsample_kernel_size, stride=stride, padding=padding, output_padding=stride-1),
+                make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine),
+                make_activation(activation),
+            )
+        else:
+            raise ValueError(f"Unknown upsample_type '{upsample_type}'. Choose from: nearest, linear, convtranspose.")
+        
+        in_channels = out_channels  # Update in_channels for the next layer
+        for _ in range(layers):
+            self.block.append(self.block_type(
+                in_channels=in_channels,
+                out_channels=out_channels,
+                kernel_size=kernel_size,
+                stride=1,
+                dilation=dilation,
+                groups=groups,
+                dropout=dropout,
+                activation=activation,
+                norm_affine=norm_affine,
+                eps=eps,
+            ))
             
-    def forward(self, x):
-        if self.growth_factor == 1:
-            return self.block(x) + x # add skip connection
-        elif self.growth_factor == 2:
-            return self.block(x)
+    def forward(self, x, skip):
+        if self.skip_before_downsample:
+            x = pad_or_crop(self.input(x), dim=2, target_size=skip.shape[2]) + skip
+        else:
+            x = self.input(pad_or_crop(x, dim=2, target_size=skip.shape[2]) + skip)
+        return self.block(x)
 
-import torch.nn.functional as F
+class ResNet1DBlock(nn.Module):
+    """
+    Basic 1D ResNet block using InstanceNorm1d:
+      Conv-IN-Act-Conv-IN + skip connection.
 
-class WindowedTransformerBotleneck(nn.Module):
-    def __init__(self, in_channels, window_size, embed_dim, transformer_layers, nhead):
-        super(WindowedTransformerBotleneck, self).__init__()
-        self.stride = window_size  # replace with stride for overlapping...
-        self.window_size = window_size
-        self.embed_dim = embed_dim
-        self.in_channels = in_channels
+    Input/Output: (B, C, T)
+    - If in_channels != out_channels or stride != 1, uses a 1x1 conv projection on the skip.
+    - InstanceNorm1d uses affine=True by default here (learnable scale/shift).
+    """
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        dilation: int = 1,
+        groups: int = 1,
+        dropout: float = 0.0,
+        activation: str = "gelu",
+        norm_affine: bool = True,
+        eps: float = 1e-5,
+    ):
+        super().__init__()
 
-        if self.in_channels != self.embed_dim:
-            print("WARNING: USING EMBEDDING LAYERS IN TRANSFORMER")
-            self.linear_embed = nn.Linear(self.in_channels, self.embed_dim)
-            self.linear_decode = nn.Linear(self.embed_dim, self.in_channels)
+        assert kernel_size % 2 == 1, "Use an odd kernel_size to preserve length with 'same' padding."
+        padding = ((kernel_size - 1) // 2) * dilation
 
-        self.positional_encoder = PositionalEncoding1D(self.embed_dim)
-        self.transformer_layer = nn.TransformerEncoderLayer(d_model=self.embed_dim, nhead=nhead)
-        self.transformer_encoder = nn.TransformerEncoder(self.transformer_layer, num_layers=transformer_layers)
+        # --- activation (inlined) ---
+        self.act = make_activation(activation)
+        self.drop = nn.Dropout(p=dropout) if dropout > 0 else nn.Identity()
+
+        # --- main path ---
+        self.conv1 = nn.Conv1d(
+            in_channels, out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            groups=groups,
+        )
+        self.in1 = make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine)
+
+        self.conv2 = nn.Conv1d(
+            out_channels, out_channels,
+            kernel_size=kernel_size,
+            stride=1,
+            padding=padding,
+            dilation=dilation,
+            groups=groups,
+        )
+        self.in2 = make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine)
+
+        # --- skip path ---
+        if stride != 1 or in_channels != out_channels:
+            self.proj = nn.Sequential(
+                nn.Conv1d(in_channels, out_channels, kernel_size=1, stride=stride),
+                make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine),
+            )
+        else:
+            self.proj = nn.Identity()
+
+        # Optional: start residual branch near-zero (only if affine=True)
+        if norm_affine and self.in2.weight is not None:
+            nn.init.zeros_(self.in2.weight)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        identity = self.proj(x)
+
+        out = self.conv1(x)
+        out = self.in1(out)
+        out = self.act(out)
+        out = self.drop(out)
+
+        out = self.conv2(out)
+        out = self.in2(out)
+
+        out = out + identity
+        out = self.act(out)
+        return out
     
-    def forward(self, x):
-        batch, channels, seq_len = x.shape
+class Simple1DBlock(nn.Module):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int = 3,
+        stride: int = 1,
+        dilation: int = 1,
+        groups: int = 1,
+        dropout: float = 0.0,
+        activation: str = "gelu",
+        norm_affine: bool = True,
+        eps: float = 1e-5,
+    ):
+        super().__init__()
 
-        # --- Padding ---
-        # Calculate the amount of padding needed to make seq_len a multiple of window_size
-        pad_len = (self.window_size - (seq_len % self.window_size)) % self.window_size
-        if pad_len > 0:
-            # Pad on the right side of the sequence dimension
-            x = F.pad(x, (0, pad_len))
-        new_seq_len = x.shape[-1]  # = seq_len + pad_len
+        assert kernel_size % 2 == 1, "Use an odd kernel_size to preserve length with 'same' padding."
+        assert stride == 1, "ResidualConvBlock does not support downsampling. Use stride=1 and add downsampling separately if needed."
+        assert in_channels == out_channels, "ResidualConvBlock requires in_channels == out_channels for the skip connection."
+        padding = ((kernel_size - 1) // 2) * dilation
 
-        # --- Windowing ---
-        # x has shape: (batch, channels, new_seq_len)
-        # Use unfold on the last dimension to create windows of size window_size
-        # The resulting shape is (batch, channels, num_windows, window_size)
-        x_windowed = x.unfold(dimension=2, size=self.window_size, step=self.stride)
-        batch, channels, num_windows, window_size = x_windowed.shape
-        
-        # Rearrange dimensions to prepare for transformer encoding:
-        # We want shape: (window_size, batch*num_windows, channels)
-        x_windowed = x_windowed.permute(3, 0, 2, 1).reshape(window_size, batch * num_windows, channels)
-        
-        if self.in_channels != self.embed_dim:
-            x_windowed = torch.vmap(self.linear_embed)(x_windowed)
+        # --- activation (inlined) ---
+        self.act = make_activation(activation)
+        self.drop = nn.Dropout(p=dropout) if dropout > 0 else nn.Identity()
 
-        # --- Positional Encoding ---
-        x_windowed = x_windowed + self.positional_encoder(x_windowed)
-        
-        # --- Transformer Encoding ---
-        #print("TRANSFORMER", x_windowed.shape)
-        encoded = self.transformer_encoder(src=x_windowed)
- 
-        if self.in_channels != self.embed_dim:
-            encoded = torch.vmap(self.linear_decode)(encoded)
-        # --- Reassemble ---
-        encoded = encoded.reshape(window_size, batch, num_windows, channels).permute(1, 3, 2, 0)
-        # Merge windows along the sequence dimension: (batch, channels, num_windows * window_size)
-        output = encoded.reshape(batch, channels, -1)
-        
-        # Remove extra padded positions to recover the original sequence length
-        if pad_len > 0:
-            output = output[:, :, :seq_len]
-        return output
+        # --- main path ---
+        self.conv1 = nn.Conv1d(
+            in_channels, out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            groups=groups
+        )
+        self.in1 = make_gn(out_channels, max_groups=8, eps=eps, affine=norm_affine)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        out = self.conv1(x)
+        out = self.in1(out)
+        out = self.act(out)
+        out = self.drop(out)
+        out = out + x
+        return out
+
+
+try:
+    import xformers.ops as xops
+    _HAS_XFORMERS = True
+except Exception:
+    _HAS_XFORMERS = False
+
+class WindowedMHA(nn.Module):
+    def __init__(self, embed_dim, num_heads, window_size=-1, dropout=0.0, bias=True):
+        super().__init__()
+        assert embed_dim % num_heads == 0
+        self.embed_dim = embed_dim
+        self.num_heads = num_heads
+        self.head_dim = embed_dim // num_heads
+        self.window_size = window_size
+        self.dropout = dropout
+
+        self.q_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.k_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.v_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+        self.out_proj = nn.Linear(embed_dim, embed_dim, bias=bias)
+
+    def forward(self, x, is_causal=False):
+        # x: (B, T, C)
+        B, T, C = x.shape
+        H, D = self.num_heads, self.head_dim
+
+        q = self.q_proj(x).view(B, T, H, D)
+        k = self.k_proj(x).view(B, T, H, D)
+        v = self.v_proj(x).view(B, T, H, D)
+
+        if _HAS_XFORMERS:
+            if self.window_size <= 0:
+                if is_causal:
+                    attn_bias = xops.fmha.attn_bias.LowerTriangularMask()
+                else:
+                    attn_bias = None
+            else:
+                if is_causal:
+                    attn_bias = xops.fmha.attn_bias.LowerTriangularFromBottomRightLocalAttentionMask(self.window_size)
+                else:
+                    attn_bias = xops.fmha.attn_bias.LocalAttentionFromBottomRightMask(window_left=self.window_size, window_right=self.window_size)
+            out = xops.memory_efficient_attention(q, k, v, attn_bias=attn_bias, p=self.dropout)
+        else:
+            # Pure PyTorch dense masked window attention
+            q_ = q.transpose(1, 2)  # (B,H,T,D)
+            k_ = k.transpose(1, 2)
+            v_ = v.transpose(1, 2)
+
+            out_ = F.scaled_dot_product_attention(
+                q_, k_, v_,
+                dropout_p=self.dropout,
+                is_causal=is_causal
+            )
+            out = out_.transpose(1, 2)  # (B,T,H,D)
+
+        out = out.reshape(B, T, C)
+        return self.out_proj(out)
+
+class WindowedTransformerEncoderLayer(nn.Module):
+    """
+    Transformer encoder layer using WindowedMHA for (local) self-attention.
+
+    Input/Output:
+      x: (B, T, C) -> (B, T, C)
+
+    Notes:
+      - This version assumes you don't need a key_padding_mask. If you do, you'll
+        want to extend WindowedMHA to accept it (easy to add to the dense SDPA path).
+      - norm_first=True gives Pre-LN (usually preferred for stability).
+    """
+    def __init__(
+        self,
+        d_model: int,
+        nhead: int,
+        window_size: int,
+        dim_feedforward: int = 256,
+        dropout: float = 0.1,
+        activation: str = "gelu",
+        norm_first: bool = True,
+        layer_norm_eps: float = 1e-5,
+    ):
+        super().__init__()
+        self.norm_first = norm_first
+
+        # --- self-attention ---
+        self.self_attn = WindowedMHA(
+            embed_dim=d_model,
+            num_heads=nhead,
+            window_size=window_size,
+            dropout=dropout,
+            bias=True,
+        )
+        self.dropout1 = nn.Dropout(dropout)
+        self.norm1 = nn.LayerNorm(d_model, eps=layer_norm_eps)
+
+        # --- feedforward ---
+        if activation.lower() == "gelu":
+            act = nn.GELU()
+        elif activation.lower() == "relu":
+            act = nn.ReLU()
+        elif activation.lower() in ("silu", "swish"):
+            act = nn.SiLU()
+        else:
+            raise ValueError(f"Unknown activation: {activation}")
+
+        self.linear1 = nn.Linear(d_model, dim_feedforward)
+        self.activation = act
+        self.dropout_ff = nn.Dropout(dropout)
+        self.linear2 = nn.Linear(dim_feedforward, d_model)
+
+        self.dropout2 = nn.Dropout(dropout)
+        self.norm2 = nn.LayerNorm(d_model, eps=layer_norm_eps)
+
+    def _sa_block(self, x: torch.Tensor, is_causal: bool) -> torch.Tensor:
+        # WindowedMHA returns (B,T,C)
+        attn_out = self.self_attn(x, is_causal=is_causal)
+        return self.dropout1(attn_out)
+
+    def _ff_block(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.linear1(x)
+        x = self.activation(x)
+        x = self.dropout_ff(x)
+        x = self.linear2(x)
+        return self.dropout2(x)
+
+    def forward(self, x: torch.Tensor, *, is_causal: bool = False) -> torch.Tensor:
+        if self.norm_first:
+            # Pre-LN
+            x = x + self._sa_block(self.norm1(x), is_causal=is_causal)
+            x = x + self._ff_block(self.norm2(x))
+            return x
+        else:
+            # Post-LN (closer to original Transformer)
+            x = self.norm1(x + self._sa_block(x, is_causal=is_causal))
+            x = self.norm2(x + self._ff_block(x))
+            return x
 
     
 class TransformerBotleneck(nn.Module):
-    def __init__(self, embed_dim, transformer_layers, nhead):
+    def __init__(self, transformer_layers: int, embed_dim: int,
+        nhead: int,
+        window_size: int,
+        dim_feedforward: int = -1,
+        dropout: float = 0.1,
+        activation: str = "gelu",
+        norm_first: bool = True,
+        layer_norm_eps: float = 1e-5,):
+
         super(TransformerBotleneck, self).__init__()
         self.embed_dim = embed_dim
+        self.window_size = window_size
+        self.transformer_layers = transformer_layers
+        if dim_feedforward == -1:
+            dim_feedforward = 2 * embed_dim
 
         self.positional_encoder = PositionalEncoding1D(self.embed_dim)
-        self.transformer_layer = nn.TransformerEncoderLayer(d_model = self.embed_dim, nhead = nhead)
-        self.transformer_encoder = nn.TransformerEncoder(self.transformer_layer, num_layers = transformer_layers)
-    
-    def forward(self, x):
-        # Apply a positional embedding
-        x = x.permute(2, 0, 1) # seq_len, batch, channels
-        x_positional_encoded = x + self.positional_encoder(x)
-        # Transformer Encoding
-        encoded = self.transformer_encoder(src = x_positional_encoded)
-        encoded = encoded.permute(1, 2, 0)
-        return encoded
-    
-# NOTE: no longer in use
-class MaxPool1dWithOddInputHandling(nn.Module):
-    def __init__(self, pool_kernel_size, stride=None, padding=0, dilation=1, ceil_mode=False):
-        super(MaxPool1dWithOddInputHandling, self).__init__()
-        self.pool = nn.MaxPool1d(kernel_size=pool_kernel_size, stride=stride, padding=padding, dilation=dilation, ceil_mode=ceil_mode)
+        self.layers = nn.ModuleList([
+            WindowedTransformerEncoderLayer(
+                d_model=embed_dim,
+                nhead=nhead,
+                window_size=window_size,
+                dim_feedforward=dim_feedforward,
+                dropout=dropout,
+                activation=activation,
+                norm_first=norm_first,
+                layer_norm_eps=layer_norm_eps,
+            )
+            for _ in range(self.transformer_layers)
+        ])
+        self.transformer_encoder = nn.Sequential(*self.layers)
 
     def forward(self, x):
-        # Check if the sequence length (dimension 2) is odd
-        if x.size(2) % 2 != 0:
-            # If odd, pad by 1 on the right side
-            x = F.pad(x, (0, 1))
-        # Apply the MaxPool1d operation
-        return self.pool(x)
+        # Apply a positional embedding
+        x = x.permute(0, 2, 1) # batch, seq_len, channels
+        x_positional_encoded = x + self.positional_encoder(x)
+        # Transformer Encoding
+        encoded = self.transformer_encoder(x_positional_encoded)
+        encoded = encoded.permute(0, 2, 1) # batch, channels, seq_len
+        return encoded
+    
