@@ -86,7 +86,7 @@ class LabelViewTab(QWidget):
         self.modelChooser.addItem("----- Mosquito Models -----")
         self.modelChooser.setItemData(self.modelChooser.count() - 1, 0, Qt.ItemDataRole.UserRole - 1)
 
-        mosquito_models = ["UNet (Block)", "UNet (Attention)"]
+        mosquito_models = ["UNet (Block)", "UNet (Attention)", "RF"]
         for model in mosquito_models:
             self.modelChooser.addItem(f"Mosquito {model}")
         
