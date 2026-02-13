@@ -34,6 +34,6 @@ If you’re not using uv, you can install the base dependencies directly:
 ```bash
 pip install .
 ```
-
+ 
 **Important:** pip will **not** automatically install PyTorch.  
 You must install the correct wheel for your system from the [PyTorch installation guide](https://pytorch.org/get-started/locally/).  
