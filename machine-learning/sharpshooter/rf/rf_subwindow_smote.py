@@ -234,14 +234,18 @@ class Model():
         X_train = train.drop(["label"], axis=1)
         Y_train = train["label"]
         
-        # Apply SMOTE if enabled
+        # Apply SMOTE if enabled (cap k_neighbors so it does not exceed smallest class size - 1)
         if self.use_smote:
-            smote = SMOTE(
-                k_neighbors=self.smote_k_neighbors,
-                sampling_strategy=self.smote_sampling_strategy,
-                random_state=self.random_state
-            )
-            X_train, Y_train = smote.fit_resample(X_train, Y_train)
+            min_class_count = int(Y_train.value_counts().min())
+            if min_class_count >= 2:
+                k_cap = min_class_count - 1
+                k_neighbors = min(self.smote_k_neighbors, k_cap)
+                smote = SMOTE(
+                    k_neighbors=k_neighbors,
+                    sampling_strategy=self.smote_sampling_strategy,
+                    random_state=self.random_state
+                )
+                X_train, Y_train = smote.fit_resample(X_train, Y_train)
         
         rf = RandomForestClassifier(self.num_estimators, class_weight="balanced", max_depth = self.max_depth)
         self.model = rf.fit(X_train, Y_train)

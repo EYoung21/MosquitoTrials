@@ -1,0 +1,19 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:00<00:13,  4.34it/s]Reading 58 .parquet files:   7%|▋         | 4/58 [00:00<00:04, 12.10it/s]Reading 58 .parquet files:  10%|█         | 6/58 [00:00<00:04, 12.08it/s]Reading 58 .parquet files:  21%|██        | 12/58 [00:00<00:01, 24.79it/s]Reading 58 .parquet files:  28%|██▊       | 16/58 [00:00<00:01, 25.84it/s]Reading 58 .parquet files:  36%|███▌      | 21/58 [00:00<00:01, 28.74it/s]Reading 58 .parquet files:  43%|████▎     | 25/58 [00:01<00:01, 31.47it/s]Reading 58 .parquet files:  50%|█████     | 29/58 [00:01<00:00, 32.52it/s]Reading 58 .parquet files:  57%|█████▋    | 33/58 [00:01<00:00, 27.56it/s]Reading 58 .parquet files:  62%|██████▏   | 36/58 [00:01<00:00, 24.34it/s]Reading 58 .parquet files:  71%|███████   | 41/58 [00:01<00:00, 30.01it/s]Reading 58 .parquet files:  78%|███████▊  | 45/58 [00:01<00:00, 23.96it/s]Reading 58 .parquet files:  90%|████████▉ | 52/58 [00:02<00:00, 30.44it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:02<00:00, 27.64it/s]
+[I 2026-02-19 07:39:44,448] A new study created in memory with name: rf_subwindow_smote_binary_hyperparameter_tuning
+  0%|          | 0/100 [00:00<?, ?it/s]
+[A
+Initializing Trial 0 Fold 0[A
+                           [A
+Training Trial 0 Fold 0[A
+                       [A
+Predicting Trial 0 Fold 0[A
+                         [A
+Initializing Trial 0 Fold 1[A
+                           [A
+Training Trial 0 Fold 1[A
+                       [A
+Predicting Trial 0 Fold 1[A
+                         [A
+Initializing Trial 0 Fold 2[A
+                           [A
+Training Trial 0 Fold 2[A

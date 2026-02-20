@@ -1,0 +1,2563 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:00<00:13,  4.16it/s]Reading 58 .parquet files:   7%|▋         | 4/58 [00:00<00:04, 13.30it/s]Reading 58 .parquet files:  10%|█         | 6/58 [00:00<00:04, 10.94it/s]Reading 58 .parquet files:  24%|██▍       | 14/58 [00:00<00:01, 28.35it/s]Reading 58 .parquet files:  31%|███       | 18/58 [00:00<00:01, 26.59it/s]Reading 58 .parquet files:  40%|███▉      | 23/58 [00:00<00:01, 30.62it/s]Reading 58 .parquet files:  47%|████▋     | 27/58 [00:01<00:01, 30.49it/s]Reading 58 .parquet files:  55%|█████▌    | 32/58 [00:01<00:00, 33.49it/s]Reading 58 .parquet files:  62%|██████▏   | 36/58 [00:01<00:00, 26.88it/s]Reading 58 .parquet files:  69%|██████▉   | 40/58 [00:01<00:00, 25.61it/s]Reading 58 .parquet files:  74%|███████▍  | 43/58 [00:01<00:00, 25.99it/s]Reading 58 .parquet files:  84%|████████▍ | 49/58 [00:01<00:00, 28.75it/s]Reading 58 .parquet files:  95%|█████████▍| 55/58 [00:02<00:00, 33.89it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:02<00:00, 27.75it/s]
+[I 2026-02-19 07:39:16,364] A new study created in memory with name: rf_subwindow_smote_hyperparameter_tuning
+  0%|          | 0/100 [00:00<?, ?it/s]
+[A
+Initializing Trial 0 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:01<00:00, 24.46it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:02<00:01,  9.58it/s][A[A
+
+Getting probes:  72%|███████▏  | 33/46 [00:03<00:01,  8.68it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+                                                      [A[A
+                           [A
+Training Trial 0 Fold 0[A
+                       [A
+Predicting Trial 0 Fold 0[A
+                         [A
+Initializing Trial 0 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:01<00:01, 17.11it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:01<00:00, 17.78it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:02,  2.75it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:01<00:01,  4.09it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 0 Fold 1[A
+                       [A
+Predicting Trial 0 Fold 1[A
+                         [A
+Initializing Trial 0 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 103.86it/s][A[A
+
+Getting probes:  76%|███████▌  | 35/46 [00:02<00:00, 13.77it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:00,  9.73it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:01,  5.52it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 0 Fold 2[A
+                       [A
+Predicting Trial 0 Fold 2[A
+                         [A
+Initializing Trial 0 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  43%|████▎     | 20/47 [00:00<00:00, 39.07it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:02<00:03,  6.80it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:03,  2.66it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:01<00:04,  1.64it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:02<00:02,  2.56it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 0 Fold 3[A
+                       [A
+Predicting Trial 0 Fold 3[A
+                         [A
+Initializing Trial 0 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:01<00:01, 18.55it/s][A[A
+
+Getting probes:  62%|██████▏   | 29/47 [00:02<00:01,  9.36it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  7.42it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:00<00:00,  7.37it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 0 Fold 4[A
+                       [A
+Predicting Trial 0 Fold 4[A
+                         [A
+Evaluating Trial 0...[A
+                     [A                                       
+[A  0%|          | 0/100 [28:05<?, ?it/s]
+[A                                       
+[A  0%|          | 0/100 [28:05<?, ?it/s]
+[A
+[A                                         0%|          | 0/100 [28:05<?, ?it/s]Best trial: 0. Best value: 0.6338:   0%|          | 0/100 [28:05<?, ?it/s]Best trial: 0. Best value: 0.6338:   1%|          | 1/100 [28:05<46:20:25, 1685.11s/it]
+[A
+Initializing Trial 1 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:00<00:00, 115.21it/s][A[A
+
+Getting probes:  85%|████████▍ | 39/46 [00:01<00:00, 31.13it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:00, 12.27it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 1 Fold 0[A
+                       [A
+Predicting Trial 1 Fold 0[A
+                         [A
+Initializing Trial 1 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:00<00:00, 32.59it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:02<00:01, 17.27it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:02<00:02,  8.99it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:02<00:01,  8.94it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:03<00:02,  5.97it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:00, 24.87it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:00, 10.58it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 1 Fold 1[A
+                       [A
+Predicting Trial 1 Fold 1[A
+                         [A
+Initializing Trial 1 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 24.69it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:03<00:03,  5.84it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:04<00:02,  5.70it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.75it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:06,  1.50it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 1 Fold 2[A
+                       [A
+Predicting Trial 1 Fold 2[A
+                         [A
+Initializing Trial 1 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:00<00:00, 61.90it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:02,  3.74it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:00<00:01,  5.63it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 1 Fold 3[A
+                       [A
+Predicting Trial 1 Fold 3[A
+                         [A
+Initializing Trial 1 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:01<00:00, 199.23it/s][A[A
+
+Getting probes:  91%|█████████▏| 43/47 [00:03<00:00,  9.76it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:01,  5.05it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 1 Fold 4[A
+                       [A
+Predicting Trial 1 Fold 4[A
+                         [A
+Evaluating Trial 1...[A
+                     [A                                                                                       
+[ABest trial: 0. Best value: 0.6338:   1%|          | 1/100 [2:22:23<46:20:25, 1685.11s/it]
+[A                                                                                         
+[ABest trial: 0. Best value: 0.6338:   1%|          | 1/100 [2:22:23<46:20:25, 1685.11s/it]
+[A
+[A                                                                                         Best trial: 0. Best value: 0.6338:   1%|          | 1/100 [2:22:23<46:20:25, 1685.11s/it]Best trial: 0. Best value: 0.6338:   1%|          | 1/100 [2:22:23<46:20:25, 1685.11s/it]Best trial: 0. Best value: 0.6338:   2%|▏         | 2/100 [2:22:23<128:42:44, 4728.21s/it]
+[A
+Initializing Trial 2 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:01<00:01, 14.77it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:02<00:01, 10.51it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:02<00:02,  8.52it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:06,  1.58it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:02<00:02,  2.60it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 2 Fold 0[A
+                       [A
+Predicting Trial 2 Fold 0[A
+                         [A
+Initializing Trial 2 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:01, 16.64it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:02<00:01, 13.62it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:04,  2.11it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:01<00:00,  5.98it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 2 Fold 1[A
+                       [A
+Predicting Trial 2 Fold 1[A
+                         [A
+Initializing Trial 2 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:00<00:00, 214.62it/s][A[A
+
+                                                                [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:10,  1.09it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.59it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 2 Fold 2[A
+                       [A
+Predicting Trial 2 Fold 2[A
+                         [A
+Initializing Trial 2 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:02<00:01, 19.42it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:02<00:02,  8.94it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:00, 16.97it/s][A[A
+
+Getting probes:  64%|██████▎   | 7/11 [00:00<00:00, 12.80it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 2 Fold 3[A
+                       [A
+Predicting Trial 2 Fold 3[A
+                         [A
+Initializing Trial 2 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:02<00:02,  9.17it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:04<00:03,  5.64it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:04<00:04,  4.55it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:05,  1.90it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:00<00:01,  5.96it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 2 Fold 4[A
+                       [A
+Predicting Trial 2 Fold 4[A
+                         [A
+Evaluating Trial 2...[A
+                     [A                                                                                          
+[ABest trial: 0. Best value: 0.6338:   2%|▏         | 2/100 [2:37:16<128:42:44, 4728.21s/it]
+[A                                                                                          
+[ABest trial: 0. Best value: 0.6338:   2%|▏         | 2/100 [2:37:16<128:42:44, 4728.21s/it]
+[A
+[A                                                                                          Best trial: 0. Best value: 0.6338:   2%|▏         | 2/100 [2:37:16<128:42:44, 4728.21s/it]Best trial: 2. Best value: 0.659864:   2%|▏         | 2/100 [2:37:16<128:42:44, 4728.21s/it]Best trial: 2. Best value: 0.659864:   3%|▎         | 3/100 [2:37:16<80:12:30, 2976.81s/it] 
+[A
+Initializing Trial 3 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 206.62it/s][A[A
+
+Getting probes:  98%|█████████▊| 45/46 [00:03<00:00, 12.64it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:02,  3.53it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.61it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  3.51it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 3 Fold 0[A
+                       [A
+Predicting Trial 3 Fold 0[A
+                         [A
+Initializing Trial 3 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:02<00:02,  9.63it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:02<00:02,  8.63it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:03<00:02,  7.85it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.87it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.78it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:02<00:05,  1.39it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 3 Fold 1[A
+                       [A
+Predicting Trial 3 Fold 1[A
+                         [A
+Initializing Trial 3 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:00<00:00, 54.99it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  5.30it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:01<00:01,  3.58it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 3 Fold 2[A
+                       [A
+Predicting Trial 3 Fold 2[A
+                         [A
+Initializing Trial 3 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:01<00:00, 27.69it/s][A[A
+
+Getting probes:  66%|██████▌   | 31/47 [00:01<00:01, 13.98it/s][A[A
+
+Getting probes:  70%|███████   | 33/47 [00:02<00:01,  9.13it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:00, 25.65it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:01<00:01,  3.63it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 3 Fold 3[A
+                       [A
+Predicting Trial 3 Fold 3[A
+                         [A
+Initializing Trial 3 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:01<00:00, 49.95it/s][A[A
+
+Getting probes:  66%|██████▌   | 31/47 [00:01<00:00, 18.14it/s][A[A
+
+Getting probes:  72%|███████▏  | 34/47 [00:01<00:00, 13.39it/s][A[A
+
+Getting probes:  77%|███████▋  | 36/47 [00:02<00:01,  8.51it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:01<00:14,  1.46s/it][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:01<00:04,  1.88it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 3 Fold 4[A
+                       [A
+Predicting Trial 3 Fold 4[A
+                         [A
+Evaluating Trial 3...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   3%|▎         | 3/100 [2:49:56<80:12:30, 2976.81s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   3%|▎         | 3/100 [2:49:56<80:12:30, 2976.81s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   3%|▎         | 3/100 [2:49:56<80:12:30, 2976.81s/it]Best trial: 2. Best value: 0.659864:   3%|▎         | 3/100 [2:49:56<80:12:30, 2976.81s/it]Best trial: 2. Best value: 0.659864:   4%|▍         | 4/100 [2:49:56<56:02:48, 2101.75s/it]
+[A
+Initializing Trial 4 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  43%|████▎     | 20/46 [00:01<00:01, 17.35it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:04<00:03,  7.53it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:04<00:06,  3.78it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:06<00:10,  2.04it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:00, 16.71it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  7.02it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 4 Fold 0[A
+                       [A
+Predicting Trial 4 Fold 0[A
+                         [A
+Initializing Trial 4 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  43%|████▎     | 20/46 [00:03<00:03,  6.79it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:03<00:05,  4.99it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:05<00:03,  5.56it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:04,  2.49it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:04,  2.12it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:04,  2.23it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:02,  3.23it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 4 Fold 1[A
+                       [A
+Predicting Trial 4 Fold 1[A
+                         [A
+Initializing Trial 4 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  43%|████▎     | 20/46 [00:02<00:02,  8.92it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:03<00:04,  6.02it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:04<00:05,  3.90it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:06<00:08,  2.53it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:06<00:07,  2.83it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:01<00:11,  1.05s/it][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.99it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  4.18it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 4 Fold 2[A
+                       [A
+Predicting Trial 4 Fold 2[A
+                         [A
+Initializing Trial 4 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:00<00:00, 106.35it/s][A[A
+
+Getting probes:  77%|███████▋  | 36/47 [00:02<00:01, 10.76it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:03,  2.70it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:01<00:02,  2.54it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 4 Fold 3[A
+                       [A
+Predicting Trial 4 Fold 3[A
+                         [A
+Initializing Trial 4 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:01<00:00, 33.30it/s][A[A
+
+Getting probes:  66%|██████▌   | 31/47 [00:01<00:01, 14.24it/s][A[A
+
+Getting probes:  70%|███████   | 33/47 [00:02<00:01,  9.29it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:08,  1.23it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 4 Fold 4[A
+                       [A
+Predicting Trial 4 Fold 4[A
+                         [A
+Evaluating Trial 4...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   4%|▍         | 4/100 [3:39:41<56:02:48, 2101.75s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   4%|▍         | 4/100 [3:39:41<56:02:48, 2101.75s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   4%|▍         | 4/100 [3:39:41<56:02:48, 2101.75s/it]Best trial: 2. Best value: 0.659864:   4%|▍         | 4/100 [3:39:41<56:02:48, 2101.75s/it]Best trial: 2. Best value: 0.659864:   5%|▌         | 5/100 [3:39:41<63:52:17, 2420.40s/it]
+[A
+Initializing Trial 5 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:02<00:02,  9.68it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:03<00:02,  7.86it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:03<00:03,  5.99it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:01,  8.61it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.71it/s][A[A
+
+Getting probes:  67%|██████▋   | 8/12 [00:01<00:00,  6.46it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 5 Fold 0[A
+                       [A
+Predicting Trial 5 Fold 0[A
+                         [A
+Initializing Trial 5 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 202.12it/s][A[A
+
+Getting probes:  98%|█████████▊| 45/46 [00:03<00:00,  9.64it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:00, 17.14it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:01,  4.93it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 5 Fold 1[A
+                       [A
+Predicting Trial 5 Fold 1[A
+                         [A
+Initializing Trial 5 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:01<00:00, 27.18it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:01<00:01, 14.11it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:00, 25.71it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:01,  5.71it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 5 Fold 2[A
+                       [A
+Predicting Trial 5 Fold 2[A
+                         [A
+Initializing Trial 5 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:01<00:00, 32.03it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:02<00:01, 11.13it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:02<00:01,  9.69it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  7.21it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 5 Fold 3[A
+                       [A
+Predicting Trial 5 Fold 3[A
+                         [A
+Initializing Trial 5 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:00<00:00, 30.57it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:02<00:01, 13.04it/s][A[A
+
+Getting probes:  62%|██████▏   | 29/47 [00:02<00:01, 10.77it/s][A[A
+
+Getting probes:  66%|██████▌   | 31/47 [00:03<00:02,  7.11it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:00, 25.95it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:01<00:00,  5.08it/s][A[A
+
+Getting probes:  73%|███████▎  | 8/11 [00:01<00:00,  5.00it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 5 Fold 4[A
+                       [A
+Predicting Trial 5 Fold 4[A
+                         [A
+Evaluating Trial 5...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   5%|▌         | 5/100 [4:32:11<63:52:17, 2420.40s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   5%|▌         | 5/100 [4:32:11<63:52:17, 2420.40s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   5%|▌         | 5/100 [4:32:11<63:52:17, 2420.40s/it]Best trial: 2. Best value: 0.659864:   5%|▌         | 5/100 [4:32:11<63:52:17, 2420.40s/it]Best trial: 2. Best value: 0.659864:   6%|▌         | 6/100 [4:32:11<69:40:39, 2668.50s/it]
+[A
+Initializing Trial 6 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  43%|████▎     | 20/46 [00:03<00:00, 26.93it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:03<00:04,  4.68it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:03<00:04,  5.23it/s][A[A
+
+Getting probes:  72%|███████▏  | 33/46 [00:04<00:01,  7.80it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:05,  1.91it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:02,  3.03it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:02,  2.82it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 6 Fold 0[A
+                       [A
+Predicting Trial 6 Fold 0[A
+                         [A
+Initializing Trial 6 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:00<00:00, 28.53it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:01<00:01, 15.68it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:02<00:02,  7.51it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:02<00:01,  9.58it/s][A[A
+
+Getting probes:  74%|███████▍  | 34/46 [00:03<00:01,  7.01it/s][A[A
+
+Getting probes:  78%|███████▊  | 36/46 [00:03<00:01,  6.54it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:00, 16.95it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  6.99it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 6 Fold 1[A
+                       [A
+Predicting Trial 6 Fold 1[A
+                         [A
+Initializing Trial 6 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:00<00:00, 186.95it/s][A[A
+
+Getting probes:  89%|████████▉ | 41/46 [00:06<00:00,  5.01it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:00, 16.70it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:00<00:00, 13.00it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 6 Fold 2[A
+                       [A
+Predicting Trial 6 Fold 2[A
+                         [A
+Initializing Trial 6 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:05<00:00, 48.50it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:06<00:05,  3.31it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  5.85it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:00<00:00,  6.70it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 6 Fold 3[A
+                       [A
+Predicting Trial 6 Fold 3[A
+                         [A
+Initializing Trial 6 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:00<00:00, 37.80it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:02<00:01, 10.02it/s][A[A
+
+Getting probes:  74%|███████▍  | 35/47 [00:02<00:01, 11.58it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:01,  4.69it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:02,  3.41it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 6 Fold 4[A
+                       [A
+Predicting Trial 6 Fold 4[A
+                         [A
+Evaluating Trial 6...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   6%|▌         | 6/100 [5:02:22<69:40:39, 2668.50s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   6%|▌         | 6/100 [5:02:22<69:40:39, 2668.50s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   6%|▌         | 6/100 [5:02:22<69:40:39, 2668.50s/it]Best trial: 2. Best value: 0.659864:   6%|▌         | 6/100 [5:02:22<69:40:39, 2668.50s/it]Best trial: 2. Best value: 0.659864:   7%|▋         | 7/100 [5:02:22<61:41:38, 2388.15s/it]
+[A
+Initializing Trial 7 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:01<00:02, 11.95it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:01<00:01, 12.38it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:02<00:01, 12.89it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:02,  7.42it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:03<00:02,  7.38it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.91it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  3.64it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 7 Fold 0[A
+                       [A
+Predicting Trial 7 Fold 0[A
+                         [A
+Initializing Trial 7 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:00<00:00, 109.45it/s][A[A
+
+Getting probes:  78%|███████▊  | 36/46 [00:04<00:01,  6.04it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  7.76it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:01,  5.00it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 7 Fold 1[A
+                       [A
+Predicting Trial 7 Fold 1[A
+                         [A
+Initializing Trial 7 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:02<00:00, 25.48it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:02,  8.10it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:03<00:02,  6.36it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:01,  8.52it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:04,  2.22it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:03,  2.30it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:02,  2.37it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 7 Fold 2[A
+                       [A
+Predicting Trial 7 Fold 2[A
+                         [A
+Initializing Trial 7 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:01<00:01, 12.83it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:03<00:02,  7.83it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:03<00:03,  6.39it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:03<00:03,  6.07it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:00<00:00, 42.16it/s][A[A
+
+Getting probes:  91%|█████████ | 10/11 [00:00<00:00, 16.78it/s][A[A
+
+                                                               [A[A
+                           [A
+Training Trial 7 Fold 3[A
+                       [A
+Predicting Trial 7 Fold 3[A
+                         [A
+Initializing Trial 7 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:00<00:00, 218.42it/s][A[A
+
+                                                                [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  7.15it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 7 Fold 4[A
+                       [A
+Predicting Trial 7 Fold 4[A
+                         [A
+Evaluating Trial 7...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   7%|▋         | 7/100 [6:03:41<61:41:38, 2388.15s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   7%|▋         | 7/100 [6:03:41<61:41:38, 2388.15s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   7%|▋         | 7/100 [6:03:41<61:41:38, 2388.15s/it]Best trial: 2. Best value: 0.659864:   7%|▋         | 7/100 [6:03:41<61:41:38, 2388.15s/it]Best trial: 2. Best value: 0.659864:   8%|▊         | 8/100 [6:03:41<71:31:32, 2798.83s/it]
+[A
+Initializing Trial 8 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:00<00:00, 211.22it/s][A[A
+
+                                                                [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.98it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  3.95it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 8 Fold 0[A
+                       [A
+Predicting Trial 8 Fold 0[A
+                         [A
+Initializing Trial 8 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:01, 13.96it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:02<00:01,  9.72it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:01,  8.53it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  5.96it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  4.21it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 8 Fold 1[A
+                       [A
+Predicting Trial 8 Fold 1[A
+                         [A
+Initializing Trial 8 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:04<00:03,  6.14it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:04<00:03,  5.70it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:05<00:05,  3.93it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:02,  3.25it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 8 Fold 2[A
+                       [A
+Predicting Trial 8 Fold 2[A
+                         [A
+Initializing Trial 8 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:01<00:01, 14.07it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:00<00:00, 11.77it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 8 Fold 3[A
+                       [A
+Predicting Trial 8 Fold 3[A
+                         [A
+Initializing Trial 8 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:01<00:01, 12.27it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:02<00:01, 12.84it/s][A[A
+
+Getting probes:  68%|██████▊   | 32/47 [00:02<00:01, 10.92it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  5.81it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:00<00:00,  6.50it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 8 Fold 4[A
+                       [A
+Predicting Trial 8 Fold 4[A
+                         [A
+Evaluating Trial 8...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   8%|▊         | 8/100 [6:35:35<71:31:32, 2798.83s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   8%|▊         | 8/100 [6:35:35<71:31:32, 2798.83s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   8%|▊         | 8/100 [6:35:35<71:31:32, 2798.83s/it]Best trial: 2. Best value: 0.659864:   8%|▊         | 8/100 [6:35:35<71:31:32, 2798.83s/it]Best trial: 2. Best value: 0.659864:   9%|▉         | 9/100 [6:35:35<63:45:27, 2522.28s/it]
+[A
+Initializing Trial 9 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:00<00:00, 34.91it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:02<00:02,  6.95it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:01,  8.62it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:03,  2.12it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 9 Fold 0[A
+                       [A
+Predicting Trial 9 Fold 0[A
+                         [A
+Initializing Trial 9 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:00<00:00, 54.71it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:01<00:01, 11.82it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:02,  3.23it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:01<00:00,  5.72it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 9 Fold 1[A
+                       [A
+Predicting Trial 9 Fold 1[A
+                         [A
+Initializing Trial 9 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+                                                      [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:06,  1.65it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 9 Fold 2[A
+                       [A
+Predicting Trial 9 Fold 2[A
+                         [A
+Initializing Trial 9 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:01<00:00, 38.42it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:04<00:04,  4.45it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:05<00:03,  4.50it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:01,  5.72it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:01<00:04,  1.61it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 9 Fold 3[A
+                       [A
+Predicting Trial 9 Fold 3[A
+                         [A
+Initializing Trial 9 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:00<00:00, 37.18it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:02,  3.98it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:00<00:01,  5.71it/s][A[A
+
+                                                              [A[A
+                           [A
+Training Trial 9 Fold 4[A
+                       [A
+Predicting Trial 9 Fold 4[A
+                         [A
+Evaluating Trial 9...[A
+                     [A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   9%|▉         | 9/100 [7:21:03<63:45:27, 2522.28s/it]
+[A                                                                                           
+[ABest trial: 2. Best value: 0.659864:   9%|▉         | 9/100 [7:21:03<63:45:27, 2522.28s/it]
+[A
+[A                                                                                           Best trial: 2. Best value: 0.659864:   9%|▉         | 9/100 [7:21:03<63:45:27, 2522.28s/it]Best trial: 2. Best value: 0.659864:   9%|▉         | 9/100 [7:21:03<63:45:27, 2522.28s/it]Best trial: 2. Best value: 0.659864:  10%|█         | 10/100 [7:21:03<64:38:57, 2585.98s/it]
+[A
+Initializing Trial 10 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:01<00:00, 36.33it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:01<00:00, 17.12it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  5.01it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 10 Fold 0[A
+                        [A
+Predicting Trial 10 Fold 0[A
+                          [A
+Initializing Trial 10 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:00<00:00, 37.40it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:00, 25.99it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:01<00:01,  3.00it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 10 Fold 1[A
+                        [A
+Predicting Trial 10 Fold 1[A
+                          [A
+[A                                                                                            
+[ABest trial: 2. Best value: 0.659864:  10%|█         | 10/100 [7:49:04<64:38:57, 2585.98s/it]
+[ABest trial: 2. Best value: 0.659864:  10%|█         | 10/100 [7:49:04<64:38:57, 2585.98s/it]Best trial: 2. Best value: 0.659864:  11%|█         | 11/100 [7:49:04<57:04:39, 2308.76s/it]
+[A
+Initializing Trial 11 Fold 0[A
+[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 207.80it/s][A[A
+
+Getting probes:  98%|█████████▊| 45/46 [00:03<00:00, 12.35it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:00,  9.90it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 11 Fold 0[A
+                        [A
+Predicting Trial 11 Fold 0[A
+                          [A
+Initializing Trial 11 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:02<00:02,  9.79it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:04<00:04,  5.23it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:04<00:04,  4.81it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:00, 17.10it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:00,  8.44it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:01<00:00,  5.43it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 11 Fold 1[A
+                        [A
+Predicting Trial 11 Fold 1[A
+                          [A
+[A                                                                                            
+[ABest trial: 2. Best value: 0.659864:  11%|█         | 11/100 [7:53:29<57:04:39, 2308.76s/it]
+[ABest trial: 2. Best value: 0.659864:  11%|█         | 11/100 [7:53:29<57:04:39, 2308.76s/it]Best trial: 2. Best value: 0.659864:  12%|█▏        | 12/100 [7:53:29<41:14:23, 1687.09s/it]
+[A
+Initializing Trial 12 Fold 0[A
+[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  43%|████▎     | 20/46 [00:02<00:03,  7.85it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:04<00:05,  4.35it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:04<00:04,  5.12it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  4.95it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 12 Fold 0[A
+                        [A
+Predicting Trial 12 Fold 0[A
+                          [A
+Initializing Trial 12 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:01<00:01, 19.20it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:01, 10.80it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:02<00:01,  8.82it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:04,  2.47it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:02,  4.22it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:00<00:00,  9.03it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 12 Fold 1[A
+                        [A
+Predicting Trial 12 Fold 1[A
+                          [A
+[A                                                                                            
+[ABest trial: 2. Best value: 0.659864:  12%|█▏        | 12/100 [7:58:26<41:14:23, 1687.09s/it]
+[ABest trial: 2. Best value: 0.659864:  12%|█▏        | 12/100 [7:58:26<41:14:23, 1687.09s/it]Best trial: 2. Best value: 0.659864:  13%|█▎        | 13/100 [7:58:26<30:35:48, 1266.08s/it]
+[A
+Initializing Trial 13 Fold 0[A
+[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:00<00:00, 228.87it/s][A[A
+
+                                                                [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:00, 34.10it/s][A[A
+
+Getting probes:  67%|██████▋   | 8/12 [00:00<00:00, 13.87it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 13 Fold 0[A
+                        [A
+Predicting Trial 13 Fold 0[A
+                          [A
+Initializing Trial 13 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:02<00:01, 11.84it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:01,  5.73it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:00,  6.58it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 13 Fold 1[A
+                        [A
+Predicting Trial 13 Fold 1[A
+                          [A
+Initializing Trial 13 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:00<00:00, 112.32it/s][A[A
+
+Getting probes:  83%|████████▎ | 38/46 [00:01<00:00, 16.61it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:04,  2.46it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.45it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 13 Fold 2[A
+                        [A
+Predicting Trial 13 Fold 2[A
+                          [A
+Initializing Trial 13 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  66%|██████▌   | 31/47 [00:00<00:00, 79.46it/s][A[A
+
+Getting probes:  83%|████████▎ | 39/47 [00:00<00:00, 42.61it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  4.73it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:01<00:01,  3.67it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 13 Fold 3[A
+                        [A
+Predicting Trial 13 Fold 3[A
+                          [A
+Initializing Trial 13 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  47%|████▋     | 22/47 [00:02<00:02, 10.89it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:03<00:03,  7.11it/s][A[A
+
+Getting probes:  68%|██████▊   | 32/47 [00:03<00:01,  9.55it/s][A[A
+
+Getting probes:  74%|███████▍  | 35/47 [00:03<00:01, 10.70it/s][A[A
+
+Getting probes:  83%|████████▎ | 39/47 [00:03<00:00, 10.49it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:05,  1.92it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:00<00:01,  4.66it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 13 Fold 4[A
+                        [A
+Predicting Trial 13 Fold 4[A
+                          [A
+Evaluating Trial 13...[A
+                      [A                                                                                            
+[ABest trial: 2. Best value: 0.659864:  13%|█▎        | 13/100 [8:10:09<30:35:48, 1266.08s/it]
+[A                                                                                            
+[ABest trial: 2. Best value: 0.659864:  13%|█▎        | 13/100 [8:10:09<30:35:48, 1266.08s/it]
+[A
+[A                                                                                            Best trial: 2. Best value: 0.659864:  13%|█▎        | 13/100 [8:10:09<30:35:48, 1266.08s/it]Best trial: 13. Best value: 0.669853:  13%|█▎        | 13/100 [8:10:09<30:35:48, 1266.08s/it]Best trial: 13. Best value: 0.669853:  14%|█▍        | 14/100 [8:10:09<26:10:48, 1095.92s/it]
+[A
+Initializing Trial 14 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 103.44it/s][A[A
+
+Getting probes:  76%|███████▌  | 35/46 [00:02<00:01, 10.06it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:07,  1.56it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:02,  2.95it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 14 Fold 0[A
+                        [A
+Predicting Trial 14 Fold 0[A
+                          [A
+Initializing Trial 14 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:01<00:00, 22.74it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:02<00:02,  8.40it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:03<00:02,  7.68it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:03<00:02,  6.52it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:02,  3.21it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 14 Fold 1[A
+                        [A
+Predicting Trial 14 Fold 1[A
+                          [A
+Initializing Trial 14 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:01<00:00, 62.36it/s][A[A
+
+Getting probes:  70%|██████▉   | 32/46 [00:02<00:01, 11.40it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:00, 25.01it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:00, 10.37it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 14 Fold 2[A
+                        [A
+Predicting Trial 14 Fold 2[A
+                          [A
+Initializing Trial 14 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  45%|████▍     | 21/47 [00:02<00:02,  9.80it/s][A[A
+
+Getting probes:  47%|████▋     | 22/47 [00:02<00:02,  9.71it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:02<00:02, 10.42it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:04<00:04,  4.32it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:04<00:04,  4.43it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:00<00:00, 34.83it/s][A[A
+
+Getting probes:  73%|███████▎  | 8/11 [00:02<00:01,  2.90it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 14 Fold 3[A
+                        [A
+Predicting Trial 14 Fold 3[A
+                          [A
+Initializing Trial 14 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  68%|██████▊   | 32/47 [00:00<00:00, 39.02it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+                                                      [A[A
+                            [A
+Training Trial 14 Fold 4[A
+                        [A
+Predicting Trial 14 Fold 4[A
+                          [A
+Evaluating Trial 14...[A
+                      [A                                                                                             
+[ABest trial: 13. Best value: 0.669853:  14%|█▍        | 14/100 [8:44:33<26:10:48, 1095.92s/it]
+[A                                                                                             
+[ABest trial: 13. Best value: 0.669853:  14%|█▍        | 14/100 [8:44:33<26:10:48, 1095.92s/it]
+[A
+[A                                                                                             Best trial: 13. Best value: 0.669853:  14%|█▍        | 14/100 [8:44:33<26:10:48, 1095.92s/it]Best trial: 14. Best value: 0.678006:  14%|█▍        | 14/100 [8:44:33<26:10:48, 1095.92s/it]Best trial: 14. Best value: 0.678006:  15%|█▌        | 15/100 [8:44:33<32:46:06, 1387.84s/it]
+[A
+Initializing Trial 15 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:03<00:03,  6.08it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:04<00:03,  6.29it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:04<00:03,  5.71it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:04<00:03,  5.11it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:09,  1.02it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:02<00:06,  1.36it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 15 Fold 0[A
+                        [A
+Predicting Trial 15 Fold 0[A
+                          [A
+Initializing Trial 15 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:04<00:02, 12.13it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:04<00:05,  4.47it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:00, 12.44it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:00<00:00,  7.95it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 15 Fold 1[A
+                        [A
+Predicting Trial 15 Fold 1[A
+                          [A
+Initializing Trial 15 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:00<00:00, 64.01it/s][A[A
+
+Getting probes:  74%|███████▍  | 34/46 [00:02<00:01, 10.63it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:00, 34.10it/s][A[A
+
+Getting probes:  67%|██████▋   | 8/12 [00:00<00:00,  7.57it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 15 Fold 2[A
+                        [A
+Predicting Trial 15 Fold 2[A
+                          [A
+Initializing Trial 15 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:03<00:02, 11.55it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:03<00:03,  6.65it/s][A[A
+
+Getting probes:  68%|██████▊   | 32/47 [00:03<00:01,  8.25it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:03,  2.60it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:01<00:01,  3.97it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 15 Fold 3[A
+                        [A
+Predicting Trial 15 Fold 3[A
+                          [A
+Initializing Trial 15 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  45%|████▍     | 21/47 [00:01<00:01, 18.05it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:01<00:01, 12.60it/s][A[A
+
+Getting probes:  72%|███████▏  | 34/47 [00:02<00:00, 16.98it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:05,  1.93it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:02,  3.49it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 15 Fold 4[A
+                        [A
+Predicting Trial 15 Fold 4[A
+                          [A
+Evaluating Trial 15...[A
+                      [A                                                                                             
+[ABest trial: 14. Best value: 0.678006:  15%|█▌        | 15/100 [9:15:32<32:46:06, 1387.84s/it]
+[A                                                                                             
+[ABest trial: 14. Best value: 0.678006:  15%|█▌        | 15/100 [9:15:32<32:46:06, 1387.84s/it]
+[A
+[A                                                                                             Best trial: 14. Best value: 0.678006:  15%|█▌        | 15/100 [9:15:32<32:46:06, 1387.84s/it]Best trial: 14. Best value: 0.678006:  15%|█▌        | 15/100 [9:15:32<32:46:06, 1387.84s/it]Best trial: 14. Best value: 0.678006:  16%|█▌        | 16/100 [9:15:32<35:41:28, 1529.62s/it]
+[A
+Initializing Trial 16 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:04<00:02,  6.71it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:04<00:02,  6.53it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:05<00:02,  5.44it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  4.95it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 16 Fold 0[A
+                        [A
+Predicting Trial 16 Fold 0[A
+                          [A
+Initializing Trial 16 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:01<00:00, 54.17it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:01<00:00, 19.97it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:01,  5.30it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:01<00:00,  5.16it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 16 Fold 1[A
+                        [A
+Predicting Trial 16 Fold 1[A
+                          [A
+Initializing Trial 16 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:03<00:02,  7.46it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:03<00:03,  6.42it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:04<00:03,  6.13it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:02,  3.80it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:02,  3.12it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 16 Fold 2[A
+                        [A
+Predicting Trial 16 Fold 2[A
+                          [A
+Initializing Trial 16 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:01<00:01, 21.89it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:02<00:02,  7.76it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:01<00:04,  1.67it/s][A[A
+
+Getting probes:  64%|██████▎   | 7/11 [00:02<00:01,  3.65it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 16 Fold 3[A
+                        [A
+Predicting Trial 16 Fold 3[A
+                          [A
+Initializing Trial 16 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:01<00:00, 21.82it/s][A[A
+
+Getting probes:  66%|██████▌   | 31/47 [00:01<00:00, 17.34it/s][A[A
+
+Getting probes:  74%|███████▍  | 35/47 [00:02<00:00, 15.04it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:00, 25.90it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:00<00:00, 10.15it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 16 Fold 4[A
+                        [A
+Predicting Trial 16 Fold 4[A
+                          [A
+Evaluating Trial 16...[A
+                      [A                                                                                             
+[ABest trial: 14. Best value: 0.678006:  16%|█▌        | 16/100 [9:51:03<35:41:28, 1529.62s/it]
+[A                                                                                             
+[ABest trial: 14. Best value: 0.678006:  16%|█▌        | 16/100 [9:51:03<35:41:28, 1529.62s/it]
+[A
+[A                                                                                             Best trial: 14. Best value: 0.678006:  16%|█▌        | 16/100 [9:51:03<35:41:28, 1529.62s/it]Best trial: 14. Best value: 0.678006:  16%|█▌        | 16/100 [9:51:03<35:41:28, 1529.62s/it]Best trial: 14. Best value: 0.678006:  17%|█▋        | 17/100 [9:51:03<39:26:17, 1710.58s/it]
+[A
+Initializing Trial 17 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:04<00:02, 10.11it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:04<00:05,  3.92it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.74it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:04,  1.98it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 17 Fold 0[A
+                        [A
+Predicting Trial 17 Fold 0[A
+                          [A
+Initializing Trial 17 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:02<00:02,  9.73it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:02<00:01, 11.21it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:00, 14.65it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 17 Fold 1[A
+                        [A
+Predicting Trial 17 Fold 1[A
+                          [A
+Initializing Trial 17 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  48%|████▊     | 22/46 [00:01<00:00, 55.26it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:01<00:01, 13.80it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:02<00:01,  7.80it/s][A[A
+
+Getting probes:  72%|███████▏  | 33/46 [00:03<00:01,  7.16it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:02,  4.98it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 17 Fold 2[A
+                        [A
+Predicting Trial 17 Fold 2[A
+                          [A
+Initializing Trial 17 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:00<00:00, 48.05it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:05<00:03,  4.30it/s][A[A
+
+Getting probes:  70%|███████   | 33/47 [00:05<00:02,  4.95it/s][A[A
+
+Getting probes:  77%|███████▋  | 36/47 [00:05<00:02,  5.27it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:01<00:02,  2.87it/s][A[A
+
+Getting probes:  64%|██████▎   | 7/11 [00:01<00:00,  5.26it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 17 Fold 3[A
+                        [A
+Predicting Trial 17 Fold 3[A
+                          [A
+Initializing Trial 17 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  45%|████▍     | 21/47 [00:00<00:00, 39.50it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:03<00:03,  5.74it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:01<00:08,  1.23it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:01<00:07,  1.22it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 17 Fold 4[A
+                        [A
+Predicting Trial 17 Fold 4[A
+                          [A
+Evaluating Trial 17...[A
+                      [A                                                                                             
+[ABest trial: 14. Best value: 0.678006:  17%|█▋        | 17/100 [10:21:47<39:26:17, 1710.58s/it]
+[A                                                                                              
+[ABest trial: 14. Best value: 0.678006:  17%|█▋        | 17/100 [10:21:47<39:26:17, 1710.58s/it]
+[A
+[A                                                                                              Best trial: 14. Best value: 0.678006:  17%|█▋        | 17/100 [10:21:47<39:26:17, 1710.58s/it]Best trial: 14. Best value: 0.678006:  17%|█▋        | 17/100 [10:21:47<39:26:17, 1710.58s/it]Best trial: 14. Best value: 0.678006:  18%|█▊        | 18/100 [10:21:47<39:52:19, 1750.49s/it]
+[A
+Initializing Trial 18 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:01<00:00, 24.66it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  6.38it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:02,  3.09it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 18 Fold 0[A
+                        [A
+Predicting Trial 18 Fold 0[A
+                          [A
+Initializing Trial 18 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:00<00:00, 103.98it/s][A[A
+
+Getting probes:  76%|███████▌  | 35/46 [00:01<00:00, 22.87it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:04,  2.22it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:02,  3.05it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 18 Fold 1[A
+                        [A
+Predicting Trial 18 Fold 1[A
+                          [A
+Initializing Trial 18 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  52%|█████▏    | 24/46 [00:03<00:00, 104.87it/s][A[A
+
+Getting probes:  76%|███████▌  | 35/46 [00:05<00:01,  5.56it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:05,  1.90it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:04,  2.20it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.31it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 18 Fold 2[A
+                        [A
+Predicting Trial 18 Fold 2[A
+                          [A
+Initializing Trial 18 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  47%|████▋     | 22/47 [00:01<00:02, 11.16it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:02<00:02,  7.93it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:03<00:02,  8.27it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  7.22it/s][A[A
+
+Getting probes:  45%|████▌     | 5/11 [00:00<00:01,  5.91it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 18 Fold 3[A
+                        [A
+Predicting Trial 18 Fold 3[A
+                          [A
+Initializing Trial 18 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:01<00:01, 19.20it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:02<00:02,  8.70it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:03<00:02,  8.38it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:05,  1.94it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:01<00:06,  1.31it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 18 Fold 4[A
+                        [A
+Predicting Trial 18 Fold 4[A
+                          [A
+Evaluating Trial 18...[A
+                      [A                                                                                              
+[ABest trial: 14. Best value: 0.678006:  18%|█▊        | 18/100 [10:55:34<39:52:19, 1750.49s/it]
+[A                                                                                              
+[ABest trial: 14. Best value: 0.678006:  18%|█▊        | 18/100 [10:55:34<39:52:19, 1750.49s/it]
+[A
+[A                                                                                              Best trial: 14. Best value: 0.678006:  18%|█▊        | 18/100 [10:55:34<39:52:19, 1750.49s/it]Best trial: 18. Best value: 0.697592:  18%|█▊        | 18/100 [10:55:34<39:52:19, 1750.49s/it]Best trial: 18. Best value: 0.697592:  19%|█▉        | 19/100 [10:55:34<41:15:31, 1833.72s/it]
+[A
+Initializing Trial 19 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:01<00:01, 15.70it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:02<00:02,  7.27it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:01<00:13,  1.20s/it][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 19 Fold 0[A
+                        [A
+Predicting Trial 19 Fold 0[A
+                          [A
+Initializing Trial 19 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:00<00:00, 29.71it/s][A[A
+
+Getting probes:  72%|███████▏  | 33/46 [00:01<00:00, 23.17it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:00<00:00, 15.02it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 19 Fold 1[A
+                        [A
+Predicting Trial 19 Fold 1[A
+                          [A
+Initializing Trial 19 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:01<00:01, 20.15it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:01<00:01, 18.51it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:02,  7.37it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:01<00:11,  1.04s/it][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:09,  1.11it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:02<00:06,  1.49it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 19 Fold 2[A
+                        [A
+Predicting Trial 19 Fold 2[A
+                          [A
+Initializing Trial 19 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  49%|████▉     | 23/47 [00:00<00:00, 24.79it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:01<00:00, 19.86it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:02<00:01, 10.67it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:00, 17.07it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:00<00:01,  3.89it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 19 Fold 3[A
+                        [A
+Predicting Trial 19 Fold 3[A
+                          [A
+Initializing Trial 19 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  60%|█████▉    | 28/47 [00:00<00:00, 53.60it/s][A[A
+
+Getting probes:  72%|███████▏  | 34/47 [00:04<00:02,  5.64it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:02,  3.16it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:01,  4.29it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:01<00:00,  5.71it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 19 Fold 4[A
+                        [A
+Predicting Trial 19 Fold 4[A
+                          [A
+Evaluating Trial 19...[A
+                      [A                                                                                              
+[ABest trial: 18. Best value: 0.697592:  19%|█▉        | 19/100 [11:46:08<41:15:31, 1833.72s/it]
+[A                                                                                              
+[ABest trial: 18. Best value: 0.697592:  19%|█▉        | 19/100 [11:46:08<41:15:31, 1833.72s/it]
+[A
+[A                                                                                              Best trial: 18. Best value: 0.697592:  19%|█▉        | 19/100 [11:46:08<41:15:31, 1833.72s/it]Best trial: 19. Best value: 0.704332:  19%|█▉        | 19/100 [11:46:08<41:15:31, 1833.72s/it]Best trial: 19. Best value: 0.704332:  20%|██        | 20/100 [11:46:08<48:45:27, 2194.10s/it]
+[A
+Initializing Trial 20 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:00<00:00, 49.43it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:04<00:03,  4.94it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:10,  1.08it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:02,  3.49it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 20 Fold 0[A
+                        [A
+Predicting Trial 20 Fold 0[A
+                          [A
+Initializing Trial 20 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:00<00:00, 259.22it/s][A[A
+
+                                                                [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:00, 12.91it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  3.79it/s][A[A
+
+Getting probes:  58%|█████▊    | 7/12 [00:01<00:01,  4.20it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 20 Fold 1[A
+                        [A
+Predicting Trial 20 Fold 1[A
+                          [A
+Initializing Trial 20 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:02<00:00, 43.79it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:03<00:02,  6.20it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:01<00:15,  1.45s/it][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 20 Fold 2[A
+                        [A
+Predicting Trial 20 Fold 2[A
+                          [A
+Initializing Trial 20 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  47%|████▋     | 22/47 [00:01<00:01, 17.27it/s][A[A
+
+Getting probes:  51%|█████     | 24/47 [00:01<00:01, 12.24it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:03<00:03,  6.07it/s][A[A
+
+Getting probes:  62%|██████▏   | 29/47 [00:03<00:02,  6.30it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:02,  3.14it/s][A[A
+
+Getting probes:  55%|█████▍    | 6/11 [00:01<00:00,  6.26it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 20 Fold 3[A
+                        [A
+Predicting Trial 20 Fold 3[A
+                          [A
+Initializing Trial 20 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:01<00:01, 14.05it/s][A[A
+
+Getting probes:  62%|██████▏   | 29/47 [00:02<00:01, 11.66it/s][A[A
+
+Getting probes:  68%|██████▊   | 32/47 [00:02<00:01, 10.62it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:05,  1.93it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:00<00:01,  4.70it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 20 Fold 4[A
+                        [A
+Predicting Trial 20 Fold 4[A
+                          [A
+Evaluating Trial 20...[A
+                      [A                                                                                              
+[ABest trial: 19. Best value: 0.704332:  20%|██        | 20/100 [12:25:40<48:45:27, 2194.10s/it]
+[A                                                                                              
+[ABest trial: 19. Best value: 0.704332:  20%|██        | 20/100 [12:25:40<48:45:27, 2194.10s/it]
+[A
+[A                                                                                              Best trial: 19. Best value: 0.704332:  20%|██        | 20/100 [12:25:40<48:45:27, 2194.10s/it]Best trial: 19. Best value: 0.704332:  20%|██        | 20/100 [12:25:40<48:45:27, 2194.10s/it]Best trial: 19. Best value: 0.704332:  21%|██        | 21/100 [12:25:40<49:19:03, 2247.38s/it]
+[A
+Initializing Trial 21 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:04<00:03,  5.56it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:05<00:04,  4.55it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:01,  7.60it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 21 Fold 0[A
+                        [A
+Predicting Trial 21 Fold 0[A
+                          [A
+Initializing Trial 21 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:01<00:00, 27.49it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:02<00:02,  8.58it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:03<00:01,  8.33it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:01,  7.42it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 21 Fold 1[A
+                        [A
+Predicting Trial 21 Fold 1[A
+                          [A
+Initializing Trial 21 Fold 2[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:03<00:02,  7.24it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:04<00:02,  6.33it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:05<00:03,  4.74it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:05<00:03,  4.39it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:00<00:05,  1.94it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:04,  2.22it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 21 Fold 2[A
+                        [A
+Predicting Trial 21 Fold 2[A
+                          [A
+Initializing Trial 21 Fold 3[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  55%|█████▌    | 26/47 [00:00<00:00, 63.86it/s][A[A
+
+Getting probes:  70%|███████   | 33/47 [00:02<00:01, 10.56it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:01<00:03,  2.37it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:02<00:03,  1.81it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 21 Fold 3[A
+                        [A
+Predicting Trial 21 Fold 3[A
+                          [A
+Initializing Trial 21 Fold 4[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  53%|█████▎    | 25/47 [00:01<00:01, 15.88it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:02<00:02,  9.68it/s][A[A
+
+Getting probes:  62%|██████▏   | 29/47 [00:02<00:02,  8.63it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:   9%|▉         | 1/11 [00:00<00:09,  1.09it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 21 Fold 4[A
+                        [A
+Predicting Trial 21 Fold 4[A
+                          [A
+Evaluating Trial 21...[A
+                      [A                                                                                              
+[ABest trial: 19. Best value: 0.704332:  21%|██        | 21/100 [12:53:33<49:19:03, 2247.38s/it]
+[A                                                                                              
+[ABest trial: 19. Best value: 0.704332:  21%|██        | 21/100 [12:53:33<49:19:03, 2247.38s/it]
+[A
+[A                                                                                              Best trial: 19. Best value: 0.704332:  21%|██        | 21/100 [12:53:33<49:19:03, 2247.38s/it]Best trial: 19. Best value: 0.704332:  21%|██        | 21/100 [12:53:33<49:19:03, 2247.38s/it]Best trial: 19. Best value: 0.704332:  22%|██▏       | 22/100 [12:53:33<44:57:21, 2074.89s/it]
+[A
+Initializing Trial 22 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  46%|████▌     | 21/46 [00:02<00:02,  9.91it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:05<00:04,  4.20it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:02,  4.93it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:00<00:02,  3.49it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 22 Fold 0[A
+                        [A
+Predicting Trial 22 Fold 0[A
+                          [A
+Initializing Trial 22 Fold 1[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:00<00:00, 49.09it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:01<00:01, 15.37it/s][A[A
+
+Getting probes:  67%|██████▋   | 31/46 [00:01<00:01, 12.83it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:   8%|▊         | 1/12 [00:01<00:13,  1.21s/it][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 22 Fold 1[A
+                        [A
+Predicting Trial 22 Fold 1[A
+                          [A
+[A                                                                                              
+[ABest trial: 19. Best value: 0.704332:  22%|██▏       | 22/100 [13:01:22<44:57:21, 2074.89s/it]
+[ABest trial: 19. Best value: 0.704332:  22%|██▏       | 22/100 [13:01:22<44:57:21, 2074.89s/it]Best trial: 19. Best value: 0.704332:  23%|██▎       | 23/100 [13:01:22<34:04:27, 1593.08s/it]
+[A
+Initializing Trial 23 Fold 0[A
+[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  50%|█████     | 23/46 [00:01<00:01, 19.84it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:02<00:02, 10.39it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:02<00:01, 10.09it/s][A[A
+
+Getting probes:  72%|███████▏  | 33/46 [00:03<00:01,  7.56it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.74it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:01<00:03,  2.10it/s][A[A
+
+                                                              [A[A
+                            [A
+Training Trial 23 Fold 0[A

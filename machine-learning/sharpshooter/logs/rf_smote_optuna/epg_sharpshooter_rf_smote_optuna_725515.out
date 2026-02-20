@@ -1,0 +1,143 @@
+uv version: uv 0.9.5
+Running on host: gpu04.cluster
+Job started at: Thu Feb 19 07:39:12 EST 2026
+Running job ID: 725515
+Loaded 58 files (2.86 GB) in 2.13 seconds.
+Skipping probe: too short (len=834, chunk_size=900)
+Skipping probe: too short (len=559, chunk_size=900)
+Skipping probe: too short (len=670, chunk_size=900)
+Skipping probe: too short (len=886, chunk_size=900)
+Skipping probe: too short (len=632, chunk_size=900)
+Skipping probe: too short (len=834, chunk_size=900)
+Skipping probe: too short (len=559, chunk_size=900)
+Skipping probe: too short (len=670, chunk_size=900)
+Skipping probe: too short (len=886, chunk_size=900)
+Skipping probe: too short (len=632, chunk_size=900)
+Skipping probe: too short (len=559, chunk_size=900)
+Skipping probe: too short (len=834, chunk_size=900)
+Skipping probe: too short (len=670, chunk_size=900)
+Skipping probe: too short (len=886, chunk_size=900)
+Skipping probe: too short (len=632, chunk_size=900)
+Skipping probe: too short (len=834, chunk_size=900)
+Skipping probe: too short (len=670, chunk_size=900)
+Skipping probe: too short (len=886, chunk_size=900)
+Skipping probe: too short (len=632, chunk_size=900)
+Skipping probe: too short (len=559, chunk_size=900)
+Skipping probe: too short (len=559, chunk_size=900)
+Skipping probe: too short (len=632, chunk_size=900)
+Skipping probe: too short (len=834, chunk_size=900)
+Skipping probe: too short (len=670, chunk_size=900)
+Skipping probe: too short (len=886, chunk_size=900)
+Trial 0 F1s - Weighted: 0.6338 | Macro: 0.1690 | Micro: 0.6008
+
+[I 2026-02-19 08:07:21,471] Trial 0 finished with value: 0.6338003632954297 and parameters: {'chunk_seconds': 9, 'num_freqs': 4, 'num_estimators': 16, 'max_depth': 64, 'window_seconds': 10, 'num_subwindows': 17, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': True, 'smote_k_neighbors': 9}. Best is trial 0 with value: 0.6338003632954297.
+Trial 1 F1s - Weighted: 0.5989 | Macro: 0.1875 | Micro: 0.5314
+
+[I 2026-02-19 10:01:39,859] Trial 1 finished with value: 0.5988778336532515 and parameters: {'chunk_seconds': 3, 'num_freqs': 16, 'num_estimators': 128, 'max_depth': 8, 'window_seconds': 7, 'num_subwindows': 8, 'subwindow_freq': 17, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': True, 'smote_k_neighbors': 2}. Best is trial 0 with value: 0.6338003632954297.
+Skipping probe: too short (len=834, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=886, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=834, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=886, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=834, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=886, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=834, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=886, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=834, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=886, chunk_size=1000)
+Trial 2 F1s - Weighted: 0.6599 | Macro: 0.1399 | Micro: 0.7051
+
+[I 2026-02-19 10:16:32,492] Trial 2 finished with value: 0.6598639321308475 and parameters: {'chunk_seconds': 10, 'num_freqs': 11, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 9, 'num_subwindows': 11, 'subwindow_freq': 15, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 2 with value: 0.6598639321308475.
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Trial 3 F1s - Weighted: 0.6572 | Macro: 0.1412 | Micro: 0.7044
+
+[I 2026-02-19 10:29:12,789] Trial 3 finished with value: 0.657241893056823 and parameters: {'chunk_seconds': 10, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 128, 'window_seconds': 6, 'num_subwindows': 7, 'subwindow_freq': 11, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 2 with value: 0.6598639321308475.
+Trial 4 F1s - Weighted: 0.6297 | Macro: 0.1896 | Micro: 0.5963
+
+[I 2026-02-19 11:18:58,169] Trial 4 finished with value: 0.6296667425963718 and parameters: {'chunk_seconds': 2, 'num_freqs': 4, 'num_estimators': 8, 'max_depth': 32, 'window_seconds': 7, 'num_subwindows': 5, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': True, 'smote_k_neighbors': 1}. Best is trial 2 with value: 0.6598639321308475.
+Trial 5 F1s - Weighted: 0.6138 | Macro: 0.1927 | Micro: 0.5437
+
+[I 2026-02-19 12:11:28,285] Trial 5 finished with value: 0.6138186598294416 and parameters: {'chunk_seconds': 3, 'num_freqs': 6, 'num_estimators': 256, 'max_depth': 8, 'window_seconds': 9, 'num_subwindows': 14, 'subwindow_freq': 10, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 2 with value: 0.6598639321308475.
+Trial 6 F1s - Weighted: 0.6376 | Macro: 0.1654 | Micro: 0.6497
+
+[I 2026-02-19 12:41:39,245] Trial 6 finished with value: 0.6375519369116187 and parameters: {'chunk_seconds': 1, 'num_freqs': 5, 'num_estimators': 32, 'max_depth': 32, 'window_seconds': 8, 'num_subwindows': 1, 'subwindow_freq': 1, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 2 with value: 0.6598639321308475.
+Trial 7 F1s - Weighted: 0.6455 | Macro: 0.1987 | Micro: 0.6189
+
+[I 2026-02-19 13:42:57,404] Trial 7 finished with value: 0.6454928184498023 and parameters: {'chunk_seconds': 2, 'num_freqs': 17, 'num_estimators': 16, 'max_depth': 16, 'window_seconds': 4, 'num_subwindows': 17, 'subwindow_freq': 20, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 2 with value: 0.6598639321308475.
+Trial 8 F1s - Weighted: 0.4712 | Macro: 0.1099 | Micro: 0.4300
+
+[I 2026-02-19 14:14:51,607] Trial 8 finished with value: 0.47121465075127 and parameters: {'chunk_seconds': 9, 'num_freqs': 6, 'num_estimators': 16, 'max_depth': 4, 'window_seconds': 2, 'num_subwindows': 12, 'subwindow_freq': 10, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': True, 'smote_k_neighbors': 3}. Best is trial 2 with value: 0.6598639321308475.
+Skipping probe: too short (len=559, chunk_size=700)
+Skipping probe: too short (len=559, chunk_size=700)
+Skipping probe: too short (len=559, chunk_size=700)
+Skipping probe: too short (len=559, chunk_size=700)
+Skipping probe: too short (len=559, chunk_size=700)
+Trial 9 F1s - Weighted: 0.6360 | Macro: 0.1744 | Micro: 0.5979
+
+[I 2026-02-19 15:00:20,211] Trial 9 finished with value: 0.6359563780245624 and parameters: {'chunk_seconds': 7, 'num_freqs': 17, 'num_estimators': 128, 'max_depth': 64, 'window_seconds': 6, 'num_subwindows': 1, 'subwindow_freq': 15, 'use_window_slope': True, 'use_subwindow_slope': True, 'use_smote': True, 'smote_k_neighbors': 9}. Best is trial 2 with value: 0.6598639321308475.
+Skipping probe: too short (len=559, chunk_size=600)
+Skipping probe: too short (len=559, chunk_size=600)
+[I 2026-02-19 15:28:20,400] Trial 10 pruned. 
+[I 2026-02-19 15:32:45,601] Trial 11 pruned. 
+[I 2026-02-19 15:37:42,926] Trial 12 pruned. 
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=559, chunk_size=1000)
+Skipping probe: too short (len=632, chunk_size=1000)
+Skipping probe: too short (len=670, chunk_size=1000)
+Trial 13 F1s - Weighted: 0.6699 | Macro: 0.1435 | Micro: 0.7137
+
+[I 2026-02-19 15:49:25,639] Trial 13 finished with value: 0.6698527876946543 and parameters: {'chunk_seconds': 10, 'num_freqs': 13, 'num_estimators': 128, 'max_depth': 128, 'window_seconds': 8, 'num_subwindows': 5, 'subwindow_freq': 14, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 13 with value: 0.6698527876946543.
+Trial 14 F1s - Weighted: 0.6780 | Macro: 0.1614 | Micro: 0.7220
+
+[I 2026-02-19 16:23:50,020] Trial 14 finished with value: 0.6780061281202098 and parameters: {'chunk_seconds': 5, 'num_freqs': 14, 'num_estimators': 256, 'max_depth': 64, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 18, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 14 with value: 0.6780061281202098.
+Trial 15 F1s - Weighted: 0.6768 | Macro: 0.1602 | Micro: 0.7176
+
+[I 2026-02-19 16:54:48,891] Trial 15 finished with value: 0.67684402972555 and parameters: {'chunk_seconds': 5, 'num_freqs': 20, 'num_estimators': 256, 'max_depth': 256, 'window_seconds': 8, 'num_subwindows': 3, 'subwindow_freq': 20, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 14 with value: 0.6780061281202098.
+Trial 16 F1s - Weighted: 0.6761 | Macro: 0.1602 | Micro: 0.7200
+
+[I 2026-02-19 17:30:20,290] Trial 16 finished with value: 0.6760918144558979 and parameters: {'chunk_seconds': 5, 'num_freqs': 19, 'num_estimators': 256, 'max_depth': 256, 'window_seconds': 8, 'num_subwindows': 4, 'subwindow_freq': 20, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 14 with value: 0.6780061281202098.
+Trial 17 F1s - Weighted: 0.6757 | Macro: 0.1601 | Micro: 0.7180
+
+[I 2026-02-19 18:01:03,685] Trial 17 finished with value: 0.6756690374154932 and parameters: {'chunk_seconds': 5, 'num_freqs': 20, 'num_estimators': 256, 'max_depth': 256, 'window_seconds': 7, 'num_subwindows': 3, 'subwindow_freq': 18, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 14 with value: 0.6780061281202098.
+Trial 18 F1s - Weighted: 0.6976 | Macro: 0.2088 | Micro: 0.6802
+
+[I 2026-02-19 18:34:51,304] Trial 18 finished with value: 0.6975920069403316 and parameters: {'chunk_seconds': 4, 'num_freqs': 14, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 3, 'subwindow_freq': 18, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 18 with value: 0.6975920069403316.
+Trial 19 F1s - Weighted: 0.7043 | Macro: 0.2133 | Micro: 0.6946
+
+[I 2026-02-19 19:25:25,315] Trial 19 finished with value: 0.7043315645535969 and parameters: {'chunk_seconds': 4, 'num_freqs': 14, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 6, 'subwindow_freq': 17, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 19 with value: 0.7043315645535969.
+Trial 20 F1s - Weighted: 0.6710 | Macro: 0.1940 | Micro: 0.6536
+
+[I 2026-02-19 20:04:56,939] Trial 20 finished with value: 0.6710375798237104 and parameters: {'chunk_seconds': 4, 'num_freqs': 8, 'num_estimators': 8, 'max_depth': 16, 'window_seconds': 10, 'num_subwindows': 6, 'subwindow_freq': 12, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 19 with value: 0.7043315645535969.
+Trial 21 F1s - Weighted: 0.6899 | Macro: 0.2059 | Micro: 0.6694
+
+[I 2026-02-19 20:32:49,560] Trial 21 finished with value: 0.6898514471503595 and parameters: {'chunk_seconds': 4, 'num_freqs': 14, 'num_estimators': 256, 'max_depth': 16, 'window_seconds': 9, 'num_subwindows': 2, 'subwindow_freq': 17, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 19 with value: 0.7043315645535969.
+[I 2026-02-19 20:40:38,877] Trial 22 pruned. 

@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=epg_sharpshooter_rf_smote_optuna
-#SBATCH --output=/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/%x_%j.out
-#SBATCH --error=/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/%x_%j.err
+#SBATCH --output=/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/rf_smote_optuna/%x_%j.out
+#SBATCH --error=/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/rf_smote_optuna/%x_%j.err
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:l40s:2
 #SBATCH --cpus-per-task=32
@@ -17,7 +17,7 @@ fi
 echo "uv version: $(uv --version)"
 
 SHARPSHOOTER_DIR=/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter
-mkdir -p "$SHARPSHOOTER_DIR/logs"
+mkdir -p "$SHARPSHOOTER_DIR/logs/rf_smote_optuna"
 
 echo "Running on host: $(hostname)"
 echo "Job started at: $(date)"

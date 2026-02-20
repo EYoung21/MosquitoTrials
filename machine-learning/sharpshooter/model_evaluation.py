@@ -149,7 +149,12 @@ def optuna_objective(data, args, trial, **kwargs):
 
     def clear_msg():
         msg_bar.set_description_str("")
-    
+
+    # Accumulate labels across folds so the final objective
+    # reflects performance over the full cross-validation split.
+    all_labels_true = []
+    all_labels_pred = []
+
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
         show_msg(f"Initializing Trial {trial.number} Fold {fold}")
         train_data = [data.df_list[i] for i in train_index]
@@ -169,10 +174,30 @@ def optuna_objective(data, args, trial, **kwargs):
         predicted_labels = model.predict(test_data)
         clear_msg()
 
-        labels_true = np.concatenate([df["labels"].values for df in test_data])
-        labels_pred = np.concatenate(predicted_labels)
+        labels_true_fold = np.concatenate([df["labels"].values for df in test_data])
+        labels_pred_fold = np.concatenate(predicted_labels)
 
-    # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+        # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+        labels_true_fold = np.asarray(labels_true_fold).astype(str)
+        labels_pred_fold = np.asarray(labels_pred_fold).astype(str)
+
+        # Store for final full-CV metrics
+        all_labels_true.append(labels_true_fold)
+        all_labels_pred.append(labels_pred_fold)
+
+        # Per-fold metric, used both for logging and pruning.
+        weighted_f1_fold = f1_score(labels_true_fold, labels_pred_fold, average="weighted")
+
+        # Report intermediate value so the pruner can stop bad trials early.
+        trial.report(weighted_f1_fold, step=fold)
+        if trial.should_prune():
+            clear_msg()
+            raise optuna.TrialPruned()
+
+    # Concatenate across folds for overall metrics.
+    labels_true = np.concatenate(all_labels_true)
+    labels_pred = np.concatenate(all_labels_pred)
+
     labels_true = np.asarray(labels_true).astype(str)
     labels_pred = np.asarray(labels_pred).astype(str)
 
@@ -331,13 +356,22 @@ def main():
     data = DataImport(args.data_path, filetype = ".parquet", exclude=EXCLUDE, folds = 5, binary=args.binary)
 
     if args.optuna:
-        def progress_bar_callback(total_trials):
-            pbar = tqdm(total=total_trials, desc="Optuna Trials", position=0)
-            return lambda s, t: pbar.update(1)
-        
+        # Optuna hyperparameter search: keep 100 trials (full search).
         trial_count = 100
 
-        study = optuna.create_study(study_name=f"{args.model_name}_hyperparameter_tuning", direction='maximize')
+        # Use a pruner so clearly bad trials are stopped early.
+        # - n_startup_trials: run the first few trials fully to get a baseline.
+        # - n_warmup_steps: require at least one fold metric before pruning.
+        pruner = optuna.pruners.MedianPruner(
+            n_startup_trials=10,
+            n_warmup_steps=1,
+        )
+
+        study = optuna.create_study(
+            study_name=f"{args.model_name}_hyperparameter_tuning",
+            direction='maximize',
+            pruner=pruner,
+        )
 
         kwargs = dict()
         if "unet" in args.model_path:
@@ -371,10 +405,9 @@ def main():
             kwargs = {}
 
         study.optimize(
-            lambda x : optuna_objective(data, args, x, **kwargs), 
-            n_trials = trial_count, 
-            show_progress_bar=False,
-            callbacks=[progress_bar_callback(trial_count)] # add custom progress bar
+            lambda x: optuna_objective(data, args, x, **kwargs),
+            n_trials=trial_count,
+            show_progress_bar=True,
         )
 
         print(study.best_params)
