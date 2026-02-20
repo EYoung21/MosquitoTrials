@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=epg_job          # Name of the job
-#SBATCH --output=/data/labs/hopelab/epg/logs/%x_%j.out
-#SBATCH --error=/data/labs/hopelab/epg/logs/%x_%j\.err
+#SBATCH --output=/home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/%x_%j.out
+#SBATCH --error=/home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/%x_%j.err
 #SBATCH --gres=gpu:1                # Request 1 GPU
 #SBATCH --cpus-per-task=8           # Request 8 CPU cores
 #SBATCH --mem=16G                   # Request 16 GB memory
@@ -17,8 +17,8 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 echo "uv version: $(uv --version)"
 
-# Create log directory if it doesn't exist
-mkdir -p /data/labs/hopelab/epg/wandb_logs
+mkdir -p /home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/logs
+mkdir -p /home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/wandb_logs
 
 # Print info for debugging
 echo "Running on host: $(hostname)"
@@ -27,11 +27,16 @@ echo "Running job ID: $SLURM_JOB_ID"
 
 # ==== WANDB CONFIGURATION ====
 
+# Load the API key from the .env file in the parent machine-learning directory
+if [ -f "../.env" ]; then
+    export $(grep -v '^#' ../.env | xargs)
+fi
+
 # To store wandb logs in the run directory instead of the project root:
-export WANDB_DIR="/data/labs/hopelab/epg/logs"
+export WANDB_DIR="/home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/wandb_logs"
 
 # Run your Python script
 uv run --extra cu129 model_evaluation.py --data_path /data/labs/hopelab/epg/epg_data/sharpshooter_parquet \
-    --save_path /data/labs/hopelab/epg/outputs/sharpshooter_results --model_path unet/unet.py --model_name=unet 
+    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/sharpshooter_results --model_path unet/unet.py --model_name=unet 
 
 echo "Job finished at: $(date)"

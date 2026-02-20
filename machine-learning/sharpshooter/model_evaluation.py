@@ -145,16 +145,7 @@ def optuna_objective(data, args, trial, **kwargs):
     def clear_msg():
         msg_bar.set_description_str("")
 
-    # Initialize a nested run for this trial
-    run = wandb.init(
-        project="hmc-epg-sharpshooter",
-        group=f"{args.model_name}_optuna",
-        name=f"trial_{trial.number}",
-        config=trial.params,
-        reinit=True,
-        tags=["optuna", "nested"]
-    )
-    
+
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
         show_msg(f"Initializing Trial {trial.number} Fold {fold}")
         train_data = [data.df_list[i] for i in train_index]
@@ -188,9 +179,8 @@ def optuna_objective(data, args, trial, **kwargs):
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print(trial.datetime_start, trial.number, trial.params, weighted_f1, file=f)
 
-    if run is not None:
-        run.log({"trial.weighted_f1": weighted_f1})
-        run.finish()
+    if wandb.run is not None:
+        wandb.log({"trial.weighted_f1": weighted_f1})
 
     return weighted_f1
 
@@ -280,10 +270,19 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     # confusion matrix
     ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    plt.savefig(rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png")
+    cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
+    plt.savefig(cm_path)
+
+    if wandb.run is not None:
+        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
 
     # difference plots
     base_name = Path(model_name).name
+    if wandb.run is not None:
+        diff_table = wandb.Table(columns=["Probe", "Plot"])
+    else:
+        diff_table = None
+
     for df, preds, name in zip(test_data, predicted_labels, test_names):
         fig = plot_labels(
             df["time"],
@@ -296,6 +295,11 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
         fig_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(fig_path)
         plt.close(fig)
+        if diff_table is not None:
+            diff_table.add_data(file_stem, wandb.Image(str(fig_path)))
+
+    if wandb.run is not None and diff_table is not None:
+        wandb.log({f"Fold_{fold}/Difference_Plots": diff_table})
 
     print(f"Fold {fold} Overall Accuracy: {accuracy}")
     return labels_true, labels_pred, out_dataframe
@@ -319,6 +323,8 @@ def main():
     parser.add_argument("--optuna", action="store_true")
     parser.add_argument("--attention", action="store_true") # can only be used with UNet 
     args = parser.parse_args()
+
+    run_group_id = wandb.util.generate_id()
 
     EXCLUDE = {
         "a01", "a02", "a03", "a10", "a15",
@@ -371,7 +377,7 @@ def main():
 
         wandb_kwargs = {
             "project": "hmc-epg-sharpshooter",
-            "group": f"{args.model_name}_optuna_study",
+            "group": f"{args.model_name}_optuna_study_{run_group_id}",
             "name": f"{args.model_name}_study",
             "tags": ["optuna", "study"]
         }
@@ -425,7 +431,7 @@ def main():
         if not args.optuna:
             run = wandb.init(
                 project="hmc-epg-sharpshooter",
-                group=f"{args.model_name}_evaluation",
+                group=f"{args.model_name}_eval_{run_group_id}",
                 name=f"fold_{fold}",
                 config={"fold": fold, "model": args.model_name, **kwargs},
                 reinit=True,

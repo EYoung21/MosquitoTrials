@@ -227,13 +227,28 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     # confusion matrix
     ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    plt.savefig(rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png")
+    cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
+    plt.savefig(cm_path)
+
+    if wandb.run is not None:
+        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
 
     # difference plots
+    if wandb.run is not None:
+        diff_table = wandb.Table(columns=["Probe", "Plot"])
+    else:
+        diff_table = None
+
     for i, (df, preds, name) in enumerate(zip(test_data, predicted_labels, test_names)):
         fig = plot_labels(df["time"], df["pre_rect"], df["labels"].values, np.array(preds))
-        fig.savefig(fr"{save_path}/{model_name}_{os.path.split(name)[1]}_Fold{fold}.png")
+        img_path = fr"{save_path}/{model_name}_{os.path.split(name)[1]}_Fold{fold}.png"
+        fig.savefig(img_path)
         plt.close(fig)
+        if diff_table is not None:
+            diff_table.add_data(os.path.split(name)[1], wandb.Image(img_path))
+
+    if wandb.run is not None and diff_table is not None:
+        wandb.log({f"Fold_{fold}/Difference_Plots": diff_table})
 
     print(f"Fold {fold} Overall Accuracy: {accuracy}")
     return labels_true, labels_pred, out_dataframe
@@ -464,16 +479,7 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
       - returns macro-F1 aggregated across inner validation folds
     """
     
-    # Initialize a nested run for this trial
-    run = wandb.init(
-        project="hmc-epg-mosquito",
-        group=f"{args.model_name}_optuna_outer{outer_fold}",
-        name=f"trial_{trial.number}",
-        config=trial.params,
-        reinit=True,
-        tags=["optuna", "nested"]
-    )
-    
+
     labels_true = []
     labels_pred = []
 
@@ -519,9 +525,8 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
 
-    if run is not None:
-        run.log({"trial.macro_f1": f1})
-        run.finish()
+    if wandb.run is not None:
+        wandb.log({"trial.macro_f1": f1})
 
     return f1
 
@@ -545,6 +550,8 @@ def main():
     parser.add_argument("--attention", action="store_true") # can only be used with UNet
     parser.add_argument("--fold", type = int, required = False, default = -1) 
     args = parser.parse_args()
+
+    run_group_id = wandb.util.generate_id()
 
     print("Loading Data...")
     data = DataImport(args.data_path, 5)
@@ -606,7 +613,7 @@ def main():
             
             wandb_kwargs = {
                 "project": "hmc-epg-mosquito",
-                "group": f"{args.model_name}_optuna_study",
+                "group": f"{args.model_name}_optuna_study_{run_group_id}",
                 "name": f"outer_fold_{fold}_study",
                 "tags": ["optuna", "study"]
             }
@@ -643,6 +650,8 @@ def main():
             optuna.visualization.matplotlib.plot_optimization_history(study)
             plt.savefig(f"{args.model_name}_hyper_outer{fold}.png")
             plt.close()
+            if wandb.run is not None:
+                wandb.finish()
 
         #kwargs = {'epochs': 128, 'num_layers': 6, 'n_conv_steps_per_block': 3, 'features': 96, 'embed_dim': 96, 'lr': 0.0001528325773887917, 'dropout_rate': 0.2546315931008927, 'weight_decay': 4.1530388051130336e-08, 'transformer_window_size': 200, 'transformer_layers': 2, 'transformer_nhead': 96 // 16}
 
@@ -662,16 +671,15 @@ def main():
 
         # ---- Create model with (possibly overwritten) kwargs and run your original training ----
         # Initialize wandb for standalone evaluation runs
-        run = None
-        if not args.optuna:
-            run = wandb.init(
-                project="hmc-epg-mosquito",
-                group=f"{args.model_name}_evaluation",
-                name=f"fold_{fold}",
-                config={"fold": fold, "model": args.model_name, "augment_factor": augment_factor, **kwargs},
-                reinit=True,
-                tags=["evaluation"]
-            )
+        run_tags = ["evaluation", "optuna"] if args.optuna else ["evaluation"]
+        run = wandb.init(
+            project="hmc-epg-mosquito",
+            group=f"{args.model_name}_eval_{run_group_id}",
+            name=f"fold_{fold}",
+            config={"fold": fold, "model": args.model_name, "augment_factor": augment_factor, "optuna": args.optuna, **kwargs},
+            reinit=True,
+            tags=run_tags
+        )
 
         model = model_import.Model(save_path=args.save_path, **kwargs)
         print("Training Model...")
