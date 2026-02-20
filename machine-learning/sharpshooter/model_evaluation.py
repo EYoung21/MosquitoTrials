@@ -21,6 +21,9 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay, accuracy_score, f1_score
 )
 
+import wandb
+from optuna.integration.wandb import WeightsAndBiasesCallback
+
 from data_loader import import_data
 
 
@@ -141,6 +144,16 @@ def optuna_objective(data, args, trial, **kwargs):
 
     def clear_msg():
         msg_bar.set_description_str("")
+
+    # Initialize a nested run for this trial
+    run = wandb.init(
+        project="hmc-epg-sharpshooter",
+        group=f"{args.model_name}_optuna",
+        name=f"trial_{trial.number}",
+        config=trial.params,
+        reinit=True,
+        tags=["optuna", "nested"]
+    )
     
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
         show_msg(f"Initializing Trial {trial.number} Fold {fold}")
@@ -174,6 +187,10 @@ def optuna_objective(data, args, trial, **kwargs):
 
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print(trial.datetime_start, trial.number, trial.params, weighted_f1, file=f)
+
+    if run is not None:
+        run.log({"trial.weighted_f1": weighted_f1})
+        run.finish()
 
     return weighted_f1
 
@@ -352,11 +369,19 @@ def main():
         else:
             kwargs = {}
 
+        wandb_kwargs = {
+            "project": "hmc-epg-sharpshooter",
+            "group": f"{args.model_name}_optuna_study",
+            "name": f"{args.model_name}_study",
+            "tags": ["optuna", "study"]
+        }
+        wandbc = WeightsAndBiasesCallback(metric_name="weighted_f1", wandb_kwargs=wandb_kwargs)
+
         study.optimize(
             lambda x : optuna_objective(data, args, x, **kwargs), 
             n_trials = trial_count, 
             show_progress_bar=False,
-            callbacks=[progress_bar_callback(trial_count)] # add custom progress bar
+            callbacks=[progress_bar_callback(trial_count), wandbc] # add custom progress bar
         )
 
         print(study.best_params)
@@ -395,6 +420,18 @@ def main():
 
         model = model_import.Model(save_path = args.save_path, **kwargs)
 
+        # Initialize wandb for standalone evaluation runs
+        run = None
+        if not args.optuna:
+            run = wandb.init(
+                project="hmc-epg-sharpshooter",
+                group=f"{args.model_name}_evaluation",
+                name=f"fold_{fold}",
+                config={"fold": fold, "model": args.model_name, **kwargs},
+                reinit=True,
+                tags=["evaluation"]
+            )
+
         print("Training Model...")
         model.train(train_data)
 
@@ -407,6 +444,12 @@ def main():
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
+
+        if run is not None:
+            f1 = f1_score(true, pred, average="macro")
+            acc = accuracy_score(true, pred)
+            run.log({"eval/macro_f1": f1, "eval/accuracy": acc})
+            run.finish()
         
     out_summary_data = pd.concat(summary_data)
 

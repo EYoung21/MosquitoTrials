@@ -15,6 +15,8 @@ from matplotlib import pyplot as plt
 from itertools import groupby
 import optuna
 from sklearn.model_selection import train_test_split
+import wandb
+from optuna.integration.wandb import WeightsAndBiasesCallback
 
 from data_augmentation import build_augmented_dataset
 from postprocessing import PostProcessor
@@ -461,6 +463,17 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
       - runs an inner KFold over outer_train_index
       - returns macro-F1 aggregated across inner validation folds
     """
+    
+    # Initialize a nested run for this trial
+    run = wandb.init(
+        project="hmc-epg-mosquito",
+        group=f"{args.model_name}_optuna_outer{outer_fold}",
+        name=f"trial_{trial.number}",
+        config=trial.params,
+        reinit=True,
+        tags=["optuna", "nested"]
+    )
+    
     labels_true = []
     labels_pred = []
 
@@ -505,6 +518,10 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
 
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
+
+    if run is not None:
+        run.log({"trial.macro_f1": f1})
+        run.finish()
 
     return f1
 
@@ -586,6 +603,14 @@ def main():
         if args.optuna:
             print(f"Running nested Optuna for outer fold {fold} (inner 5-fold on outer-train)...")
             study = optuna.create_study(direction='maximize')
+            
+            wandb_kwargs = {
+                "project": "hmc-epg-mosquito",
+                "group": f"{args.model_name}_optuna_study",
+                "name": f"outer_fold_{fold}_study",
+                "tags": ["optuna", "study"]
+            }
+            wandbc = WeightsAndBiasesCallback(metric_name="macro_f1", wandb_kwargs=wandb_kwargs)
 
             study.optimize(
                 lambda t: optuna_objective(
@@ -599,6 +624,7 @@ def main():
                 ),
                 n_trials=50,
                 show_progress_bar=True,
+                callbacks=[wandbc],
             )
 
             print(f"[Fold {fold}] Best params:", study.best_params)
@@ -635,6 +661,18 @@ def main():
             print(f"{len(augmented_train_data)} Training Probes with Augment")
 
         # ---- Create model with (possibly overwritten) kwargs and run your original training ----
+        # Initialize wandb for standalone evaluation runs
+        run = None
+        if not args.optuna:
+            run = wandb.init(
+                project="hmc-epg-mosquito",
+                group=f"{args.model_name}_evaluation",
+                name=f"fold_{fold}",
+                config={"fold": fold, "model": args.model_name, "augment_factor": augment_factor, **kwargs},
+                reinit=True,
+                tags=["evaluation"]
+            )
+
         model = model_import.Model(save_path=args.save_path, **kwargs)
         print("Training Model...")
 
@@ -681,6 +719,13 @@ def main():
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
+
+        if run is not None:
+            # We already track the epoch loss in model_eval, we can track the final macro-f1 here
+            f1 = f1_score(true, pred, average="macro")
+            acc = accuracy_score(true, pred)
+            run.log({"eval/macro_f1": f1, "eval/accuracy": acc})
+            run.finish()
 
         
     out_summary_data = pd.concat(summary_data)

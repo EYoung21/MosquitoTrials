@@ -17,14 +17,18 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 echo "uv version: $(uv --version)"
 
-# Create log directory if it doesn’t exist
-mkdir -p /data/labs/hopelab/epg/logs
+# Create log directory if it doesn't exist
+mkdir -p /data/labs/hopelab/epg/wandb_logs
 
 # Print info for debugging
 echo "Running on host: $(hostname)"
 echo "Job started at: $(date)"
 echo "Running job ID: $SLURM_JOB_ID"
 
+# ==== WANDB CONFIGURATION ====
+
+# To store wandb logs in the run directory instead of the project root:
+export WANDB_DIR="/data/labs/hopelab/epg/logs"
 
 # Run your Python script
 uv run --extra cu129 model_evaluation.py --data_path /data/labs/hopelab/epg/epg_data/sharpshooter_parquet \

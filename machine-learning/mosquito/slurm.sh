@@ -25,7 +25,10 @@ echo "Running on host: $(hostname)"
 echo "Job started at: $(date)"
 echo "Running job ID: $SLURM_JOB_ID"
 
+# ==== WANDB CONFIGURATION ====
 
+# To store wandb logs in the run directory instead of the project root:
+export WANDB_DIR="/data/labs/hopelab/epg/logs"
 
 #echo "Random forest evaluation"
 #uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \

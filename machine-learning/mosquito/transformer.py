@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import wandb
 import torch.nn.functional as F
 import numpy as np
 from positional_encodings.torch_encodings import PositionalEncoding1D
@@ -55,6 +56,9 @@ class Model:
 
         self.model = self.model.to(self.device)
 
+        if wandb.run is not None:
+            wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
+
         train_losses = []
         test_losses = []
         for epoch in tqdm.tqdm(range(self.epochs)):
@@ -71,6 +75,9 @@ class Model:
                 running_loss += loss.item()            
 
             train_losses.append(running_loss / len(tr_dataloader))
+
+            if wandb.run is not None:
+                wandb.log({"epoch": epoch, "train_loss": train_losses[-1]})
         """
             # Get test loss
             running_loss = 0

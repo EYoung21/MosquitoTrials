@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from collections import Counter
 import torch
+import wandb
 from torch import nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -184,6 +185,9 @@ class Model:
         criterion = nn.CrossEntropyLoss(weight=weights)
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, capturable=False)
 
+        if wandb.run is not None:
+            wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
+
         train_losses = []
         validation_losses = []
         for epoch in tqdm.tqdm(range(self.epochs)):
@@ -232,6 +236,9 @@ class Model:
                     val_loss = running_loss / len(val_dataloader)
                     validation_losses.append(val_loss)
         
+            if wandb.run is not None:
+                wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss if val_probes else None})
+
         def draw_loss_plot(tr_losses, val_losses):
             plt.plot(tr_losses, label = "Train")
             plt.plot(val_losses, label = "Validation")

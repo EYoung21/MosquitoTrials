@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import torch
+import wandb
 from torch import nn
 import torch.optim as optim
 import torch.nn.functional as F
@@ -159,6 +160,9 @@ class Model():
             criterion = FocalLoss(alpha=self.loss_alpha, gamma=self.loss_gamma, reduction='mean')
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, capturable=False)
 
+        if wandb.run is not None:
+            wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
+
         train_losses = []
         test_losses = []
         pbar = tqdm.tqdm(range(self.epochs), desc=f"Fold {fold} Training")
@@ -203,6 +207,9 @@ class Model():
                     test_loss = running_loss / len(test_dataloader)
                     test_losses.append(test_loss)
                 pbar.set_postfix({"train_loss": f"{train_loss:.4f}", "test_loss": f"{test_loss:.4f}" if test_probes else "N/A"})
+
+            if wandb.run is not None:
+                wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": test_loss if test_probes else None})
 
         if save_train_curve:
             plt.plot(train_losses, label = "Train")

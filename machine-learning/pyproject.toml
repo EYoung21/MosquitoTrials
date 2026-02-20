@@ -16,6 +16,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "torch-struct",
     "tqdm>=4.67.1",
+    "wandb>=0.25.0",
 ]
 
 [project.optional-dependencies]
