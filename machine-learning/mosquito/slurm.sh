@@ -34,20 +34,20 @@ fi
 # To store wandb logs in the run directory instead of the project root:
 export WANDB_DIR="/home/clin4-swat/hmc-epg-project/machine-learning/mosquito/wandb_logs"
 
-#echo "Random forest evaluation"
-#uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/nested_model_evaluation_forest --model_path rf.py --model_name=rf --optuna # --post_process v
-# # --optuna
-
-# Run your Python script
-echo "UNET attention evaluation"
-uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention --model_path unet.py --model_name=unet --attention  --optuna # --post_process v
+# echo "Random forest evaluation"
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/nested_model_evaluation_forest --model_path rf.py --model_name=rf # --optuna # --post_process v
 # --optuna
 
-# echo "UNET evaluation"
+# Run your Python script
+# echo "UNET attention evaluation"
 # uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet --model_path unet.py --model_name=unet  --optuna 
+#     --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention --model_path unet.py --model_name=unet --attention --optuna # --post_process v
+# # --optuna
+
+echo "UNET evaluation"
+uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet --model_path unet.py --model_name=unet --optuna 
 
 # echo "TCN evaluation"
 # uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
@@ -56,10 +56,8 @@ uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_d
 # uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
 #     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer --model_path transformer.py --model_name=transformer  --optuna # --post_process v
 
-
-
 # uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/model_evaluation_crf --model_path unet_crf.py --model_name=unet --attention
+#     --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/model_evaluation_crf --model_path unet_crf.py --model_name=unet --attention
 
 
 echo "Job finished at: $(date)"

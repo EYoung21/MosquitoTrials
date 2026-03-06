@@ -12,7 +12,7 @@ import tqdm
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model():
-    def __init__(self, save_path = None, trial = None):
+    def __init__(self, save_path = None, trial = None, enable_wandb_logging=True):
         self.chunk_seconds = 3
         self.num_estimators = 128
         self.num_freqs = 7

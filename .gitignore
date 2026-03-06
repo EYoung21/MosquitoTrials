@@ -54,6 +54,15 @@ machine-learning/**/*.pkl
 
 # Model reports
 machine-learning/**/*.png
+machine-learning/**/logs
+machine-learning/**/model_evaluation_crf
+machine-learning/**/model_evaluation_crf
+machine-learning/**/vnested_model_evaluation_unet_attention
+
+
+# Wandb Ignore
+machine-learning/**/wandb_logs
+
 
 #============== FIRMWARE IGNORES ============== 
 

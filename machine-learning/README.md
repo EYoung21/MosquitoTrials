@@ -37,3 +37,12 @@ pip install .
  
 **Important:** pip will **not** automatically install PyTorch.  
 You must install the correct wheel for your system from the [PyTorch installation guide](https://pytorch.org/get-started/locally/).  
+
+
+# Weights and Biases Setup
+The project is integrated with weights and biases for visualization and logging of model evaluations, in order to actually run
+models with weights and biases, please create an [api key](https://wandb.ai/settings#apikeys) from wandb and create a .env file.
+
+```bash
+WANDB_API_KEY= <Key Here>
+```

@@ -35,8 +35,9 @@ class Model():
                  loss_gamma=0,
                  loss_alpha=None, 
                  transformer_layers=2, 
-                 transformer_nhead=4, save_path=None, trial = None):
+                 transformer_nhead=4, save_path=None, trial = None, enable_wandb_logging=True):
         random.seed(57) # random.seed(42)  
+        self.enable_wandb_logging = enable_wandb_logging
         # Going to have to make this explicit for the time being...
         self.label_map = {
             "J"  : 0,
@@ -160,7 +161,7 @@ class Model():
             criterion = FocalLoss(alpha=self.loss_alpha, gamma=self.loss_gamma, reduction='mean')
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, capturable=False)
 
-        if wandb.run is not None:
+        if self.enable_wandb_logging and wandb.run is not None:
             wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
 
         train_losses = []
@@ -208,7 +209,7 @@ class Model():
                     test_losses.append(test_loss)
                 pbar.set_postfix({"train_loss": f"{train_loss:.4f}", "test_loss": f"{test_loss:.4f}" if test_probes else "N/A"})
 
-            if wandb.run is not None:
+            if self.enable_wandb_logging and wandb.run is not None:
                 wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": test_loss if test_probes else None})
 
         if save_train_curve:

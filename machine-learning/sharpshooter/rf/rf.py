@@ -14,7 +14,7 @@ from transform_worker import transform_single_probe
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 class Model:
-    def __init__(self, save_path = None, trial = None):
+    def __init__(self, save_path = None, trial = None, enable_wandb_logging=True):
         self.chunk_seconds = 3#3
         self.num_estimators = 8#128
         self.num_freqs = 6#7

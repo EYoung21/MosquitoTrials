@@ -156,7 +156,7 @@ def optuna_objective(data, args, trial, **kwargs):
 
         show_msg(f"Training Trial {trial.number} Fold {fold}")
         model_import = dynamic_importer(args.model_path)
-        model = model_import.Model(trial = trial, **kwargs)
+        model = model_import.Model(trial = trial, enable_wandb_logging=False, **kwargs)
         model.train(train_data, test_data, fold)
         clear_msg()
 
@@ -178,9 +178,6 @@ def optuna_objective(data, args, trial, **kwargs):
 
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print(trial.datetime_start, trial.number, trial.params, weighted_f1, file=f)
-
-    if wandb.run is not None:
-        wandb.log({"trial.weighted_f1": weighted_f1})
 
     return weighted_f1
 
@@ -267,6 +264,14 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     accuracy = accuracy_score(labels_true, labels_pred)
     out_dataframe["accuracy"] = accuracy
 
+    # store per-class and aggregate metrics in the runs table (no chart clutter)
+    if wandb.run is not None:
+        for i, label in enumerate(labels):
+            wandb.run.summary[f"Fold_{fold}/{label}_precision"] = precision[i]
+            wandb.run.summary[f"Fold_{fold}/{label}_recall"] = recall[i]
+            wandb.run.summary[f"Fold_{fold}/{label}_fscore"] = fscore[i]
+        wandb.run.summary[f"Fold_{fold}/accuracy"] = accuracy
+
     # confusion matrix
     ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
@@ -276,13 +281,8 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     if wandb.run is not None:
         wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
 
-    # difference plots
+    # difference plots (saved locally only)
     base_name = Path(model_name).name
-    if wandb.run is not None:
-        diff_table = wandb.Table(columns=["Probe", "Plot"])
-    else:
-        diff_table = None
-
     for df, preds, name in zip(test_data, predicted_labels, test_names):
         fig = plot_labels(
             df["time"],
@@ -295,11 +295,6 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
         fig_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(fig_path)
         plt.close(fig)
-        if diff_table is not None:
-            diff_table.add_data(file_stem, wandb.Image(str(fig_path)))
-
-    if wandb.run is not None and diff_table is not None:
-        wandb.log({f"Fold_{fold}/Difference_Plots": diff_table})
 
     print(f"Fold {fold} Overall Accuracy: {accuracy}")
     return labels_true, labels_pred, out_dataframe
@@ -392,7 +387,12 @@ def main():
 
         print(study.best_params)
         optuna.visualization.matplotlib.plot_optimization_history(study)
-        plt.savefig(f"{args.model_name}_hyper.png")
+        hyper_plot_path = f"{args.model_name}_hyper.png"
+        plt.savefig(hyper_plot_path)
+        plt.close()
+        if wandb.run is not None:
+            wandb.log({"optuna_optimization_history": wandb.Image(hyper_plot_path)})
+            wandb.finish()
         return
     
     summary_data = []
@@ -476,11 +476,28 @@ def main():
 
     overall = ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    overall.plot().figure_.savefig(rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png")
+    overall_cm_path = rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png"
+    overall.plot().figure_.savefig(overall_cm_path)
 
     all_data = pd.DataFrame({'labels_true': labels_true,
                              'labels_pred': labels_pred})
     all_data.to_csv(f"{args.save_path}/{args.model_name}_allpredictions.csv")
+
+    # Log overall summary to W&B
+    overall_f1 = f1_score(labels_true, labels_pred, average="macro")
+    overall_acc = accuracy_score(labels_true, labels_pred)
+    summary_run = wandb.init(
+        project="hmc-epg-sharpshooter",
+        group=f"{args.model_name}_eval_{run_group_id}",
+        name="overall_summary",
+        config={"model": args.model_name, "optuna": args.optuna},
+        reinit=True,
+        tags=["summary"],
+    )
+    summary_run.summary["overall/macro_f1"] = overall_f1
+    summary_run.summary["overall/accuracy"] = overall_acc
+    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
+    summary_run.finish()
 
 if __name__ == "__main__":
     main() 

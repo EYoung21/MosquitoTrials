@@ -14,8 +14,9 @@ from scipy.signal import stft
 import tqdm
 
 class Model():
-    def __init__(self, save_path = None, epochs = 4, trial = None):
+    def __init__(self, save_path = None, epochs = 4, trial = None, enable_wandb_logging=True):
         random.seed(42)
+        self.enable_wandb_logging = enable_wandb_logging
         # Define all the model parameters
         self.SAMPLING_RATE = 100
 
@@ -100,7 +101,7 @@ class Model():
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3)
 
-        if wandb.run is not None:
+        if self.enable_wandb_logging and wandb.run is not None:
             wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
 
         train_losses = []
@@ -121,7 +122,7 @@ class Model():
                 optimizer.step()
             train_losses.append(tot_loss / len(tr_dataloader))
 
-            if wandb.run is not None:
+            if self.enable_wandb_logging and wandb.run is not None:
                 wandb.log({"epoch": epoch, "train_loss": train_losses[-1]})
             """
             # Get the test loss

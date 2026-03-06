@@ -11,6 +11,7 @@ import tqdm
 from matplotlib import pyplot as plt
 from positional_encodings.torch_encodings import PositionalEncoding1D
 from focal_loss import FocalLoss
+import wandb
 from torch_struct import LinearChainCRF
 
 class Model():
@@ -40,8 +41,9 @@ class Model():
                  downsample_type = "conv",
                  skip_before_downsample = False,
                  norm_affine = False,
-                 save_path=None, trial = None, seed=42):
-        random.seed(seed)  
+                 save_path=None, trial = None, seed=42, enable_wandb_logging=True):
+        random.seed(seed)
+        self.enable_wandb_logging = enable_wandb_logging
         # Going to have to make this explicit for the time being...
         self.label_map = {
             "J"  : 0,
@@ -151,6 +153,9 @@ class Model():
     def train(self, probes, test_probes, fold = None, save_train_curve=False, show_train_curve=False):
         self.model = self.model.to(self.device)
 
+        if self.enable_wandb_logging and wandb.run is not None:
+            wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
+
         tr_dfs, tr_df = self.load_probes(probes)
         tr_dataset = TimeSeriesDataset(tr_dfs, self.label_map, data_columns=self.data_columns, 
                                        class_column = "labels", ignore_N=self.ignore_N)
@@ -207,6 +212,9 @@ class Model():
                     test_loss = running_loss / len(test_dataloader)
                     test_losses.append(test_loss)
                 pbar.set_postfix({"train_loss": f"{train_loss:.4f}", "test_loss": f"{test_loss:.4f}" if test_probes else "N/A"})
+
+            if self.enable_wandb_logging and wandb.run is not None:
+                wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": test_loss if test_probes else None})
 
         if save_train_curve:
             plt.plot(train_losses, label = "Train")

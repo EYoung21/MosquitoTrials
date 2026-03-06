@@ -50,9 +50,11 @@ class Model:
             transformer_layers=None, 
             transformer_nhead=None, 
             save_path=None, 
-            trial = None
+            trial = None,
+            enable_wandb_logging=True
         ):
-        random.seed(42)  
+        random.seed(42)
+        self.enable_wandb_logging = enable_wandb_logging
 
         binary_label_map = load_label_map("../label_map.json")[0]
         self.label_map = {k: i for i, k in enumerate(sorted(binary_label_map))}
@@ -185,7 +187,7 @@ class Model:
         criterion = nn.CrossEntropyLoss(weight=weights)
         optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, capturable=False)
 
-        if wandb.run is not None:
+        if self.enable_wandb_logging and wandb.run is not None:
             wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
 
         train_losses = []
@@ -236,7 +238,7 @@ class Model:
                     val_loss = running_loss / len(val_dataloader)
                     validation_losses.append(val_loss)
         
-            if wandb.run is not None:
+            if self.enable_wandb_logging and wandb.run is not None:
                 wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss if val_probes else None})
 
         def draw_loss_plot(tr_losses, val_losses):
