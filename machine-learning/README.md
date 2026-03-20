@@ -39,10 +39,18 @@ pip install .
 You must install the correct wheel for your system from the [PyTorch installation guide](https://pytorch.org/get-started/locally/).  
 
 
-# Weights and Biases Setup
-The project is integrated with weights and biases for visualization and logging of model evaluations, in order to actually run
-models with weights and biases, please create an [api key](https://wandb.ai/settings#apikeys) from wandb and create a .env file.
+# Weights & Biases + Weave
 
+Both mosquito and sharpshooter log to W&B for experiment tracking and Weave for Optuna trace inspection.
+
+**Setup:** create a `.env` file in `machine-learning/` with your [W&B API key](https://wandb.ai/settings#apikeys):
 ```bash
-WANDB_API_KEY= <Key Here>
+WANDB_API_KEY=<your key>
 ```
+The SLURM scripts load this automatically.
+
+**Projects:** `hmc-epg-mosquito` and `hmc-epg-sharpshooter` under `hopelab-swarthmore`.
+
+**What's logged per fold:** train/val loss curves (epoch on x-axis), per-class precision/recall/F1 as a filterable table, confusion matrix image, and scalar macro-F1/accuracy. The `overall` summary run aggregates across all folds.
+
+**Optuna:** mosquito uses nested CV (one study per outer fold); sharpshooter runs one global study across all folds and exits before the eval. After each trial, `log_optuna_trial_snapshot` logs each hyperparameter as its own column in Weave Traces
