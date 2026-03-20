@@ -243,14 +243,7 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     plt.close()
 
     if wandb.run is not None:
-        # Use native interactive confusion matrix panel
-        wandb.log({
-            f"Fold_{fold}/Confusion_Matrix": wandb.plot.confusion_matrix(
-                y_true=labels_true,
-                preds=labels_pred,
-                class_names=labels,
-            )
-        })
+        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
 
     # difference plots (saved locally only)
     for i, (df, preds, name) in enumerate(zip(test_data, predicted_labels, test_names)):
@@ -480,7 +473,6 @@ def apply_best_params_to_kwargs(best_params: dict, kwargs: dict) -> dict:
 
     return new_kwargs
 
-@weave.op
 def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_folds=5, **kwargs):
     """
     Nested CV objective:
@@ -488,58 +480,71 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
       - runs an inner KFold over outer_train_index
       - returns macro-F1 aggregated across inner validation folds
     """
-    # Surface trial params at the Weave trace list level — no clicking in required.
-    with weave.attributes({
-        "outer_fold": outer_fold,
-        "trial_number": trial.number,
-        "trial_params": trial.params,
-    }):
-        labels_true = []
-        labels_pred = []
+    labels_true = []
+    labels_pred = []
 
-        augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
+    augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
 
-        # Inner CV over the outer-train set only
-        inner_kf = KFold(
-            n_splits=inner_folds,
-            random_state=data.random_state + outer_fold,  # deterministic per outer fold
-            shuffle=True,
-        )
+    # Inner CV over the outer-train set only
+    inner_kf = KFold(
+        n_splits=inner_folds,
+        random_state=data.random_state + outer_fold,  # deterministic per outer fold
+        shuffle=True,
+    )
 
-        outer_train_index = np.array(list(outer_train_index))
-        model_import = dynamic_importer(args.model_path)
+    outer_train_index = np.array(list(outer_train_index))
+    model_import = dynamic_importer(args.model_path)
 
-        for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
-            inner_train_idx = outer_train_index[inner_train_pos]
-            inner_val_idx   = outer_train_index[inner_val_pos]
+    for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
+        inner_train_idx = outer_train_index[inner_train_pos]
+        inner_val_idx   = outer_train_index[inner_val_pos]
 
-            train_dfs = [data.raw_dfs[i] for i in inner_train_idx]
-            val_dfs   = [data.raw_dfs[i] for i in inner_val_idx]
+        train_dfs = [data.raw_dfs[i] for i in inner_train_idx]
+        val_dfs   = [data.raw_dfs[i] for i in inner_val_idx]
 
-            train_data, _ = data.get_probes(train_dfs)
-            val_data, _   = data.get_probes(val_dfs)
+        train_data, _ = data.get_probes(train_dfs)
+        val_data, _   = data.get_probes(val_dfs)
 
-            if args.augment:
-                train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
+        if args.augment:
+            train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
 
-            model = model_import.Model(trial=trial, enable_wandb_logging=False, **kwargs)
-            model.train(train_data, val_data, inner_fold)
+        model = model_import.Model(trial=trial, enable_wandb_logging=False, **kwargs)
+        model.train(train_data, val_data, inner_fold)
 
-            predicted_labels = model.predict(val_data)
+        predicted_labels = model.predict(val_data)
 
-            # Flatten everything (same as your original objective)
-            for df, preds in zip(val_data, predicted_labels):
-                labels_true.extend(df["labels"].values)
-                labels_pred.extend(preds)
-            break
+        # Flatten everything (same as your original objective)
+        for df, preds in zip(val_data, predicted_labels):
+            labels_true.extend(df["labels"].values)
+            labels_pred.extend(preds)
+        break
 
-        f1 = f1_score(labels_true, labels_pred, average="macro")
-        print(f1_score(labels_true, labels_pred, average=None))
+    f1 = f1_score(labels_true, labels_pred, average="macro")
+    print(f1_score(labels_true, labels_pred, average=None))
 
-        with open(f"{args.model_name}_optuna.txt", "a") as f:
-            print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
+    with open(f"{args.model_name}_optuna.txt", "a") as f:
+        print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
 
-        return f1
+    # trial.params is now fully populated (suggest_* was called inside Model.__init__).
+    # Spread as **kwargs so each param becomes its own column in the Weave trace list.
+    log_optuna_trial_snapshot(
+        outer_fold=outer_fold,
+        trial_number=trial.number,
+        macro_f1=f1,
+        **trial.params,
+    )
+
+    return f1
+
+
+@weave.op
+def log_optuna_trial_snapshot(outer_fold: int, trial_number: int, macro_f1: float, **trial_params):
+    """
+    Logged after each trial completes, each Optuna-suggested hyperparam
+    appears as its own input.* column in the Weave trace list.
+    Returning only macro_f1 avoids duplicating columns as output.*.
+    """
+    return macro_f1
 
 
 def main():
@@ -627,7 +632,7 @@ def main():
             
             wandb_kwargs = {
                 "project": "hmc-epg-mosquito",
-                "group": f"{args.model_name}_optuna_study_{run_group_id}",
+                "group": f"{args.model_name}_optuna_eval_{run_group_id}",
                 "name": f"outer_fold_{fold}_study",
                 "tags": ["optuna", "study"]
             }
@@ -695,10 +700,11 @@ def main():
 
         # ---- Create model with (possibly overwritten) kwargs and run your original training ----
         # Initialize wandb for standalone evaluation runs
+        run_group_name = f"{args.model_name}_optuna_eval_{run_group_id}" if args.optuna else f"{args.model_name}_eval_{run_group_id}"
         run_tags = ["evaluation", "optuna"] if args.optuna else ["evaluation"]
         run = wandb.init(
             project="hmc-epg-mosquito",
-            group=f"{args.model_name}_eval_{run_group_id}",
+            group=run_group_name,
             name=f"fold_{fold}",
             config={"fold": fold, "model": args.model_name, "augment_factor": augment_factor, "optuna": args.optuna, **kwargs},
             reinit=True,
@@ -805,7 +811,7 @@ def main():
     # Log overall summary to W&B
     summary_run = wandb.init(
         project="hmc-epg-mosquito",
-        group=f"{args.model_name}_eval_{run_group_id}",
+        group=run_group_name if args.optuna else f"{args.model_name}_eval_{run_group_id}",
         name="overall",
         config={"model": args.model_name, "optuna": args.optuna},
         reinit=True,
@@ -814,14 +820,7 @@ def main():
     summary_run.summary["overall/macro_f1"] = all_fscore_macro
     summary_run.summary["overall/accuracy"] = out_dataframe["accuracy"].values[0]
 
-    # Interactive overall confusion matrix panel
-    summary_run.log({
-        "overall/Confusion_Matrix": wandb.plot.confusion_matrix(
-            y_true=labels_true,
-            preds=labels_pred,
-            class_names=sorted(np.unique(labels_true).tolist()),
-        )
-    })
+    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
 
 
     if args.optuna and len(optuna_fold_best_rows) > 0:
