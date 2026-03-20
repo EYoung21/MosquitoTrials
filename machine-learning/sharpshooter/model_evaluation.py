@@ -22,6 +22,7 @@ from sklearn.metrics import (
 )
 
 import wandb
+import weave
 from optuna.integration.wandb import WeightsAndBiasesCallback
 
 from data_loader import import_data
@@ -179,7 +180,24 @@ def optuna_objective(data, args, trial, **kwargs):
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print(trial.datetime_start, trial.number, trial.params, weighted_f1, file=f)
 
+    # trial.params is fully populated here — spread as kwargs so each param
+    # appears as its own column in the Weave trace list.
+    log_optuna_trial_snapshot(
+        trial_number=trial.number,
+        macro_f1=weighted_f1,
+        **trial.params,
+    )
+
     return weighted_f1
+
+
+@weave.op
+def log_optuna_trial_snapshot(trial_number: int, macro_f1: float, **trial_params):
+    """
+    Logged after each trial completes — each Optuna-suggested hyperparam
+    appears as its own input.* column in the Weave trace list.
+    """
+    return macro_f1
 
 def plot_labels(time, voltage, true_labels, pred_labels, probs = None):
     """
@@ -264,19 +282,21 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     accuracy = accuracy_score(labels_true, labels_pred)
     out_dataframe["accuracy"] = accuracy
 
-    # store per-class and aggregate metrics in the runs table (no chart clutter)
+    # Per-class metrics as a wandb.Table so they're chartable and filterable
     if wandb.run is not None:
-        for i, label in enumerate(labels):
-            wandb.run.summary[f"Fold_{fold}/{label}_precision"] = precision[i]
-            wandb.run.summary[f"Fold_{fold}/{label}_recall"] = recall[i]
-            wandb.run.summary[f"Fold_{fold}/{label}_fscore"] = fscore[i]
-        wandb.run.summary[f"Fold_{fold}/accuracy"] = accuracy
+        per_class_table = wandb.Table(
+            columns=["class", "precision", "recall", "f1"],
+            data=[[label, float(precision[i]), float(recall[i]), float(fscore[i])]
+                  for i, label in enumerate(labels)]
+        )
+        wandb.log({f"Fold_{fold}/per_class_metrics": per_class_table})
 
     # confusion matrix
-    ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
-                                            normalize = 'true')
+    ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred,
+                                            normalize='true')
     cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
     plt.savefig(cm_path)
+    plt.close()
 
     if wandb.run is not None:
         wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
@@ -320,6 +340,7 @@ def main():
     args = parser.parse_args()
 
     run_group_id = wandb.util.generate_id()
+    weave.init("hmc-epg-sharpshooter")
 
     EXCLUDE = {
         "a01", "a02", "a03", "a10", "a15",

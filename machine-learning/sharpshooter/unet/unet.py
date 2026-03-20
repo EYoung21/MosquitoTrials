@@ -239,7 +239,7 @@ class Model:
                     validation_losses.append(val_loss)
         
             if self.enable_wandb_logging and wandb.run is not None:
-                wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": val_loss if val_probes else None})
+                wandb.log({"train_loss": train_loss, "val_loss": val_loss if val_probes else None}, step=epoch)
 
         def draw_loss_plot(tr_losses, val_losses):
             plt.plot(tr_losses, label = "Train")
