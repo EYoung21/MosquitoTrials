@@ -78,7 +78,7 @@ class Model:
             train_losses.append(running_loss / len(tr_dataloader))
 
             if self.enable_wandb_logging and wandb.run is not None:
-                wandb.log({"epoch": epoch, "train_loss": train_losses[-1]})
+                wandb.log({"train_loss": train_losses[-1]}, step=epoch)
         """
             # Get test loss
             running_loss = 0

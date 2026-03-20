@@ -210,7 +210,7 @@ class Model():
                 pbar.set_postfix({"train_loss": f"{train_loss:.4f}", "test_loss": f"{test_loss:.4f}" if test_probes else "N/A"})
 
             if self.enable_wandb_logging and wandb.run is not None:
-                wandb.log({"epoch": epoch, "train_loss": train_loss, "val_loss": test_loss if test_probes else None})
+                wandb.log({"train_loss": train_loss, "val_loss": test_loss if test_probes else None}, step=epoch)
 
         if save_train_curve:
             plt.plot(train_losses, label = "Train")

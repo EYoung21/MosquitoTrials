@@ -1,6 +1,5 @@
 import os
 import glob
-import json
 import numpy as np
 import pandas as pd
 import argparse
@@ -227,24 +226,31 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     out_dataframe["recall_macro"] = all_recall_macro
     out_dataframe["fscore_macro"] = all_fscore_macro
 
-    # store per-class and aggregate metrics in the runs table (no chart clutter)
+    # Log per-class metrics as an interactive W&B Table (chartable, filterable)
     if wandb.run is not None:
-        for i, label in enumerate(labels):
-            wandb.run.summary[f"Fold_{fold}/{label}_precision"] = precision[i]
-            wandb.run.summary[f"Fold_{fold}/{label}_recall"] = recall[i]
-            wandb.run.summary[f"Fold_{fold}/{label}_fscore"] = fscore[i]
-        wandb.run.summary[f"Fold_{fold}/accuracy"] = accuracy
-        wandb.run.summary[f"Fold_{fold}/fscore_macro"] = all_fscore_macro
-        wandb.run.summary[f"Fold_{fold}/fscore_micro"] = all_fscore_micro
+        per_class_table = wandb.Table(
+            columns=["class", "precision", "recall", "f1"],
+            data=[[label, float(precision[i]), float(recall[i]), float(fscore[i])]
+                  for i, label in enumerate(labels)]
+        )
+        wandb.log({f"Fold_{fold}/per_class_metrics": per_class_table})
 
-    # confusion matrix
+    # confusion matrix (saved locally for reference)
     ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
     cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
     plt.savefig(cm_path)
+    plt.close()
 
     if wandb.run is not None:
-        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
+        # Use native interactive confusion matrix panel
+        wandb.log({
+            f"Fold_{fold}/Confusion_Matrix": wandb.plot.confusion_matrix(
+                y_true=labels_true,
+                preds=labels_pred,
+                class_names=labels,
+            )
+        })
 
     # difference plots (saved locally only)
     for i, (df, preds, name) in enumerate(zip(test_data, predicted_labels, test_names)):
@@ -482,75 +488,58 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
       - runs an inner KFold over outer_train_index
       - returns macro-F1 aggregated across inner validation folds
     """
-    
-
-    labels_true = []
-    labels_pred = []
-
-    augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
-
-    # Inner CV over the outer-train set only
-    inner_kf = KFold(
-        n_splits=inner_folds,
-        random_state=data.random_state + outer_fold,  # deterministic per outer fold
-        shuffle=True,
-    )
-
-    outer_train_index = np.array(list(outer_train_index))
-    model_import = dynamic_importer(args.model_path)
-
-    for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
-        inner_train_idx = outer_train_index[inner_train_pos]
-        inner_val_idx   = outer_train_index[inner_val_pos]
-
-        train_dfs = [data.raw_dfs[i] for i in inner_train_idx]
-        val_dfs   = [data.raw_dfs[i] for i in inner_val_idx]
-
-        train_data, _ = data.get_probes(train_dfs)
-        val_data, _   = data.get_probes(val_dfs)
-
-        if args.augment:
-            train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
-
-        model = model_import.Model(trial=trial, enable_wandb_logging=False, **kwargs)
-        model.train(train_data, val_data, inner_fold)
-
-        predicted_labels = model.predict(val_data)
-
-        # Flatten everything (same as your original objective)
-        for df, preds in zip(val_data, predicted_labels):
-            labels_true.extend(df["labels"].values)
-            labels_pred.extend(preds)
-        break
-
-    f1 = f1_score(labels_true, labels_pred, average="macro")
-    print(f1_score(labels_true, labels_pred, average=None))
-
-    with open(f"{args.model_name}_optuna.txt", "a") as f:
-        print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
-
-    # Log a serializable snapshot so Weave panels show readable trial details.
-    log_optuna_trial_snapshot(
-        outer_fold=outer_fold,
-        trial_number=trial.number,
-        trial_params=trial.params,
-        macro_f1=f1,
-    )
-
-    return f1
-
-
-@weave.op
-def log_optuna_trial_snapshot(outer_fold, trial_number, trial_params, macro_f1):
-    """
-    Emit an explicit, serializable trial record for easier Weave inspection.
-    """
-    return {
+    # Surface trial params at the Weave trace list level — no clicking in required.
+    with weave.attributes({
         "outer_fold": outer_fold,
-        "trial_number": trial_number,
-        "trial_params": trial_params,
-        "macro_f1": macro_f1,
-    }
+        "trial_number": trial.number,
+        "trial_params": trial.params,
+    }):
+        labels_true = []
+        labels_pred = []
+
+        augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
+
+        # Inner CV over the outer-train set only
+        inner_kf = KFold(
+            n_splits=inner_folds,
+            random_state=data.random_state + outer_fold,  # deterministic per outer fold
+            shuffle=True,
+        )
+
+        outer_train_index = np.array(list(outer_train_index))
+        model_import = dynamic_importer(args.model_path)
+
+        for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
+            inner_train_idx = outer_train_index[inner_train_pos]
+            inner_val_idx   = outer_train_index[inner_val_pos]
+
+            train_dfs = [data.raw_dfs[i] for i in inner_train_idx]
+            val_dfs   = [data.raw_dfs[i] for i in inner_val_idx]
+
+            train_data, _ = data.get_probes(train_dfs)
+            val_data, _   = data.get_probes(val_dfs)
+
+            if args.augment:
+                train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
+
+            model = model_import.Model(trial=trial, enable_wandb_logging=False, **kwargs)
+            model.train(train_data, val_data, inner_fold)
+
+            predicted_labels = model.predict(val_data)
+
+            # Flatten everything (same as your original objective)
+            for df, preds in zip(val_data, predicted_labels):
+                labels_true.extend(df["labels"].values)
+                labels_pred.extend(preds)
+            break
+
+        f1 = f1_score(labels_true, labels_pred, average="macro")
+        print(f1_score(labels_true, labels_pred, average=None))
+
+        with open(f"{args.model_name}_optuna.txt", "a") as f:
+            print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
+
+        return f1
 
 
 def main():
@@ -678,12 +667,13 @@ def main():
             plt.close()
 
             best_trial = study.best_trial
+            # Expand hyperparams as individual columns so W&B Table is filterable per-param
             best_row = {
                 "outer_fold": fold,
                 "best_trial_number": best_trial.number,
                 "best_value_macro_f1": study.best_value,
                 "trial_count": len(study.trials),
-                "best_params_json": json.dumps(study.best_params, sort_keys=True),
+                **study.best_params,  # one column per hyperparam, not a JSON string
             }
             optuna_fold_best_rows.append(best_row)
 
@@ -823,7 +813,16 @@ def main():
     )
     summary_run.summary["overall/macro_f1"] = all_fscore_macro
     summary_run.summary["overall/accuracy"] = out_dataframe["accuracy"].values[0]
-    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
+
+    # Interactive overall confusion matrix panel
+    summary_run.log({
+        "overall/Confusion_Matrix": wandb.plot.confusion_matrix(
+            y_true=labels_true,
+            preds=labels_pred,
+            class_names=sorted(np.unique(labels_true).tolist()),
+        )
+    })
+
 
     if args.optuna and len(optuna_fold_best_rows) > 0:
         fold_best_df = pd.DataFrame(optuna_fold_best_rows).sort_values("outer_fold").reset_index(drop=True)
@@ -834,11 +833,9 @@ def main():
         summary_run.summary["overall/optuna_global_best_outer_fold"] = int(global_best["outer_fold"])
         summary_run.summary["overall/optuna_global_best_trial_number"] = int(global_best["best_trial_number"])
         summary_run.summary["overall/optuna_global_best_value_macro_f1"] = float(global_best["best_value_macro_f1"])
-        summary_run.summary["overall/optuna_global_best_params_json"] = str(global_best["best_params_json"])
 
     summary_run.finish()
 
-    #generate_roc(all_test, logits_pred, args.save_path, args.model_name, "Overall")
 
 if __name__ == "__main__":
     main()

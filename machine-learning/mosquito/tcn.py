@@ -123,7 +123,7 @@ class Model():
             train_losses.append(tot_loss / len(tr_dataloader))
 
             if self.enable_wandb_logging and wandb.run is not None:
-                wandb.log({"epoch": epoch, "train_loss": train_losses[-1]})
+                wandb.log({"train_loss": train_losses[-1]}, step=epoch)
             """
             # Get the test loss
             with torch.no_grad():
