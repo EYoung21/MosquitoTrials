@@ -1,0 +1,15 @@
+batch_size: 1
+epochs: 128
+lr: 5e-4
+weight_decay: 1e-7
+folds: 4
+inner_folds: 4
+save_train_curve: false
+show_train_curve: false
+trial: false
+
+augment: true
+augment_factor: 1
+
+loss_gamma: 1.5
+loss_alpha: null

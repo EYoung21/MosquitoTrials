@@ -1,0 +1,35 @@
+hydra:
+  mode: MULTIRUN
+
+  sweeper:
+    direction: maximize
+    n_trials: 100
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 123
+      multivariate: true
+
+    params:
+      train.epochs: range(64, 129, step=16)
+      train.lr: tag(log, interval(5e-5, 5e-3))
+
+      model.model.num_layers: range(6, 9)
+      model.model.n_conv_steps_per_block: range(1, 4)
+      model.model.features: choice(32, 64, 128)
+
+      model.model.crf_type: choice(crf, shared_transition_crf)
+      model.model.skip_start_layer: range(0, 5)
+
+      model.model.block_type: choice(resnet, simple)
+      model.model.upsample_type: choice(convtranspose, nearest, linear)
+      model.model.downsample_type: choice(conv, avgpool, maxpool)
+      model.model.growth_factor: choice(1, 2)
+      model.model.skip_before_downsample: choice(true, false)
+      model.model.norm_affine: choice(true, false)
+
+      train.augment_factor: choice(1, 2, 4, 8)
+      # helper flags for conditional search
+      model.model.dropout_is_zero: choice(true, false)
+      train.weight_decay_is_zero: choice(true, false)
+
+    custom_search_space: utilities.search_space.configure

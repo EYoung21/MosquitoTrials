@@ -17,156 +17,73 @@ from positional_encodings.torch_encodings import PositionalEncoding1D
 from focal_loss import FocalLoss
 
 class Model():
-    def __init__(self, epochs=128, 
-                 lr=5e-4, 
-                 num_layers=8, 
-                 growth_factor=1, 
-                 features=64, 
-                 n_conv_steps_per_block=2, 
-                 block_kernel_size=3, 
-                 up_down_sample_kernel_size=2, 
-                 block_padding=1, 
-                 weight_decay=1e-7, 
-                 dropout_rate=0., 
-                 bottleneck_type="windowed_attention", 
+    def __init__(self, model: "UNet1D",
                  ignore_N=None, 
-                 transformer_window_size=200, 
-                 embed_dim=64,
-                 loss_gamma=0,
-                 loss_alpha=None, 
-                 transformer_layers=2, 
-                 transformer_nhead=4, save_path=None, trial = None, enable_wandb_logging=True):
-        random.seed(57) # random.seed(42)  
+                 save_path=None,
+                 data_columns = None,
+                 label_map= None,
+                 seed=42,
+                 enable_wandb_logging=True):
+        random.seed(seed) 
         self.enable_wandb_logging = enable_wandb_logging
-        # Going to have to make this explicit for the time being...
-        self.label_map = {
-            "J"  : 0,
-            "K"  : 1,
-            "L"  : 2,
-            "M"  : 3,
-            "N"  : 4,
-            "W"  : 5
-        }
+        if data_columns == None:
+            data_columns = ["post_rect"],
+        if label_map == None:
+            label_map= {"J"  : 0, "K"  : 1, "L"  : 2, "M"  : 3, "N"  : 4, "W"  : 5},
+
+        self.label_map = label_map
         self.inv_label_map = {i:label for label, i in self.label_map.items()}
 
-        self.data_columns = ["post_rect"]
-        
-        self.batch_size = 1
-        self.epochs=epochs
-        self.lr=lr
-        self.weight_decay = weight_decay
-        self.dropout_rate = dropout_rate
-        self.block_kernel_size = block_kernel_size
-        self.up_down_sample_kernel_size = up_down_sample_kernel_size
-        self.block_padding = block_padding
-        self.n_conv_steps_per_block = n_conv_steps_per_block
-        self.num_layers = num_layers
-        self.growth_factor = growth_factor
-        self.features = features
-        self.bottleneck_type = bottleneck_type
-        self.transformer_window_size = transformer_window_size
+        self.data_columns = data_columns
         self.ignore_N = ignore_N
-        self.loss_gamma = loss_gamma
-        self.loss_alpha = loss_alpha
-        
-        
-        if embed_dim is None:
-            if self.bottleneck_type == "windowed_attention":
-                self.embed_dim = self.features * (self.growth_factor**self.num_layers)
-            elif self.bottleneck_type == "attention":
-                self.embed_dim = self.features * (self.growth_factor**self.num_layers)
-            else:
-                self.embed_dim = None
-        else:
-            self.embed_dim = embed_dim
-
-        self.transformer_layers = transformer_layers
-
-        if transformer_nhead is None:
-            if self.bottleneck_type == "windowed_attention":
-                self.transformer_nhead = self.embed_dim // 32
-            elif self.bottleneck_type == "attention":
-                self.transformer_nhead = self.transformer_window_size // 32
-            else:
-                self.transformer_nhead = None
-        else:
-            self.transformer_nhead = transformer_nhead
-
-        if trial:
-            # integers from a power-of-two grid
-            self.epochs      = trial.suggest_int("epochs", 64, 128, step=16)
-            self.num_layers  = trial.suggest_int("num_layers", 6, 8, step=2)
-            self.n_conv_steps_per_block = trial.suggest_int("n_conv_steps_per_block", 1, 3, step=1)
-            self.features    = trial.suggest_int("features", 32, 128, step=32)
-            self.lr          = trial.suggest_float("lr", 5e-5, 5e-3, log=True)
-            self.loss_gamma  = 0.0 #trial.suggest_float("loss_gamma", 0.0, 5.0, step=0.5)
-            use_dropout0     = False # trial.suggest_categorical("dropout_is_zero", [True, False])
-            self.dropout_rate = 0.0 if use_dropout0 else trial.suggest_float("dropout_pos", 0.05, 0.5)
-            use_wd0          = False # trial.suggest_categorical("weight_decay_is_zero", [True, False])
-            self.weight_decay = 0.0 if use_wd0 else trial.suggest_float("weight_decay_pos", 1e-8, 1e-4, log=True)
-
-            if self.bottleneck_type == "windowed_attention":
-                self.transformer_window_size = trial.suggest_int("transformer_window_size", 100, 400, step=100)
-                self.embed_dim = self.features  # tie to features
-                self.transformer_layers = trial.suggest_int("transformer_layers", 0, 3, step=1)
-                heads_per_channel = trial.suggest_categorical("heads_per_channel", [16, 32])
-                self.transformer_nhead = max(self.features // heads_per_channel, 1)
-            else:
-                self.bottleneck_type = "block"
-
-        # if not a block, i.e actually used, make sure divisible 
-        if self.bottleneck_type != "block":
-            assert self.embed_dim % self.transformer_nhead == 0
 
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         self.num_classes = len(self.label_map)
             
-        self.model = UNet1D(input_size=len(self.data_columns), 
-                            output_size=self.num_classes,
-                            growth_factor=self.growth_factor,
-                            features=self.features,
-                            num_layers=self.num_layers, 
-                            n_conv_steps_per_block=self.n_conv_steps_per_block, 
-                            dropout_rate=self.dropout_rate, 
-                            block_kernel_size=self.block_kernel_size,
-                            up_down_sample_kernel_size=self.up_down_sample_kernel_size,
-                            block_padding=self.block_padding,
-                            bottleneck_type=self.bottleneck_type, 
-                            transformer_window_size=self.transformer_window_size, 
-                            embed_dim=self.embed_dim, 
-                            transformer_layers=self.transformer_layers, 
-                            transformer_nhead=self.transformer_nhead) 
+        self.model = model
 
         dirname = os.path.dirname(__file__)
         self.save_path = save_path
 
-    def train(self, probes, test_probes, fold = None, save_train_curve=False, show_train_curve=False):
+    def train(self, probes, test_probes, **kwargs):
         self.model = self.model.to(self.device)
+        
+        batch_size = kwargs.get("batch_size", 1)
+        epochs = kwargs.get("epoches", 128)
+        lr = kwargs.get("lr", 5e-4)
+        weight_decay = kwargs.get("weight_decay", 1e-7)
+        folds = kwargs.get("folds", 5)
+        save_train_curve = kwargs.get("save_train_curve", False)
+        show_train_curve = kwargs.get("show_train_curve", False)
+        augment = kwargs.get("augment", True)
+        augment_factor = kwargs.get("augment_factor", 1)
+        loss_gamma = kwargs.get('loss_gamma', 1.5)
+        loss_alpha = kwargs.get('loss_alpha', None)
 
         tr_dfs, tr_df = self.load_probes(probes)
         tr_dataset = TimeSeriesDataset(tr_dfs, self.label_map, data_columns=self.data_columns, 
                                        class_column = "labels", ignore_N=self.ignore_N)
-        tr_dataloader = DataLoader(tr_dataset, batch_size=self.batch_size, shuffle=True)
+        tr_dataloader = DataLoader(tr_dataset, batch_size=batch_size, shuffle=True)
 
         if test_probes:
             test_dfs, test_df = self.load_probes(test_probes)
             test_dataset = TimeSeriesDataset(test_dfs, self.label_map, data_columns=self.data_columns,
                                              class_column = "labels",ignore_N=self.ignore_N)
-            test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
+            test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
         criterion = nn.CrossEntropyLoss()
-        if self.loss_gamma != 0. or self.loss_alpha is not None:
-            criterion = FocalLoss(alpha=self.loss_alpha, gamma=self.loss_gamma, reduction='mean')
-        optimizer = optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay, capturable=False)
+        if loss_gamma != 0. or loss_alpha is not None:
+            criterion = FocalLoss(alpha=loss_alpha, gamma=loss_gamma, reduction='mean')
+        optimizer = optim.Adam(self.model.parameters(), lr=lr, weight_decay=weight_decay, capturable=False)
 
         if self.enable_wandb_logging and wandb.run is not None:
             wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
 
         train_losses = []
         test_losses = []
-        pbar = tqdm.tqdm(range(self.epochs), desc=f"Fold {fold} Training")
+        pbar = tqdm.tqdm(range(epochs), desc=f"Fold {folds} Training")
         for epoch in pbar:
             self.model.train()
             running_loss = 0.0
@@ -225,10 +142,10 @@ class Model():
             plt.ylabel("Loss")
             plt.show()
 
-    def predict(self, probes, preprocess = False, return_logits=False):
+    def predict(self, probes, batch_size, preprocess = False, return_logits=False):
         test_dataset = TimeSeriesDataset(probes, self.label_map, data_columns=self.data_columns,
                                          class_column = "labels", ignore_N=self.ignore_N)
-        test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
         all_predictions = []
         all_logits = []
         self.model.eval()
@@ -248,10 +165,10 @@ class Model():
             else:
                 return all_predictions
             
-    def predict_proba(self, probes, preprocess = False):
+    def predict_proba(self, probes, batch_size, preprocess = False):
         test_dataset = TimeSeriesDataset(probes, self.label_map, data_columns=self.data_columns,
                                          class_column = "labels", ignore_N=self.ignore_N)
-        test_dataloader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=False)
+        test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
         all_probabilities = []
         self.model.eval()
         with torch.no_grad():
@@ -402,8 +319,31 @@ def pad_or_crop(tensor, dim, target_size):
 
 
 class UNet1D(nn.Module):
-    def __init__(self, input_size, output_size, growth_factor, features, num_layers, n_conv_steps_per_block, dropout_rate, block_kernel_size, up_down_sample_kernel_size, block_padding, bottleneck_type, transformer_window_size, embed_dim, transformer_layers, transformer_nhead):
+    def __init__(self, input_size, 
+                 output_size, 
+                 growth_factor, 
+                 features, 
+                 num_layers, 
+                 n_conv_steps_per_block, 
+                 dropout_rate, 
+                 block_kernel_size, 
+                 up_down_sample_kernel_size, 
+                 block_padding, 
+                 bottleneck_type, 
+                 transformer_window_size, 
+                 embed_dim, 
+                 transformer_layers, 
+                 transformer_nhead,
+                 block_type = "resnet",
+                 upsample_type = "nearest",
+                 downsample_type = "conv", 
+                 crf_type = 'none',
+                 skip_before_downsample = False,
+                 norm_affine = False, 
+                 skip_start_layer=0,
+                 trial=False):
         super(UNet1D, self).__init__()
+        
         self.num_layers = num_layers
         self.features = features
         self.growth_factor = growth_factor
@@ -412,6 +352,41 @@ class UNet1D(nn.Module):
         self.embed_dim = embed_dim
         self.transformer_layers = transformer_layers
         self.transformer_nhead = transformer_nhead
+        self.crf_type = crf_type
+        self.skip_start_layer = skip_start_layer
+        self.block_type = block_type
+        self.upsample_type = upsample_type
+        self.downsample_type = downsample_type
+        self.skip_before_downsample = skip_before_downsample
+        self.norm_affine = norm_affine
+
+        if trial:
+            # integers from a power-of-two grid
+            self.epochs      = 96 #trial.suggest_int("epochs", 64, 128, step=16)
+            self.num_layers  = trial.suggest_int("num_layers", 6, 8, step=1)
+            self.n_conv_steps_per_block = 2 # trial.suggest_int("n_conv_steps_per_block", 1, 3, step=1)
+            self.features    = 64 #trial.suggest_int("features", 32, 128, step=32)
+            self.lr          = trial.suggest_float("lr", 5e-5, 5e-3, log=True)
+            use_dropout0     = False # trial.suggest_categorical("dropout_is_zero", [True, False])
+            self.dropout_rate = 0.0 if use_dropout0 else trial.suggest_float("dropout_pos", 1e-2, 0.5, log=True)
+            use_wd0          = False # trial.suggest_categorical("weight_decay_is_zero", [True, False])
+            self.weight_decay = 0.0 if use_wd0 else trial.suggest_float("weight_decay_pos", 1e-8, 1e-3, log=True)
+            self.crf_type = trial.suggest_categorical("crf_type", ['crf', 'shared_transition_crf'])
+            self.skip_start_layer = trial.suggest_int("skip_start_layer", 0, 4, step=1)
+            self.block_type = 'resnet' # trial.suggest_categorical("block_type", ['resnet', 'simple'])
+            self.upsample_type = 'nearest' # trial.suggest_categorical("upsample_type", ['convtranspose', 'nearest', 'linear'])
+            self.downsample_type = 'maxpool' # trial.suggest_categorical("downsample_type", ['conv', 'avgpool', 'maxpool'])
+            self.growth_factor = 1 # trial.suggest_categorical("growth_factor", [1, 2])
+            self.skip_before_downsample = True # trial.suggest_categorical("skip_before_downsample", [True, False])
+            self.norm_affine = True # trial.suggest_categorical("norm_affine", [True, False])
+
+            if self.bottleneck_type == "attention" or self.bottleneck_type == "windowed_attention":
+                self.transformer_window_size = -1 # trial.suggest_int("transformer_window_size", 100, 400, step=100)
+                self.embed_dim = self.features  # tie to features
+                self.transformer_layers = trial.suggest_int("transformer_layers", 1, 3, step=1)
+                self.transformer_nhead = trial.suggest_categorical("heads_per_channel", [4, 8, 16])
+            else:
+                self.bottleneck_type = "block"
 
 
         # input layer
