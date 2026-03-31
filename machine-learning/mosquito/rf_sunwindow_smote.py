@@ -50,22 +50,25 @@ class Model():
         self.smote_sampling_strategy = 'auto'  # 'auto' balances all classes (required for multi-class classification)
         
         if trial: #?
-            self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 10)
-            self.num_freqs = trial.suggest_int('num_freqs', 1, 20)
-            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256])
-            self.max_depth = trial.suggest_categorical('max_depth', [4, 8, 16, 32, 64, 128, 256])
-            self.window_seconds = trial.suggest_int('window_seconds', 2, 10)
-            
-            # Recalculate derived values based on trial suggestions
-            self.chunk_size = self.chunk_seconds * self.sample_rate
+            # window must be >= chunk (FFT/window logic); expanded again for edge exploration
+            self.window_seconds = trial.suggest_int('window_seconds', 2, 30)
             self.window_size = self.window_seconds * self.sample_rate
+            # Finer sub-second chunks; best prior trial sat at the minimum chunk length.
+            max_chunk_sec = float(self.window_seconds)
+            self.chunk_seconds = trial.suggest_float(
+                'chunk_seconds', 0.25, max_chunk_sec, step=0.25
+            )
+            self.chunk_size = max(1, int(round(self.chunk_seconds * self.sample_rate)))
+            self.num_freqs = trial.suggest_int('num_freqs', 1, 30)
+            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256, 512])
+            self.max_depth = trial.suggest_categorical('max_depth', [4, 8, 16, 32, 64, 128, 256, 512])
 
 
 
              #SUBWINDOW PARAMETER OPTIMIZATION
-            self.num_subwindows = trial.suggest_int('num_subwindows', 1, 20)
+            self.num_subwindows = trial.suggest_int('num_subwindows', 1, 30)
             self.subwindow_size = int(self.window_size / self.num_subwindows)
-            self.subwindow_freq = trial.suggest_int('subwindow_freq', 1, 20)
+            self.subwindow_freq = trial.suggest_int('subwindow_freq', 1, 30)
             
             # Optional slope features
             self.use_window_slope = trial.suggest_categorical('use_window_slope', [True, False])
@@ -74,7 +77,7 @@ class Model():
             # SMOTE hyperparameters
             self.use_smote = trial.suggest_categorical('use_smote', [True, False])
             if self.use_smote:
-                self.smote_k_neighbors = trial.suggest_int('smote_k_neighbors', 1, 10)
+                self.smote_k_neighbors = trial.suggest_int('smote_k_neighbors', 1, 30)
                 # sampling_strategy: 'auto' for multi-class (float only works for binary classification)
                 self.smote_sampling_strategy = 'auto'
 
@@ -213,8 +216,10 @@ class Model():
         
         # Apply SMOTE if enabled
         if self.use_smote:
+            n_minority = int(Y_train.value_counts().min())
+            k_eff = min(self.smote_k_neighbors, max(1, n_minority - 1))
             smote = SMOTE(
-                k_neighbors=self.smote_k_neighbors,
+                k_neighbors=k_eff,
                 sampling_strategy=self.smote_sampling_strategy,
                 random_state=self.random_state
             )
@@ -238,7 +243,7 @@ class Model():
             pred = self.model.predict(test_probe)
 
             # we need to expand the prediction based on the sample rate
-            pred = np.repeat(pred, self.chunk_seconds * self.sample_rate) #what does this do?!
+            pred = np.repeat(pred, self.chunk_size)
             # expand until the end since probe is never exactly divisible by window size
             pad_length = len(raw_probe) - len(pred)
             if pad_length > 0:

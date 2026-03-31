@@ -234,7 +234,9 @@ def optuna_objective(data, args, trial, **kwargs):
         train_data, _ = data.get_probes(train_data) #why are train names seemingly not defined here?
         test_data, test_names = data.get_probes(test_data)
 
-        augment_factor = trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
+        augment_factor = trial.suggest_categorical(
+            "augment_factor", [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64]
+        )
 
         if args.augment:
             train_data = build_augmented_dataset(train_data, size = len(train_data) * augment_factor)
