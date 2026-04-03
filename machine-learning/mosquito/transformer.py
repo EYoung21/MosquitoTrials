@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import wandb
 import torch.nn.functional as F
 import numpy as np
 from positional_encodings.torch_encodings import PositionalEncoding1D
@@ -9,7 +10,8 @@ import matplotlib.pyplot as plt
 import optuna
 
 class Model:
-    def __init__(self, trial = None, sample_rate = 100, embed_dim = 32, epochs = 32, save_path = None, lr = 5e-4, transformer_layers = 2, nhead = 16):
+    def __init__(self, trial = None, sample_rate = 100, embed_dim = 32, epochs = 32, save_path = None, lr = 5e-4, transformer_layers = 2, nhead = 16, enable_wandb_logging=True):
+        self.enable_wandb_logging = enable_wandb_logging
         self.sample_rate = sample_rate
         self.stride = self.sample_rate // 2
         self.window_size = self.sample_rate * 1
@@ -55,6 +57,9 @@ class Model:
 
         self.model = self.model.to(self.device)
 
+        if self.enable_wandb_logging and wandb.run is not None:
+            wandb.watch(self.model, log="all", log_freq=10, log_graph=True)
+
         train_losses = []
         test_losses = []
         for epoch in tqdm.tqdm(range(self.epochs)):
@@ -71,6 +76,9 @@ class Model:
                 running_loss += loss.item()            
 
             train_losses.append(running_loss / len(tr_dataloader))
+
+            if self.enable_wandb_logging and wandb.run is not None:
+                wandb.log({"train_loss": train_losses[-1]}, step=epoch)
         """
             # Get test loss
             running_loss = 0

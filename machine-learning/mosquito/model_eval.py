@@ -3,6 +3,7 @@ import glob
 import numpy as np
 import pandas as pd
 import argparse
+from pathlib import Path
 from sklearn.preprocessing import normalize
 from sklearn.model_selection import KFold
 from sklearn.metrics import precision_recall_fscore_support, \
@@ -15,9 +16,16 @@ from matplotlib import pyplot as plt
 from itertools import groupby
 import optuna
 from sklearn.model_selection import train_test_split
+import wandb
+import weave
+from optuna.integration.wandb import WeightsAndBiasesCallback
 
 from data_augmentation import build_augmented_dataset
 from postprocessing import PostProcessor
+import hydra
+from omegaconf import DictConfig
+from hydra.core.hydra_config import HydraConfig
+from utilities.model_factory import build_model
 
 class DataImport:
         def __init__(self, data_path, folds):
@@ -222,15 +230,30 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     out_dataframe["recall_macro"] = all_recall_macro
     out_dataframe["fscore_macro"] = all_fscore_macro
 
-    # confusion matrix
+    # Log per-class metrics as an interactive W&B Table (chartable, filterable)
+    if wandb.run is not None:
+        per_class_table = wandb.Table(
+            columns=["class", "precision", "recall", "f1"],
+            data=[[label, float(precision[i]), float(recall[i]), float(fscore[i])]
+                  for i, label in enumerate(labels)]
+        )
+        wandb.log({f"Fold_{fold}/per_class_metrics": per_class_table})
+
+    # confusion matrix (saved locally for reference)
     ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    plt.savefig(rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png")
+    cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
+    plt.savefig(cm_path)
+    plt.close()
 
-    # difference plots
+    if wandb.run is not None:
+        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
+
+    # difference plots (saved locally only)
     for i, (df, preds, name) in enumerate(zip(test_data, predicted_labels, test_names)):
         fig = plot_labels(df["time"], df["pre_rect"], df["labels"].values, np.array(preds))
-        fig.savefig(fr"{save_path}/{model_name}_{os.path.split(name)[1]}_Fold{fold}.png")
+        img_path = fr"{save_path}/{model_name}_{os.path.split(name)[1]}_Fold{fold}.png"
+        fig.savefig(img_path)
         plt.close(fig)
 
     print(f"Fold {fold} Overall Accuracy: {accuracy}")
@@ -463,6 +486,7 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
     """
     labels_true = []
     labels_pred = []
+    
 
     augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
 
@@ -474,7 +498,6 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
     )
 
     outer_train_index = np.array(list(outer_train_index))
-    model_import = dynamic_importer(args.model_path)
 
     for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
         inner_train_idx = outer_train_index[inner_train_pos]
@@ -486,10 +509,10 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
         train_data, _ = data.get_probes(train_dfs)
         val_data, _   = data.get_probes(val_dfs)
 
-        if args.augment:
+        if args.train.augment:
             train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
 
-        model = model_import.Model(trial=trial, **kwargs)
+        model = build_model(args.model)
         model.train(train_data, val_data, inner_fold)
 
         predicted_labels = model.predict(val_data)
@@ -503,89 +526,123 @@ def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_fol
     f1 = f1_score(labels_true, labels_pred, average="macro")
     print(f1_score(labels_true, labels_pred, average=None))
 
-    with open(f"{args.model_name}_optuna.txt", "a") as f:
+    with open(f"{HydraConfig.get().runtime.choices['model']}_optuna.txt", "a") as f:
         print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
+
+    # trial.params is now fully populated (suggest_* was called inside Model.__init__).
+    # Spread as **kwargs so each param becomes its own column in the Weave trace list.
+    log_optuna_trial_snapshot(
+        outer_fold=outer_fold,
+        trial_number=trial.number,
+        macro_f1=f1,
+        **trial.params,
+    )
 
     return f1
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        prog = "Model Performance Evaluator",
-        description = "This program takes in EPG data and a \
-                        labeler program, trains it, and then \
-                        generates statistics and figures to \
-                        characterize the model's performance."
-    )
-    parser.add_argument("--data_path", type = str, required = True)
-    parser.add_argument("--model_path", type = str, required = True)
-    parser.add_argument("--save_path", type = str, required = True)
-    parser.add_argument("--model_name", type = str, required = True)
-    parser.add_argument("--augment", action="store_true")
-    parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
-    parser.add_argument("--epochs", type = int, required=False)
-    parser.add_argument("--optuna", action="store_true")
-    parser.add_argument("--attention", action="store_true") # can only be used with UNet
-    parser.add_argument("--fold", type = int, required = False, default = -1) 
-    args = parser.parse_args()
+@weave.op
+def log_optuna_trial_snapshot(outer_fold: int, trial_number: int, macro_f1: float, **trial_params):
+    """
+    Logged after each trial completes, each Optuna-suggested hyperparam
+    appears as its own input.* column in the Weave trace list.
+    Returning only macro_f1 avoids duplicating columns as output.*.
+    """
+    return macro_f1
+
+@hydra.main(version_base=None, config_path="conf", config_name="config") 
+def main(args:DictConfig):
+    # parser = argparse.ArgumentParser(
+    #     prog = "Model Performance Evaluator",
+    #     description = "This program takes in EPG data and a \
+    #                     labeler program, trains it, and then \
+    #                     generates statistics and figures to \
+    #                     characterize the model's performance."
+    # )
+    # parser.add_argument("--data_path", type = str, required = True)
+    # parser.add_argument("--model_path", type = str, required = True)
+    # parser.add_argument("--save_path", type = str, required = True)
+    # parser.add_argument("--model_name", type = str, required = True)
+    # parser.add_argument("--augment", action="store_true")
+    # parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
+    # parser.add_argument("--epochs", type = int, required=False)
+    # parser.add_argument("--optuna", action="store_true")
+    # parser.add_argument("--attention", action="store_true") # can only be used with UNet
+    # parser.add_argument("--fold", type = int, required = False, default = -1) 
+    # args = parser.parse_args()
+
+    run_group_id = wandb.util.generate_id()
+    weave.init("hmc-epg-mosquito")
 
     print("Loading Data...")
-    data = DataImport(args.data_path, 5)
+    data = DataImport(args.data.data_path, 5)
 
     summary_data = []
     labels_true = []
     labels_pred = []
     logits_pred = []
     all_test = []
+    model_name = HydraConfig.get().runtime.choices["model"]
+    print("args.train.folds =", args.train.folds, type(args.train.folds))
+    print("num cv folds =", len(data.cross_val_iter))   
+    optuna_group = f"{model_name}_optuna_study_{run_group_id}"
+    optuna_fold_best_rows = []
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
-        if args.fold != -1 and fold != args.fold:
+        if args.train.folds != -1 and fold != args.train.folds:
             continue
         print(f"Evaluating Fold {fold}")
 
-        model_import = dynamic_importer(args.model_path)
 
         # ---- base kwargs: KEEP EXACTLY YOUR NON-OPTUNA DEFAULTS ----
         kwargs = dict()
-        if args.model_path == "unet.py" or args.model_path == "unet_crf.py":
-            if args.attention:
-                # expected f1: 0.7402015172114621
-                kwargs['bottleneck_type'] = 'attention'
-                kwargs = kwargs | {
-                    'epochs': 128,
-                    'lr': 0.0005,
-                    'dropout_rate': 0.,
-                    'weight_decay': 1e-07,
-                    'num_layers': 8,
-                    'features': 64,
-                    'transformer_window_size': 200,
-                    'transformer_layers': 2,
-                    'loss_gamma': 1.5
-                }
-                heads_per_channel = 16
-                kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
-                kwargs['embed_dim'] = kwargs['features']
-            else:
-                # expected f1: 0.694895
-                kwargs['bottleneck_type'] = 'block'
-                kwargs = kwargs | {
-                    'epochs': 64,
-                    'lr': 0.0005,
-                    'dropout_rate': 0.1,
-                    'weight_decay': 1e-06,
-                    'num_layers': 8,
-                    'features': 32
-                }
+        # if args.model_path == "unet.py" or args.model_path == "unet_crf.py":
+        #     if args.attention:
+        #         # expected f1: 0.7402015172114621
+        #         kwargs['bottleneck_type'] = 'attention'
+        #         kwargs = kwargs | {
+        #             'epochs': 128,
+        #             'lr': 0.0005,
+        #             'dropout_rate': 0.,
+        #             'weight_decay': 1e-07,
+        #             'num_layers': 8,
+        #             'features': 64,
+        #             'transformer_window_size': 200,
+        #             'transformer_layers': 2,
+        #             'loss_gamma': 1.5
+        #         }
+        #         heads_per_channel = 16
+        #         kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
+        #         kwargs['embed_dim'] = kwargs['features']
+        #     else:
+        #         # expected f1: 0.694895
+        #         kwargs['bottleneck_type'] = 'block'
+        #         kwargs = kwargs | {
+        #             'epochs': 64,
+        #             'lr': 0.0005,
+        #             'dropout_rate': 0.1,
+        #             'weight_decay': 1e-06,
+        #             'num_layers': 8,
+        #             'features': 32
+        #         }
 
-            if args.epochs:
-                kwargs['epochs'] = args.epochs
-        else:
-            kwargs = {}
+        #     if args.epochs:
+        #         kwargs['epochs'] = args.epochs
+        # else:
+        #     kwargs = {}
 
-        # ---- NESTED OPTUNA: inner 5-fold CV on outer-train to overwrite kwargs ----
+        # ---- NESTED OPTUNA: inner 5-fold CV on outer-train to overwrite kwar  gs ----
         augment_factor = 1
-        if args.optuna:
+        if args.model.model.trial:
             print(f"Running nested Optuna for outer fold {fold} (inner 5-fold on outer-train)...")
             study = optuna.create_study(direction='maximize')
+            
+            wandb_kwargs = {
+                "project": "hmc-epg-mosquito",
+                "group": f"{model_name}_optuna_eval_{run_group_id}",
+                "name": f"outer_fold_{fold}_study",
+                "tags": ["optuna", "study"]
+            }
+            wandbc = WeightsAndBiasesCallback(metric_name="macro_f1", wandb_kwargs=wandb_kwargs)
 
             study.optimize(
                 lambda t: optuna_objective(
@@ -599,6 +656,7 @@ def main():
                 ),
                 n_trials=50,
                 show_progress_bar=True,
+                callbacks=[wandbc],
             )
 
             print(f"[Fold {fold}] Best params:", study.best_params)
@@ -608,15 +666,27 @@ def main():
             kwargs = apply_best_params_to_kwargs(study.best_params, kwargs)
 
             # If attention case changes features (etc), recompute dependent args
-            if args.model_path == "unet.py" and args.attention:
+            if model_name == "unet" and args.model.bottleneck_type == "attention":
                 heads_per_channel = 16
                 kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
                 kwargs['embed_dim'] = kwargs['features']
 
-            # Save per-fold hyperparam search plot (avoid overwrite)
+            # Save per-fold hyperparam search plot (avoid overwrite) and the current fold best params
             optuna.visualization.matplotlib.plot_optimization_history(study)
-            plt.savefig(f"{args.model_name}_hyper_outer{fold}.png")
+            hyper_plot_path = f"{model_name}_hyper_outer{fold}.png"
+            plt.savefig(hyper_plot_path)
             plt.close()
+
+            best_trial = study.best_trial
+            # Expand hyperparams as individual columns so W&B Table is filterable per-param
+            best_row = {
+                "outer_fold": fold,
+                "best_trial_number": best_trial.number,
+                "best_value_macro_f1": study.best_value,
+                "trial_count": len(study.trials),
+                **study.best_params,  # one column per hyperparam, not a JSON string
+            }
+            optuna_fold_best_rows.append(best_row)
 
         #kwargs = {'epochs': 128, 'num_layers': 6, 'n_conv_steps_per_block': 3, 'features': 96, 'embed_dim': 96, 'lr': 0.0001528325773887917, 'dropout_rate': 0.2546315931008927, 'weight_decay': 4.1530388051130336e-08, 'transformer_window_size': 200, 'transformer_layers': 2, 'transformer_nhead': 96 // 16}
 
@@ -627,64 +697,87 @@ def main():
         test_data, test_names = data.get_probes(test_data)
 
         # ---- augmentation: keep original behavior, but in optuna-mode respect tuned augment_factor ----
-        if args.augment:
-            if args.optuna:
+        if args.train.augment:
+            if args.model.model.trial:
                 augmented_train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
             else:
-                augmented_train_data = build_augmented_dataset(train_data)
+                augmented_train_data = build_augmented_dataset(train_data, size=len(train_data))
             print(f"{len(augmented_train_data)} Training Probes with Augment")
 
         # ---- Create model with (possibly overwritten) kwargs and run your original training ----
-        model = model_import.Model(save_path=args.save_path, **kwargs)
+        # Initialize wandb for standalone evaluation runs
+        is_optuna = args.model.model.trial
+        run_group_name = f"{model_name}_optuna_eval_{run_group_id}" if is_optuna else f"{model_name}_eval_{run_group_id}"
+        run_tags = ["evaluation", "optuna"] if is_optuna else ["evaluation"]
+        run = wandb.init(
+            project="hmc-epg-mosquito",
+            group=run_group_name,
+            name=f"fold_{fold}",
+            config={"fold": fold, "model": model_name, "augment_factor": augment_factor, "optuna": is_optuna},
+            reinit=True,
+            tags=run_tags
+        )
+
+        model = build_model(args.model)
         print("Training Model...")
 
-        if args.augment:
+        if args.train.augment:
             final_train_data = augmented_train_data
         else:
             final_train_data = train_data
 
         print(final_train_data[0].columns)
-        model.train(final_train_data, test_data, fold)
+        model.train(final_train_data, test_data, **args.train)
 
         # ---- EVERYTHING BELOW HERE: keep your original evaluation/report code unchanged ----
         print("Evaluating Model...")
 
-        if args.post_process is None:
-            predicted_labels = model.predict(test_data)
+        if args.run.post_process is None:
+            predicted_labels = model.predict(test_data, args.train.batch_size)
 
-        elif args.post_process.lower() == "viterbi" or args.post_process.lower() == "v":
-            _, logits = model.predict(test_data, return_logits=True)
+        elif args.run.post_process.lower() == "viterbi" or args.run.post_process.lower() == "v":
+            _, logits = model.predict(test_data, args.train.batch_size, return_logits=args.run.return_logits, preprocess = args.run.preprocess)
             logits = [l.transpose() for l in logits]
             post_process = PostProcessor(train_data, model.inv_label_map)
             predicted_labels = [post_process.postprocess_viterbi(logit) for logit in logits]
 
-        elif args.post_process.lower() == "smooth" or args.post_process.lower() == "s":
-            _, logits = model.predict(test_data, return_logits=True)
+        elif args.run.post_process.lower() == "smooth" or args.run.post_process.lower() == "s":
+            _, logits = model.predict(test_data, args.train.batch_size, return_logits=args.run.return_logits, preprocess = args.run.preprocess)
             post_process = PostProcessor(train_data, model.inv_label_map)
             predicted_labels = [post_process.postprocess_smooth(logit.transpose()) for logit in logits]
-        elif args.post_process.lower() == "smooth" or args.post_process.lower() == "s":
-            _, logits = model.predict(test_data, return_logits=True)
-            logits = [l.transpose() for l in logits]
-            post_process = PostProcessor(train_data, model.inv_label_map)
-            predicted_labels = [post_process.postprocess_smooth(logit) for logit in logits]
+
         else:
             print("Choose a valid (case insensitive) post-processing arguement: either V/Viterbi or S/Smooth. Terminating program")
             assert False
 
-        _, logits = model.predict(test_data, return_logits=True)
+        _, logits = model.predict(test_data, args.train.batch_size, return_logits=args.run.return_logits, preprocess = args.run.preprocess)
         print("Logits shape:", logits[0].shape)
         logits_pred.extend([l for l in logits])
         all_test.extend(test_data)
 
         print("Generating Report...")
-        true, pred, stats = generate_report(test_data, predicted_labels, test_names, args.save_path, args.model_name, fold)
+        true, pred, stats = generate_report(
+            test_data,
+            predicted_labels,
+            test_names,
+            args.run.save_path,
+            model_name,
+            fold,
+        )
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
 
+        if run is not None:
+            # We already track the epoch loss in model_eval, we can track the final macro-f1 here
+            f1 = f1_score(true, pred, average="macro")
+            acc = accuracy_score(true, pred)
+            run.log({"eval/macro_f1": f1, "eval/accuracy": acc})
+            run.finish()
+
         
     out_summary_data = pd.concat(summary_data)
-    out_summary_data.to_csv(f"{args.save_path}/{args.model_name}_SummaryStats_by_fold.csv")
+    out_summary_data.to_csv(f"{args.run.save_path}/{model_name}_SummaryStats_by_fold.csv")
 
     # Calculate statistics across every dataset
     labels = sorted(np.unique(labels_true))
@@ -707,16 +800,44 @@ def main():
     out_dataframe["precision_macro"] = all_precision_macro
     out_dataframe["recall_macro"] = all_recall_macro
     out_dataframe["fscore_macro"] = all_fscore_macro
-    out_dataframe.to_csv(f"{args.save_path}/{args.model_name}_SummaryStats.csv")
+    out_dataframe.to_csv(f"{args.run.save_path}/{model_name}_SummaryStats.csv")
 
     overall = ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    overall.plot().figure_.savefig(rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png")
+    overall_cm_path = rf"{args.run.save_path}/{model_name}_OverallConfusionMatrix.png"
+    overall.plot().figure_.savefig(overall_cm_path)
 
     all_data = pd.DataFrame({'labels_true': labels_true,
                              'labels_pred': labels_pred})
-    all_data.to_csv(f"{args.save_path}/{args.model_name}_allpredictions.csv")
-    #generate_roc(all_test, logits_pred, args.save_path, args.model_name, "Overall")
+    all_data.to_csv(f"{args.run.save_path}/{model_name}_allpredictions.csv")
+
+    # Log overall summary to W&B
+    summary_run = wandb.init(
+        project="hmc-epg-mosquito",
+        group=run_group_name if is_optuna else f"{model_name}_eval_{run_group_id}",
+        name="overall",
+        config={"model": model_name, "optuna": is_optuna},
+        reinit=True,
+        tags=["summary"],
+    )
+    summary_run.summary["overall/macro_f1"] = all_fscore_macro
+    summary_run.summary["overall/accuracy"] = out_dataframe["accuracy"].values[0]
+
+    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
+
+
+    if is_optuna and len(optuna_fold_best_rows) > 0:
+        fold_best_df = pd.DataFrame(optuna_fold_best_rows).sort_values("outer_fold").reset_index(drop=True)
+        summary_run.log({"overall/optuna_fold_best_table": wandb.Table(dataframe=fold_best_df)})
+
+        global_best_idx = fold_best_df["best_value_macro_f1"].idxmax()
+        global_best = fold_best_df.loc[global_best_idx]
+        summary_run.summary["overall/optuna_global_best_outer_fold"] = int(global_best["outer_fold"])
+        summary_run.summary["overall/optuna_global_best_trial_number"] = int(global_best["best_trial_number"])
+        summary_run.summary["overall/optuna_global_best_value_macro_f1"] = float(global_best["best_value_macro_f1"])
+
+    summary_run.finish()
+
 
 if __name__ == "__main__":
     main()

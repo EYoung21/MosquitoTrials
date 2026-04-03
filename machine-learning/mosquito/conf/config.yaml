@@ -1,0 +1,14 @@
+defaults:
+  - model: unet_crf
+  - train: default
+  - data: default
+  - search: null
+  - override hydra/sweeper: optuna
+  - _self_
+
+run:
+  seed: 42
+  save_path: ${hydra:runtime.output_dir}
+  post_process: null
+  return_logits: true
+  preprocess: false

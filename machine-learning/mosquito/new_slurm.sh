@@ -1,7 +1,5 @@
 #!/bin/bash
 #SBATCH --job-name=epg_job          # Name of the job
-#SBATCH --output=/home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/%x_%j.out
-#SBATCH --error=/home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/logs/%x_%j.err
 #SBATCH --gres=gpu:1                # Request 1 GPU
 #SBATCH --cpus-per-task=8           # Request 8 CPU cores
 #SBATCH --mem=16G                   # Request 16 GB memory
@@ -17,26 +15,32 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 echo "uv version: $(uv --version)"
 
-mkdir -p /home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/logs
-mkdir -p /home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/wandb_logs
+# Create log directory if it doesn’t exist
+mkdir -p /data/labs/hopelab/epg/logs
 
 # Print info for debugging
 echo "Running on host: $(hostname)"
 echo "Job started at: $(date)"
 echo "Running job ID: $SLURM_JOB_ID"
 
-# ==== WANDB CONFIGURATION ====
 
-# Load the API key from the .env file in the parent machine-learning directory
-if [ -f "../.env" ]; then
-    export $(grep -v '^#' ../.env | xargs)
-fi
 
-# To store wandb logs in the run directory instead of the project root:
-export WANDB_DIR="/home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/wandb_logs"
+#echo "Random forest evaluation"
+#uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/nested_model_evaluation_forest --model_path rf.py --model_name=rf --optuna # --post_process v
+# # --optuna
 
 # Run your Python script
-uv run --extra cu129 model_evaluation.py --data_path /data/labs/hopelab/epg/epg_data/sharpshooter_parquet \
-    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/sharpshooter/sharpshooter_results --model_path unet/unet.py --model_name=unet 
+echo "UNET evaluation"
+uv run --extra cu129 model_eval.py model=unet model.model.trial=true
+
+echo "UNET_crf evaluation"
+uv run --extra cu129 model_eval.py
+
+
+
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/model_evaluation_crf --model_path unet_crf.py --model_name=unet --attention
+
 
 echo "Job finished at: $(date)"

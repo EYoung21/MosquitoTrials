@@ -1,0 +1,5 @@
+seed: 42
+data_path: /data/labs/hopelab/epg/tarsalis_data_clean
+ignore_N: null
+
+test_size: 0.2

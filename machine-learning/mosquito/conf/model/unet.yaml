@@ -1,0 +1,41 @@
+_target_: models.unet.Model
+
+ignore_N: None
+data_columns: ["post_rect"]
+
+
+label_map:
+  "J": 0
+  "K": 1
+  "L": 2
+  "M": 3
+  "N": 4
+  "W": 5
+
+
+save_path: test
+model:
+  _target_: models.unet.UNet1D
+  input_size: ${len:${..data_columns}}
+  output_size: ${len:${..label_map}}
+  num_layers: 8
+  features: 64
+  growth_factor: 1
+  bottleneck_type: windowed_attention
+  embed_dim: ${model.model.features}
+  transformer_window_size: 200
+  n_conv_steps_per_block: 2
+  transformer_layers: 2
+  transformer_nhead: 4
+  dropout_rate: 0.0
+  block_type: resnet
+  upsample_type: nearest
+  downsample_type: conv 
+  skip_before_downsample: false
+  norm_affine: false
+  skip_start_layer: 0
+  up_down_sample_kernel_size: 2
+  block_padding: 1
+  block_kernel_size: 3
+  crf_type: none
+  trial: False

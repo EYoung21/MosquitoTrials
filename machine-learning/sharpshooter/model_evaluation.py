@@ -21,6 +21,10 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay, accuracy_score, f1_score
 )
 
+import wandb
+import weave
+from optuna.integration.wandb import WeightsAndBiasesCallback
+
 from data_loader import import_data
 
 
@@ -141,7 +145,8 @@ def optuna_objective(data, args, trial, **kwargs):
 
     def clear_msg():
         msg_bar.set_description_str("")
-    
+
+
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
         show_msg(f"Initializing Trial {trial.number} Fold {fold}")
         train_data = [data.df_list[i] for i in train_index]
@@ -152,7 +157,7 @@ def optuna_objective(data, args, trial, **kwargs):
 
         show_msg(f"Training Trial {trial.number} Fold {fold}")
         model_import = dynamic_importer(args.model_path)
-        model = model_import.Model(trial = trial, **kwargs)
+        model = model_import.Model(trial = trial, enable_wandb_logging=False, **kwargs)
         model.train(train_data, test_data, fold)
         clear_msg()
 
@@ -175,7 +180,24 @@ def optuna_objective(data, args, trial, **kwargs):
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print(trial.datetime_start, trial.number, trial.params, weighted_f1, file=f)
 
+    # trial.params is fully populated here — spread as kwargs so each param
+    # appears as its own column in the Weave trace list.
+    log_optuna_trial_snapshot(
+        trial_number=trial.number,
+        macro_f1=weighted_f1,
+        **trial.params,
+    )
+
     return weighted_f1
+
+
+@weave.op
+def log_optuna_trial_snapshot(trial_number: int, macro_f1: float, **trial_params):
+    """
+    Logged after each trial completes — each Optuna-suggested hyperparam
+    appears as its own input.* column in the Weave trace list.
+    """
+    return macro_f1
 
 def plot_labels(time, voltage, true_labels, pred_labels, probs = None):
     """
@@ -260,12 +282,26 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     accuracy = accuracy_score(labels_true, labels_pred)
     out_dataframe["accuracy"] = accuracy
 
-    # confusion matrix
-    ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
-                                            normalize = 'true')
-    plt.savefig(rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png")
+    # Per-class metrics as a wandb.Table so they're chartable and filterable
+    if wandb.run is not None:
+        per_class_table = wandb.Table(
+            columns=["class", "precision", "recall", "f1"],
+            data=[[label, float(precision[i]), float(recall[i]), float(fscore[i])]
+                  for i, label in enumerate(labels)]
+        )
+        wandb.log({f"Fold_{fold}/per_class_metrics": per_class_table})
 
-    # difference plots
+    # confusion matrix
+    ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred,
+                                            normalize='true')
+    cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
+    plt.savefig(cm_path)
+    plt.close()
+
+    if wandb.run is not None:
+        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
+
+    # difference plots (saved locally only)
     base_name = Path(model_name).name
     for df, preds, name in zip(test_data, predicted_labels, test_names):
         fig = plot_labels(
@@ -302,6 +338,9 @@ def main():
     parser.add_argument("--optuna", action="store_true")
     parser.add_argument("--attention", action="store_true") # can only be used with UNet 
     args = parser.parse_args()
+
+    run_group_id = wandb.util.generate_id()
+    weave.init("hmc-epg-sharpshooter")
 
     EXCLUDE = {
         "a01", "a02", "a03", "a10", "a15",
@@ -352,16 +391,29 @@ def main():
         else:
             kwargs = {}
 
+        wandb_kwargs = {
+            "project": "hmc-epg-sharpshooter",
+            "group": f"{args.model_name}_optuna_study_{run_group_id}",
+            "name": f"{args.model_name}_study",
+            "tags": ["optuna", "study"]
+        }
+        wandbc = WeightsAndBiasesCallback(metric_name="weighted_f1", wandb_kwargs=wandb_kwargs)
+
         study.optimize(
             lambda x : optuna_objective(data, args, x, **kwargs), 
             n_trials = trial_count, 
             show_progress_bar=False,
-            callbacks=[progress_bar_callback(trial_count)] # add custom progress bar
+            callbacks=[progress_bar_callback(trial_count), wandbc] # add custom progress bar
         )
 
         print(study.best_params)
         optuna.visualization.matplotlib.plot_optimization_history(study)
-        plt.savefig(f"{args.model_name}_hyper.png")
+        hyper_plot_path = f"{args.model_name}_hyper.png"
+        plt.savefig(hyper_plot_path)
+        plt.close()
+        if wandb.run is not None:
+            wandb.log({"optuna_optimization_history": wandb.Image(hyper_plot_path)})
+            wandb.finish()
         return
     
     summary_data = []
@@ -395,6 +447,18 @@ def main():
 
         model = model_import.Model(save_path = args.save_path, **kwargs)
 
+        # Initialize wandb for standalone evaluation runs
+        run = None
+        if not args.optuna:
+            run = wandb.init(
+                project="hmc-epg-sharpshooter",
+                group=f"{args.model_name}_eval_{run_group_id}",
+                name=f"fold_{fold}",
+                config={"fold": fold, "model": args.model_name, **kwargs},
+                reinit=True,
+                tags=["evaluation"]
+            )
+
         print("Training Model...")
         model.train(train_data)
 
@@ -407,6 +471,12 @@ def main():
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
+
+        if run is not None:
+            f1 = f1_score(true, pred, average="macro")
+            acc = accuracy_score(true, pred)
+            run.log({"eval/macro_f1": f1, "eval/accuracy": acc})
+            run.finish()
         
     out_summary_data = pd.concat(summary_data)
 
@@ -427,11 +497,28 @@ def main():
 
     overall = ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    overall.plot().figure_.savefig(rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png")
+    overall_cm_path = rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png"
+    overall.plot().figure_.savefig(overall_cm_path)
 
     all_data = pd.DataFrame({'labels_true': labels_true,
                              'labels_pred': labels_pred})
     all_data.to_csv(f"{args.save_path}/{args.model_name}_allpredictions.csv")
+
+    # Log overall summary to W&B
+    overall_f1 = f1_score(labels_true, labels_pred, average="macro")
+    overall_acc = accuracy_score(labels_true, labels_pred)
+    summary_run = wandb.init(
+        project="hmc-epg-sharpshooter",
+        group=f"{args.model_name}_eval_{run_group_id}",
+        name="overall_summary",
+        config={"model": args.model_name, "optuna": args.optuna},
+        reinit=True,
+        tags=["summary"],
+    )
+    summary_run.summary["overall/macro_f1"] = overall_f1
+    summary_run.summary["overall/accuracy"] = overall_acc
+    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
+    summary_run.finish()
 
 if __name__ == "__main__":
     main() 

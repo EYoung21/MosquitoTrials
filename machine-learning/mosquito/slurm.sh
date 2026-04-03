@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=epg_job          # Name of the job
-#SBATCH --output=/data/labs/hopelab/epg/logs/%x_%j.out
-#SBATCH --error=/data/labs/hopelab/epg/logs/%x_%j\.err
+#SBATCH --output=/home/clin4-swat/hmc-epg-project/machine-learning/mosquito/logs/%x_%j.out
+#SBATCH --error=/home/clin4-swat/hmc-epg-project/machine-learning/mosquito/logs/%x_%j.err
 #SBATCH --gres=gpu:1                # Request 1 GPU
 #SBATCH --cpus-per-task=8           # Request 8 CPU cores
 #SBATCH --mem=16G                   # Request 16 GB memory
@@ -25,34 +25,39 @@ echo "Running on host: $(hostname)"
 echo "Job started at: $(date)"
 echo "Running job ID: $SLURM_JOB_ID"
 
+# ==== WANDB CONFIGURATION ====
+# Load the API key from the .env file in the parent machine-learning directory
+if [ -f "../.env" ]; then
+    export $(grep -v '^#' ../.env | xargs)
+fi
 
+# To store wandb logs in the run directory instead of the project root:
+export WANDB_DIR="/home/clin4-swat/hmc-epg-project/machine-learning/mosquito/wandb_logs"
 
-#echo "Random forest evaluation"
-#uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/nested_model_evaluation_forest --model_path rf.py --model_name=rf --optuna # --post_process v
-# # --optuna
+# echo "Random forest evaluation"
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/nested_model_evaluation_forest --model_path rf.py --model_name=rf # --optuna # --post_process v
+# --optuna
 
 # Run your Python script
-echo "UNET attention evaluation"
-uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention --model_path unet.py --model_name=unet --attention  --optuna # --post_process v
-# --optuna
+# echo "UNET attention evaluation"
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#     --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet_attention --model_path unet.py --model_name=unet --attention --optuna # --post_process v
+# # --optuna
 
 echo "UNET evaluation"
 uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet --model_path unet.py --model_name=unet  --optuna 
+    --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_unet --model_path unet.py --model_name=unet --optuna 
 
-echo "TCN evaluation"
-uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_tcn --model_path tcn.py --model_name=tcn  --optuna # --post_process v
-echo "Transformer evaluation"
-uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-    --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer --model_path transformer.py --model_name=transformer  --optuna # --post_process v
-
-
+# echo "TCN evaluation"
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_tcn --model_path tcn.py --model_name=tcn  --optuna # --post_process v
+# echo "Transformer evaluation"
+# uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
+#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/vnested_model_evaluation_transformer --model_path transformer.py --model_name=transformer  --optuna # --post_process v
 
 # uv run --extra cu129 model_eval.py --data_path /data/labs/hopelab/epg/tarsalis_data_clean \
-#     --save_path /home/ghope1-swat/EPG-Project/hmc-epg-project/machine-learning/mosquito/model_evaluation_crf --model_path unet_crf.py --model_name=unet --attention
+#     --save_path /home/clin4-swat/hmc-epg-project/machine-learning/mosquito/model_evaluation_crf --model_path unet_crf.py --model_name=unet --attention
 
 
 echo "Job finished at: $(date)"
