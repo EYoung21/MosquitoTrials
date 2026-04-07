@@ -16,6 +16,14 @@ import warnings
 import tqdm
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+def _sanitize_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace inf with NaN, then fill NaN with per-column medians (fallback 0)."""
+    clean = df.replace([np.inf, -np.inf], np.nan)
+    if clean.isnull().values.any():
+        medians = clean.median(numeric_only=True).fillna(0.0)
+        clean = clean.fillna(medians)
+    return clean
+
 class Model():
     def __init__(self, save_path = None, trial = None):
         #chunk hyperparameters - OPTIMIZED FROM BEST TRIAL (Trial 95: F1=0.5444)
@@ -51,12 +59,12 @@ class Model():
         
         if trial: #?
             # window must be >= chunk (FFT/window logic); expanded again for edge exploration
-            self.window_seconds = trial.suggest_int('window_seconds', 2, 30)
+            self.window_seconds = trial.suggest_int('window_seconds', 2, 40)
             self.window_size = self.window_seconds * self.sample_rate
             # Finer sub-second chunks; best prior trial sat at the minimum chunk length.
             max_chunk_sec = float(self.window_seconds)
             self.chunk_seconds = trial.suggest_float(
-                'chunk_seconds', 0.25, max_chunk_sec, step=0.25
+                'chunk_seconds', 0.1, max_chunk_sec, step=0.1
             )
             self.chunk_size = max(1, int(round(self.chunk_seconds * self.sample_rate)))
             self.num_freqs = trial.suggest_int('num_freqs', 1, 30)
@@ -77,7 +85,7 @@ class Model():
             # SMOTE hyperparameters
             self.use_smote = trial.suggest_categorical('use_smote', [True, False])
             if self.use_smote:
-                self.smote_k_neighbors = trial.suggest_int('smote_k_neighbors', 1, 30)
+                self.smote_k_neighbors = trial.suggest_int('smote_k_neighbors', 1, 50)
                 # sampling_strategy: 'auto' for multi-class (float only works for binary classification)
                 self.smote_sampling_strategy = 'auto'
 
@@ -213,6 +221,7 @@ class Model():
         train = pd.concat(transformed_probes)
         X_train = train.drop(["label"], axis=1)
         Y_train = train["label"]
+        X_train = _sanitize_features(X_train)
         
         # Apply SMOTE if enabled
         if self.use_smote:
@@ -239,7 +248,7 @@ class Model():
                 predictions.append(pred)
                 continue
             
-            test_probe = transformed_probe
+            test_probe = _sanitize_features(transformed_probe)
             pred = self.model.predict(test_probe)
 
             # we need to expand the prediction based on the sample rate

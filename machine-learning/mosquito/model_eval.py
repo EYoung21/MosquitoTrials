@@ -235,11 +235,12 @@ def optuna_objective(data, args, trial, **kwargs):
         test_data, test_names = data.get_probes(test_data)
 
         augment_factor = trial.suggest_categorical(
-            "augment_factor", [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64]
+            "augment_factor", [0.5, 0.75, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128]
         )
 
         if args.augment:
-            train_data = build_augmented_dataset(train_data, size = len(train_data) * augment_factor)
+            aug_size = max(1, int(round(len(train_data) * float(augment_factor))))
+            train_data = build_augmented_dataset(train_data, size=aug_size)
             #making an augmented dataset?
 
         model_import = dynamic_importer(args.model_path)

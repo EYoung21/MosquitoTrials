@@ -24,6 +24,12 @@ from sklearn.metrics import (
 from data_loader import import_data
 
 
+def first_letter_label(x):
+    """Map a label to a single coarse class: e.g. F1, F2, F3 -> F. Empty strings unchanged."""
+    s = str(x).strip()
+    return s[0].upper() if s else str(x)
+
+
 class DataImport:
     """
     A class for importing and organizing labeled time-series datasets from CSV or Parquet files.
@@ -37,7 +43,7 @@ class DataImport:
     cross_val_iter : list[tuple]
         A list of (train_index, test_index) tuples for K-fold cross-validation splits.
     """
-    def __init__(self, data_path, filetype: str, exclude=[], folds=5, binary=False):
+    def __init__(self, data_path, filetype: str, exclude=[], folds=5, binary=False, coarse_first_letter_labels=False):
         """
         Initializes the DataImport class.
 
@@ -54,13 +60,20 @@ class DataImport:
         binary : bool, optional
             If True, map labels to P (probing) vs NP (non-probing) for probe-splitter use.
             N and Z become NP; all other labels become P.
+        coarse_first_letter_labels : bool, optional
+            If True, collapse each label to its first character (uppercase), e.g. F1,F2->F.
+            Use with models trained on the same scheme (e.g. rf_samchan_labels_combined).
         """
         self.df_list = import_data(data_path, filetype, exclude)
         self.binary = binary
+        self.coarse_first_letter_labels = coarse_first_letter_labels
         if binary:
             for df in self.df_list:
                 upper = df["labels"].astype(str).str.upper()
                 df["labels"] = np.where(upper.isin(["N", "Z"]), "NP", "P")
+        if coarse_first_letter_labels:
+            for df in self.df_list:
+                df["labels"] = df["labels"].map(first_letter_label)
         self.random_state = 42
         kf = KFold(n_splits=folds, random_state=self.random_state, shuffle=True)
         self.cross_val_iter = list(kf.split(self.df_list))
@@ -343,6 +356,11 @@ def main():
     parser.add_argument("--epochs", type = int, required=False)
     parser.add_argument("--optuna", action="store_true")
     parser.add_argument("--binary", action="store_true", help="P (probing) vs NP (non-probing) only for probe splitter")
+    parser.add_argument(
+        "--coarse_first_letter_labels",
+        action="store_true",
+        help="Collapse each label to its first letter (e.g. F1,F2->F) for train/eval; use with first-letter RF models.",
+    )
     parser.add_argument("--attention", action="store_true") # can only be used with UNet 
     args = parser.parse_args()
 
@@ -353,7 +371,14 @@ def main():
         "d01", "d03", "d056", "d058", "d12",
     }
 
-    data = DataImport(args.data_path, filetype = ".parquet", exclude=EXCLUDE, folds = 5, binary=args.binary)
+    data = DataImport(
+        args.data_path,
+        filetype=".parquet",
+        exclude=EXCLUDE,
+        folds=5,
+        binary=args.binary,
+        coarse_first_letter_labels=args.coarse_first_letter_labels,
+    )
 
     if args.optuna:
         # Optuna hyperparameter search: keep 100 trials (full search).

@@ -53,9 +53,10 @@ class Model():
         if trial: #?
             self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 10)
             self.num_freqs = trial.suggest_int('num_freqs', 1, 20)
-            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256])
+            # num_estimators and window_seconds best so far hit their upper bounds (512, 15), so extend again
+            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256, 512, 1024])
             self.max_depth = trial.suggest_categorical('max_depth', [4, 8, 16, 32, 64, 128, 256])
-            self.window_seconds = trial.suggest_int('window_seconds', 2, 10)
+            self.window_seconds = trial.suggest_int('window_seconds', 2, 20)
             
             # Recalculate derived values based on trial suggestions
             self.chunk_size = self.chunk_seconds * self.sample_rate

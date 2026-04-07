@@ -1,3 +1,8 @@
+"""
+Samchan-style RF with coarse labels: each original label is reduced to its first
+character (e.g. F1, F2, F3, F4 -> F). Run model_evaluation with
+--coarse_first_letter_labels so ground-truth labels match at train/eval time.
+"""
 import os
 import numpy as np
 import pandas as pd
@@ -10,14 +15,21 @@ from scipy.signal import hilbert
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+
+def _coarse_label(lab):
+    s = str(lab).strip()
+    return s[0].upper() if s else str(lab)
+
+
 class Model:
     def __init__(self, save_path=None, trial=None):
         # Hyperparameters
-        self.chunk_seconds = 19
-        self.num_estimators = 64
-        self.max_depth = 16
-        self.max_features = 0.3898934600972708  
-        self.num_freqs = 16
+        # Best trial-98 params from epg_sh_rf_samchan_lblcomb_745850.out
+        self.chunk_seconds = 25
+        self.num_estimators = 1024
+        self.max_depth = 128
+        self.max_features = 0.2006656546810392
+        self.num_freqs = 11
         self.sample_rate = 100
         self.chunk_size = self.chunk_seconds * self.sample_rate
         # Sharpshooter data uses "voltage" (pre_rect); mosquito uses "post_rect"
@@ -25,19 +37,19 @@ class Model:
         self.random_state = 42
         self.save_path = save_path
         self.model_path = "../ML/rf_pickle"
-        self.overlap = 0.6358908314038317
-        self.max_lag = 15
+        self.overlap = 0.5474607646696771
+        self.max_lag = 10
 
         # Optuna tuning (ranges expanded for rf_samchan4: trial 71 was at max_lag/max_estimators, near min max_features)
         if trial:
             # Best current samchan RF config reference:
             # chunk_seconds=19, num_freqs=16, num_estimators=64, max_depth=16,
             # max_features=0.3898934600972708, overlap=0.6358908314038317, max_lag=15
-            self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 25)
+            self.chunk_seconds = trial.suggest_int('chunk_seconds', 1, 35)
             self.num_freqs = trial.suggest_int('num_freqs', 1, 25)
-            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256, 512, 1024])
+            self.num_estimators = trial.suggest_categorical('num_estimators', [8, 16, 32, 64, 128, 256, 512, 1024, 1536, 2048])
             self.max_depth = trial.suggest_categorical('max_depth', [4, 8, 16, 32, 64, 128, 256])
-            self.max_features = trial.suggest_float('max_features', 0.2, 1.0)
+            self.max_features = trial.suggest_float('max_features', 0.1, 1.0)
             self.chunk_size = self.chunk_seconds * self.sample_rate
             self.overlap = trial.suggest_float('overlap', 0.25, 0.85)
             self.max_lag = trial.suggest_int('max_lag', 3, 30)
@@ -138,9 +150,10 @@ class Model:
                     std_y = np.std(y)
                     columns[f"autocorr_lag{lag}"].append(cov / (std_x * std_y + 1e-12))
 
-                # Label
+                # Label (majority vote on first-letter collapsed labels, e.g. F1/F2 -> F)
                 if training:
-                    vals, counts = np.unique(label_window, return_counts=True)
+                    coarse = np.array([_coarse_label(x) for x in label_window], dtype=object)
+                    vals, counts = np.unique(coarse, return_counts=True)
                     columns["label"].append(vals[np.argmax(counts)])
 
             # Constant probe info (safe for sharpshooter parquet columns)

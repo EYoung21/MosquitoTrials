@@ -3,3 +3,39 @@ Running on host: gpu04.cluster
 Job started at: Thu Feb 19 07:39:12 EST 2026
 Running job ID: 725516
 Loaded 58 files (2.86 GB) in 2.14 seconds.
+Trial 0 F1s - Weighted: 0.9331 | Macro: 0.9144 | Micro: 0.9336
+
+[I 2026-02-20 07:36:23,136] Trial 0 finished with value: 0.9330947874828295 and parameters: {'chunk_seconds': 1, 'num_freqs': 15, 'num_estimators': 256, 'max_depth': 256, 'window_seconds': 5, 'num_subwindows': 15, 'subwindow_freq': 9, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 0 with value: 0.9330947874828295.
+Trial 1 F1s - Weighted: 0.9413 | Macro: 0.9256 | Micro: 0.9410
+
+[I 2026-02-20 21:44:41,222] Trial 1 finished with value: 0.9412539654803105 and parameters: {'chunk_seconds': 1, 'num_freqs': 16, 'num_estimators': 16, 'max_depth': 4, 'window_seconds': 4, 'num_subwindows': 11, 'subwindow_freq': 14, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 1 with value: 0.9412539654803105.
+Trial 2 F1s - Weighted: 0.9337 | Macro: 0.9153 | Micro: 0.9341
+
+[I 2026-02-20 23:26:57,136] Trial 2 finished with value: 0.9337246880360188 and parameters: {'chunk_seconds': 5, 'num_freqs': 8, 'num_estimators': 16, 'max_depth': 256, 'window_seconds': 6, 'num_subwindows': 19, 'subwindow_freq': 12, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 1 with value: 0.9412539654803105.
+Trial 3 F1s - Weighted: 0.9470 | Macro: 0.9324 | Micro: 0.9472
+
+[I 2026-02-21 01:48:00,636] Trial 3 finished with value: 0.9470420713576709 and parameters: {'chunk_seconds': 9, 'num_freqs': 2, 'num_estimators': 128, 'max_depth': 8, 'window_seconds': 4, 'num_subwindows': 14, 'subwindow_freq': 17, 'use_window_slope': True, 'use_subwindow_slope': True, 'use_smote': True, 'smote_k_neighbors': 3}. Best is trial 3 with value: 0.9470420713576709.
+Trial 4 F1s - Weighted: 0.9382 | Macro: 0.9214 | Micro: 0.9381
+
+[I 2026-02-21 03:02:27,615] Trial 4 finished with value: 0.938154107537972 and parameters: {'chunk_seconds': 9, 'num_freqs': 19, 'num_estimators': 64, 'max_depth': 64, 'window_seconds': 5, 'num_subwindows': 18, 'subwindow_freq': 2, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': True, 'smote_k_neighbors': 9}. Best is trial 3 with value: 0.9470420713576709.
+Trial 5 F1s - Weighted: 0.9311 | Macro: 0.9131 | Micro: 0.9305
+
+[I 2026-02-21 04:50:11,317] Trial 5 finished with value: 0.931066316563056 and parameters: {'chunk_seconds': 7, 'num_freqs': 2, 'num_estimators': 32, 'max_depth': 8, 'window_seconds': 7, 'num_subwindows': 8, 'subwindow_freq': 5, 'use_window_slope': True, 'use_subwindow_slope': True, 'use_smote': True, 'smote_k_neighbors': 1}. Best is trial 3 with value: 0.9470420713576709.
+Trial 6 F1s - Weighted: 0.9422 | Macro: 0.9269 | Micro: 0.9420
+
+[I 2026-02-21 11:37:47,075] Trial 6 finished with value: 0.942240816553377 and parameters: {'chunk_seconds': 3, 'num_freqs': 13, 'num_estimators': 128, 'max_depth': 16, 'window_seconds': 8, 'num_subwindows': 11, 'subwindow_freq': 20, 'use_window_slope': True, 'use_subwindow_slope': True, 'use_smote': True, 'smote_k_neighbors': 6}. Best is trial 3 with value: 0.9470420713576709.
+Trial 7 F1s - Weighted: 0.9468 | Macro: 0.9324 | Micro: 0.9469
+
+[I 2026-02-21 15:04:00,587] Trial 7 finished with value: 0.9468278209545875 and parameters: {'chunk_seconds': 4, 'num_freqs': 8, 'num_estimators': 32, 'max_depth': 4, 'window_seconds': 7, 'num_subwindows': 10, 'subwindow_freq': 20, 'use_window_slope': False, 'use_subwindow_slope': True, 'use_smote': False}. Best is trial 3 with value: 0.9470420713576709.
+Trial 8 F1s - Weighted: 0.9350 | Macro: 0.9176 | Micro: 0.9348
+
+[I 2026-02-21 15:59:11,769] Trial 8 finished with value: 0.9349694172169781 and parameters: {'chunk_seconds': 10, 'num_freqs': 6, 'num_estimators': 128, 'max_depth': 8, 'window_seconds': 9, 'num_subwindows': 18, 'subwindow_freq': 4, 'use_window_slope': False, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 3 with value: 0.9470420713576709.
+Trial 9 F1s - Weighted: 0.9337 | Macro: 0.9155 | Micro: 0.9338
+
+[I 2026-02-21 20:17:23,012] Trial 9 finished with value: 0.933650945055564 and parameters: {'chunk_seconds': 2, 'num_freqs': 11, 'num_estimators': 8, 'max_depth': 16, 'window_seconds': 5, 'num_subwindows': 18, 'subwindow_freq': 4, 'use_window_slope': True, 'use_subwindow_slope': False, 'use_smote': False}. Best is trial 3 with value: 0.9470420713576709.
+[I 2026-02-21 20:33:45,371] Trial 10 pruned. 
+[I 2026-02-21 21:25:37,585] Trial 11 pruned. 
+[I 2026-02-22 00:08:20,374] Trial 12 pruned. 
+[I 2026-02-22 01:35:37,552] Trial 13 pruned. 
+[I 2026-02-22 02:07:50,281] Trial 14 pruned. 
+[I 2026-02-22 02:50:43,179] Trial 15 pruned. 

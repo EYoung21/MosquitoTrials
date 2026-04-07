@@ -1,0 +1,84 @@
+[I 2026-04-01 09:48:04,020] A new study created in memory with name: no-name-cbb11344-4c77-41d7-a5ac-29bc348d33f7
+  0%|          | 0/100 [00:00<?, ?it/s]                                         0%|          | 0/100 [07:22<?, ?it/s]Best trial: 0. Best value: 0.269636:   0%|          | 0/100 [07:22<?, ?it/s]Best trial: 0. Best value: 0.269636:   1%|          | 1/100 [07:22<12:10:26, 442.69s/it]                                                                                        Best trial: 0. Best value: 0.269636:   1%|          | 1/100 [20:35<12:10:26, 442.69s/it]Best trial: 0. Best value: 0.269636:   1%|          | 1/100 [20:35<12:10:26, 442.69s/it]Best trial: 0. Best value: 0.269636:   2%|▏         | 2/100 [20:35<17:39:24, 648.61s/it]                                                                                        Best trial: 0. Best value: 0.269636:   2%|▏         | 2/100 [33:09<17:39:24, 648.61s/it]Best trial: 0. Best value: 0.269636:   2%|▏         | 2/100 [33:09<17:39:24, 648.61s/it]Best trial: 0. Best value: 0.269636:   3%|▎         | 3/100 [33:09<18:46:26, 696.76s/it]                                                                                        Best trial: 0. Best value: 0.269636:   3%|▎         | 3/100 [18:17:03<18:46:26, 696.76s/it]Best trial: 0. Best value: 0.269636:   3%|▎         | 3/100 [18:17:03<18:46:26, 696.76s/it]Best trial: 0. Best value: 0.269636:   4%|▍         | 4/100 [18:17:03<683:16:22, 25622.73s/it]                                                                                              Best trial: 0. Best value: 0.269636:   4%|▍         | 4/100 [36:32:58<683:16:22, 25622.73s/it]Best trial: 0. Best value: 0.269636:   4%|▍         | 4/100 [36:32:58<683:16:22, 25622.73s/it]Best trial: 0. Best value: 0.269636:   5%|▌         | 5/100 [36:32:58<1058:03:12, 40094.66s/it]                                                                                               Best trial: 0. Best value: 0.269636:   5%|▌         | 5/100 [36:56:06<1058:03:12, 40094.66s/it]Best trial: 0. Best value: 0.269636:   5%|▌         | 5/100 [36:56:06<1058:03:12, 40094.66s/it]Best trial: 0. Best value: 0.269636:   6%|▌         | 6/100 [36:56:06<703:17:00, 26934.26s/it]                                                                                               Best trial: 0. Best value: 0.269636:   6%|▌         | 6/100 [37:03:03<703:17:00, 26934.26s/it]Best trial: 0. Best value: 0.269636:   6%|▌         | 6/100 [37:03:03<703:17:00, 26934.26s/it]Best trial: 0. Best value: 0.269636:   7%|▋         | 7/100 [37:03:03<471:51:05, 18265.23s/it]                                                                                              Best trial: 0. Best value: 0.269636:   7%|▋         | 7/100 [37:48:58<471:51:05, 18265.23s/it]Best trial: 0. Best value: 0.269636:   7%|▋         | 7/100 [37:48:58<471:51:05, 18265.23s/it]Best trial: 0. Best value: 0.269636:   8%|▊         | 8/100 [37:48:58<340:35:43, 13327.64s/it]                                                                                              Best trial: 0. Best value: 0.269636:   8%|▊         | 8/100 [40:51:38<340:35:43, 13327.64s/it]Best trial: 0. Best value: 0.269636:   8%|▊         | 8/100 [40:51:38<340:35:43, 13327.64s/it]Best trial: 0. Best value: 0.269636:   9%|▉         | 9/100 [40:51:38<318:11:01, 12587.49s/it]                                                                                              Best trial: 0. Best value: 0.269636:   9%|▉         | 9/100 [40:54:31<318:11:01, 12587.49s/it]Best trial: 0. Best value: 0.269636:   9%|▉         | 9/100 [40:54:31<318:11:01, 12587.49s/it]Best trial: 0. Best value: 0.269636:  10%|█         | 10/100 [40:54:31<218:52:01, 8754.68s/it]                                                                                              Best trial: 0. Best value: 0.269636:  10%|█         | 10/100 [41:00:00<218:52:01, 8754.68s/it]Best trial: 0. Best value: 0.269636:  10%|█         | 10/100 [41:00:00<218:52:01, 8754.68s/it]Best trial: 0. Best value: 0.269636:  11%|█         | 11/100 [41:00:00<152:40:57, 6175.92s/it]                                                                                              Best trial: 0. Best value: 0.269636:  11%|█         | 11/100 [41:07:41<152:40:57, 6175.92s/it]Best trial: 0. Best value: 0.269636:  11%|█         | 11/100 [41:07:41<152:40:57, 6175.92s/it]Best trial: 0. Best value: 0.269636:  12%|█▏        | 12/100 [41:07:41<108:28:10, 4437.39s/it]                                                                                              Best trial: 0. Best value: 0.269636:  12%|█▏        | 12/100 [41:39:04<108:28:10, 4437.39s/it]Best trial: 0. Best value: 0.269636:  12%|█▏        | 12/100 [41:39:04<108:28:10, 4437.39s/it]Best trial: 0. Best value: 0.269636:  13%|█▎        | 13/100 [41:39:04<88:32:13, 3663.61s/it]                                                                                              Best trial: 0. Best value: 0.269636:  13%|█▎        | 13/100 [41:41:04<88:32:13, 3663.61s/it]Best trial: 13. Best value: 0.328125:  13%|█▎        | 13/100 [41:41:04<88:32:13, 3663.61s/it]Best trial: 13. Best value: 0.328125:  14%|█▍        | 14/100 [41:41:04<61:57:03, 2593.30s/it]                                                                                              Best trial: 13. Best value: 0.328125:  14%|█▍        | 14/100 [42:04:56<61:57:03, 2593.30s/it]Best trial: 13. Best value: 0.328125:  14%|█▍        | 14/100 [42:04:56<61:57:03, 2593.30s/it]Best trial: 13. Best value: 0.328125:  15%|█▌        | 15/100 [42:04:56<52:57:56, 2243.25s/it]                                                                                              Best trial: 13. Best value: 0.328125:  15%|█▌        | 15/100 [43:20:45<52:57:56, 2243.25s/it]Best trial: 13. Best value: 0.328125:  15%|█▌        | 15/100 [43:20:45<52:57:56, 2243.25s/it]Best trial: 13. Best value: 0.328125:  16%|█▌        | 16/100 [43:20:45<68:32:03, 2937.19s/it]                                                                                              Best trial: 13. Best value: 0.328125:  16%|█▌        | 16/100 [44:52:51<68:32:03, 2937.19s/it]Best trial: 13. Best value: 0.328125:  16%|█▌        | 16/100 [44:52:51<68:32:03, 2937.19s/it]Best trial: 13. Best value: 0.328125:  17%|█▋        | 17/100 [44:52:51<85:40:12, 3715.81s/it]                                                                                              Best trial: 13. Best value: 0.328125:  17%|█▋        | 17/100 [44:55:58<85:40:12, 3715.81s/it]Best trial: 13. Best value: 0.328125:  17%|█▋        | 17/100 [44:55:58<85:40:12, 3715.81s/it]Best trial: 13. Best value: 0.328125:  18%|█▊        | 18/100 [44:55:58<60:29:01, 2655.38s/it]                                                                                              Best trial: 13. Best value: 0.328125:  18%|█▊        | 18/100 [45:08:57<60:29:01, 2655.38s/it]                                                                                              Best trial: 13. Best value: 0.328125:  18%|█▊        | 18/100 [45:08:57<60:29:01, 2655.38s/it]Best trial: 13. Best value: 0.328125:  18%|█▊        | 18/100 [45:08:57<205:40:48, 9029.86s/it]
+Traceback (most recent call last):
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 444, in <module>
+    if __name__ == "__main__":
+        ^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 335, in main
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/study.py", line 490, in optimize
+    _optimize(
+    ~~~~~~~~~^
+        study=self,
+        ^^^^^^^^^^^
+    ...<7 lines>...
+        show_progress_bar=show_progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 63, in _optimize
+    _optimize_sequential(
+    ~~~~~~~~~~~~~~~~~~~~^
+        study,
+        ^^^^^^
+    ...<8 lines>...
+        progress_bar=progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 160, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 258, in _run_trial
+    raise func_err
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/optuna/study/_optimize.py", line 201, in _run_trial
+    value_or_values = func(trial)
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 335, in <lambda>
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/model_eval.py", line 248, in optuna_objective
+    model = model_import.Model(trial = trial, **kwargs)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/mosquito/rf_sunwindow_smote.py", line 226, in train
+    X_train, Y_train = smote.fit_resample(X_train, Y_train)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/imblearn/base.py", line 202, in fit_resample
+    return super().fit_resample(X, y, **params)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/sklearn/base.py", line 1365, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/imblearn/base.py", line 99, in fit_resample
+    X, y, binarize_y = self._check_X_y(X, y)
+                       ~~~~~~~~~~~~~~~^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/imblearn/base.py", line 157, in _check_X_y
+    X, y = validate_data(self, X=X, y=y, reset=True, accept_sparse=accept_sparse)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/sklearn/utils/validation.py", line 2971, in validate_data
+    X, y = check_X_y(X, y, **check_params)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/sklearn/utils/validation.py", line 1368, in check_X_y
+    X = check_array(
+        X,
+    ...<12 lines>...
+        input_name="X",
+    )
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/sklearn/utils/validation.py", line 1105, in check_array
+    _assert_all_finite(
+    ~~~~~~~~~~~~~~~~~~^
+        array,
+        ^^^^^^
+    ...<2 lines>...
+        allow_nan=ensure_all_finite == "allow-nan",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/sklearn/utils/validation.py", line 120, in _assert_all_finite
+    _assert_all_finite_element_wise(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        X,
+        ^^
+    ...<4 lines>...
+        input_name=input_name,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/.venv/lib/python3.13/site-packages/sklearn/utils/validation.py", line 169, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input X contains NaN.
+SMOTE does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
