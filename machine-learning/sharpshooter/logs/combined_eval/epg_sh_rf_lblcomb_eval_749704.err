@@ -1,0 +1,74 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:01<01:24,  1.49s/it]Reading 58 .parquet files:   5%|▌         | 3/58 [00:01<00:23,  2.36it/s]Reading 58 .parquet files:  14%|█▍        | 8/58 [00:01<00:07,  6.69it/s]Reading 58 .parquet files:  22%|██▏       | 13/58 [00:01<00:03, 11.56it/s]Reading 58 .parquet files:  29%|██▉       | 17/58 [00:02<00:02, 15.11it/s]Reading 58 .parquet files:  38%|███▊      | 22/58 [00:02<00:01, 19.96it/s]Reading 58 .parquet files:  45%|████▍     | 26/58 [00:02<00:01, 22.77it/s]Reading 58 .parquet files:  53%|█████▎    | 31/58 [00:02<00:01, 25.28it/s]Reading 58 .parquet files:  60%|██████    | 35/58 [00:02<00:01, 15.55it/s]Reading 58 .parquet files:  66%|██████▌   | 38/58 [00:03<00:01, 14.45it/s]Reading 58 .parquet files:  79%|███████▉  | 46/58 [00:03<00:00, 22.81it/s]Reading 58 .parquet files:  88%|████████▊ | 51/58 [00:03<00:00, 24.14it/s]Reading 58 .parquet files:  95%|█████████▍| 55/58 [00:03<00:00, 26.23it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:03<00:00, 15.67it/s]
+
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  59%|█████▊    | 27/46 [00:01<00:00, 23.75it/s][A[A
+
+Getting probes:  65%|██████▌   | 30/46 [00:01<00:00, 18.43it/s][A[A
+
+Getting probes:  70%|██████▉   | 32/46 [00:02<00:01, 12.85it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  25%|██▌       | 3/12 [00:01<00:03,  2.57it/s][A[A
+
+                                                              [A[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  61%|██████    | 28/46 [00:00<00:00, 71.06it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:01<00:05,  1.91it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  3.92it/s][A[A
+
+                                                              [A[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:01<00:01, 13.97it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:00, 10.21it/s][A[A
+
+                                                              [A[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  64%|██████▍   | 30/47 [00:01<00:00, 18.02it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:00<00:03,  2.27it/s][A[A
+
+Getting probes:  27%|██▋       | 3/11 [00:00<00:02,  3.29it/s][A[A
+
+Getting probes:  36%|███▋      | 4/11 [00:01<00:03,  2.07it/s][A[A
+
+                                                              [A[A
+
+Getting probes:   0%|          | 0/47 [00:00<?, ?it/s][A[A
+
+Getting probes:  47%|████▋     | 22/47 [00:00<00:00, 44.09it/s][A[A
+
+Getting probes:  57%|█████▋    | 27/47 [00:01<00:01, 17.68it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/11 [00:00<?, ?it/s][A[A
+
+Getting probes:  18%|█▊        | 2/11 [00:01<00:05,  1.56it/s][A[A
+
+                                                              [A[A

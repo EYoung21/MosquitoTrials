@@ -1,0 +1,22 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:00<00:18,  3.16it/s]Reading 58 .parquet files:   9%|▊         | 5/58 [00:00<00:03, 13.81it/s]Reading 58 .parquet files:  16%|█▌        | 9/58 [00:00<00:02, 16.47it/s]Reading 58 .parquet files:  28%|██▊       | 16/58 [00:00<00:01, 29.52it/s]Reading 58 .parquet files:  34%|███▍      | 20/58 [00:00<00:01, 30.72it/s]Reading 58 .parquet files:  41%|████▏     | 24/58 [00:01<00:01, 27.73it/s]Reading 58 .parquet files:  52%|█████▏    | 30/58 [00:01<00:00, 34.19it/s]Reading 58 .parquet files:  59%|█████▊    | 34/58 [00:01<00:01, 23.36it/s]Reading 58 .parquet files:  66%|██████▌   | 38/58 [00:01<00:00, 24.79it/s]Reading 58 .parquet files:  76%|███████▌  | 44/58 [00:01<00:00, 30.85it/s]Reading 58 .parquet files:  88%|████████▊ | 51/58 [00:01<00:00, 37.68it/s]Reading 58 .parquet files:  97%|█████████▋| 56/58 [00:02<00:00, 32.77it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:02<00:00, 28.38it/s]
+
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+                                                      [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:00,  8.05it/s][A[A
+
+Getting probes:  67%|██████▋   | 8/12 [00:01<00:00,  7.85it/s][A[A
+
+                                                              [A[ATraceback (most recent call last):
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/rf/combined_eval_s.py", line 199, in <module>
+    main()
+    ~~~~^^
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/rf/combined_eval_s.py", line 166, in main
+    preds = model.predict(test_probes)
+  File "/home/eyoung4-swat/hmc-epg-project/machine-learning/sharpshooter/rf/rf_samchan_labels_combined.py", line 212, in predict
+    votes[last_sl] += proba[-1] * self.window_weight[:self.chunk_size, None]
+ValueError: operands could not be broadcast together with shapes (64,6) (2500,6) (64,6) 

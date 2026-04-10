@@ -1,0 +1,54 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:00<00:47,  1.19it/s]Reading 58 .parquet files:   9%|▊         | 5/58 [00:00<00:08,  6.31it/s]Reading 58 .parquet files:  16%|█▌        | 9/58 [00:01<00:04, 11.68it/s]Reading 58 .parquet files:  21%|██        | 12/58 [00:01<00:03, 14.21it/s]Reading 58 .parquet files:  28%|██▊       | 16/58 [00:01<00:02, 17.33it/s]Reading 58 .parquet files:  38%|███▊      | 22/58 [00:01<00:01, 24.56it/s]Reading 58 .parquet files:  45%|████▍     | 26/58 [00:01<00:01, 25.16it/s]Reading 58 .parquet files:  52%|█████▏    | 30/58 [00:01<00:01, 27.55it/s]Reading 58 .parquet files:  59%|█████▊    | 34/58 [00:02<00:01, 14.95it/s]Reading 58 .parquet files:  64%|██████▍   | 37/58 [00:02<00:01, 16.39it/s]Reading 58 .parquet files:  71%|███████   | 41/58 [00:02<00:00, 19.47it/s]Reading 58 .parquet files:  78%|███████▊  | 45/58 [00:02<00:00, 21.04it/s]Reading 58 .parquet files:  83%|████████▎ | 48/58 [00:02<00:00, 22.34it/s]Reading 58 .parquet files:  93%|█████████▎| 54/58 [00:03<00:00, 26.24it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:03<00:00, 18.90it/s]
+
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:00<00:00, 113.56it/s][A[A
+
+Getting probes:  83%|████████▎ | 38/46 [00:03<00:00,  9.65it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:00, 17.79it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  7.38it/s][A[A
+
+                                                              [A[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:01<00:00, 24.68it/s][A[A
+
+Getting probes:  70%|██████▉   | 32/46 [00:01<00:00, 17.49it/s][A[A
+
+Getting probes:  76%|███████▌  | 35/46 [00:02<00:00, 14.67it/s][A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:00<00:01,  6.41it/s][A[A
+
+Getting probes:  50%|█████     | 6/12 [00:01<00:01,  4.81it/s][A[A
+
+                                                              [A[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  57%|█████▋    | 26/46 [00:00<00:00, 102.46it/s][A[A
+
+Getting probes:  80%|████████  | 37/46 [00:01<00:00, 18.63it/s] [A[A
+
+                                                               [A[A
+
+Getting probes:   0%|          | 0/12 [00:00<?, ?it/s][A[A
+
+Getting probes:  17%|█▋        | 2/12 [00:00<00:00, 13.81it/s][A[A
+
+Getting probes:  33%|███▎      | 4/12 [00:00<00:01,  5.66it/s][A[A
+
+Getting probes:  42%|████▏     | 5/12 [00:01<00:01,  4.10it/s][A[A
+
+                                                              [A[Aslurmstepd: error: *** JOB 751106 ON gpu04 CANCELLED AT 2026-04-10T13:06:59 ***
