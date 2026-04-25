@@ -40,11 +40,13 @@ class Labeler(QObject):
         name_to_module = {
             'Mosquito UNet (Block)': 'models.unet_mosquito',
             'Mosquito UNet (Attention)': 'models.unet_mosquito',
+            'Mosquito RF': 'models.samchan_rf_mosquito',
             'Sharpshooter UNet (Block)': 'models.unet_sharpshooter',
         }
         name_to_path = {
             'Mosquito UNet (Block)' : "models/unet_block_mosquito_weights",
-            'Mosquito UNet (Attention)' : "models/unet_attention_mosquito_weights", 
+            'Mosquito UNet (Attention)' : "models/unet_attention_mosquito_weights",
+            'Mosquito RF': "models/rf_mosquito_pickle",
             'Sharpshooter UNet (Block)' : "models/unet_block_sharpshooter_weights",
         }
 
@@ -69,8 +71,11 @@ class Labeler(QObject):
         module = importlib.import_module(name_to_module[model_name])
         print(f'{model_name} imported')
         ModelClass = getattr(module, "Model")
-        self.model = ModelClass(**kwargs)
-        self.model.load(path = name_to_path[model_name])
+        if model_name == 'Mosquito RF':
+            self.model = ModelClass()
+        else:
+            self.model = ModelClass(**kwargs)
+        self.model.load(path=name_to_path[model_name])
 
         model_chooser.setEnabled(True)
         model_chooser.lineEdit().setStyleSheet("")

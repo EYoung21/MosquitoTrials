@@ -1,11 +1,10 @@
 import os
-import glob
+import glob #?
 import numpy as np
 import pandas as pd
-import argparse
-from pathlib import Path
-from sklearn.preprocessing import normalize
-from sklearn.model_selection import KFold
+import argparse #helps with command line, dont remember how...
+from sklearn.preprocessing import normalize #normalizes
+from sklearn.model_selection import KFold #k-fold accuracy measure
 from sklearn.metrics import precision_recall_fscore_support, \
                             confusion_matrix, \
                             ConfusionMatrixDisplay, \
@@ -13,24 +12,17 @@ from sklearn.metrics import precision_recall_fscore_support, \
                             f1_score
 import importlib.util
 from matplotlib import pyplot as plt
-from itertools import groupby
+from itertools import groupby #itertools?
 import optuna
 from sklearn.model_selection import train_test_split
-import wandb
-import weave
-from optuna.integration.wandb import WeightsAndBiasesCallback
 
 from data_augmentation import build_augmented_dataset
 from postprocessing import PostProcessor
-import hydra
-from omegaconf import DictConfig
-from hydra.core.hydra_config import HydraConfig
-from utilities.model_factory import build_model
 
 class DataImport:
         def __init__(self, data_path, folds):
             self.raw_dfs, _ = self.import_data(data_path)
-            self.random_state = 57 # 42
+            self.random_state = 42
             kf = KFold(n_splits = folds, random_state = self.random_state,\
                        shuffle = True)
             self.cross_val_iter = list(kf.split(self.raw_dfs))
@@ -42,7 +34,7 @@ class DataImport:
             
             train_probes, _ = self.get_probes(train_dfs)
             test_probes, test_names = self.get_probes(test_dfs)
-            return train_probes, test_probes, test_names
+            return train_probes, test_probes, test_names #test_names is target labels?
 
         def import_data(self, data_path):
             """
@@ -83,9 +75,10 @@ class DataImport:
                      array. Pre-rectified recordings are necessary as baseline is 
                      not 0 in post-rectified recordings.
                    window: Before NP regions can be identified, a rolling
-                     average filter is applied to remove noise in the NP regions.
+                     average filter is applied to remove noise in the NP regions. 
+                     #so regions are classified based on their average?
                      window is the size of this filter in samples.
-                   threshold: The maximum value of an NP sample.
+                   threshold: The maximum value of an NP sample. #so anything above this value is probing?
                    min_probe_length: The minimum acceptable length of a probe in
                      samples.
                    np_pad: the number of NP samples before and after each probe to
@@ -121,7 +114,8 @@ class DataImport:
             all_probe_names = []
             for df in dfs:
                 probe_indices = self.probe_finder_method(df["labels"].values)
-                probes = [df.iloc[start:end].reset_index(drop=True).copy() 
+                #each row already has a label assigned (im assuming probe_finder_method is finding the indices of the probes)
+                probes = [df.iloc[start:end].reset_index(drop=True).copy() #where is start and end defined?
                           for start, end in probe_indices]
                 probe_names = [df["file"][0][:-4] + f"_{str(i)}" 
                                for i, df in enumerate(probes)]
@@ -190,9 +184,7 @@ def plot_labels(time, voltage, true_labels, pred_labels, probs = None):
     fig.tight_layout()
     return fig
 
-
-
-def generate_report(test_data, predicted_labels, test_names, save_path, model_name, fold, predicted_logits = None, inv_label_map = None):
+def generate_report(test_data, predicted_labels, test_names, save_path, model_name, fold):
     # Flatten everything
     labels_true = []
     labels_pred = []
@@ -219,567 +211,214 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     accuracy = accuracy_score(labels_true, labels_pred)
     out_dataframe["accuracy"] = accuracy
 
-    all_precision_micro, all_recall_micro, all_fscore_micro, _ = precision_recall_fscore_support(labels_true, labels_pred, 
-                                                            labels=labels, average = "micro", zero_division=0)
-    all_precision_macro, all_recall_macro, all_fscore_macro, _ = precision_recall_fscore_support(labels_true, labels_pred, 
-                                                            labels=labels, average = "macro", zero_division=0)
-    out_dataframe["precision_micro"] = all_precision_micro
-    out_dataframe["recall_micro"] = all_recall_micro
-    out_dataframe["fscore_micro"] = all_fscore_micro
-    out_dataframe["precision_macro"] = all_precision_macro
-    out_dataframe["recall_macro"] = all_recall_macro
-    out_dataframe["fscore_macro"] = all_fscore_macro
-
-    # Log per-class metrics as an interactive W&B Table (chartable, filterable)
-    if wandb.run is not None:
-        per_class_table = wandb.Table(
-            columns=["class", "precision", "recall", "f1"],
-            data=[[label, float(precision[i]), float(recall[i]), float(fscore[i])]
-                  for i, label in enumerate(labels)]
-        )
-        wandb.log({f"Fold_{fold}/per_class_metrics": per_class_table})
-
-    # confusion matrix (saved locally for reference)
+    # confusion matrix
     ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
-    plt.savefig(cm_path)
-    plt.close()
+    plt.savefig(rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png")
 
-    if wandb.run is not None:
-        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
-
-    # difference plots (saved locally only)
+    # difference plots
     for i, (df, preds, name) in enumerate(zip(test_data, predicted_labels, test_names)):
         fig = plot_labels(df["time"], df["pre_rect"], df["labels"].values, np.array(preds))
-        img_path = fr"{save_path}/{model_name}_{os.path.split(name)[1]}_Fold{fold}.png"
-        fig.savefig(img_path)
+        fig.savefig(fr"{save_path}/{model_name}_{os.path.split(name)[1]}_Fold{fold}.png")
         plt.close(fig)
 
     print(f"Fold {fold} Overall Accuracy: {accuracy}")
     return labels_true, labels_pred, out_dataframe
 
-def generate_roc(
-    test_data,
-    all_logits,
-    save_path=None,
-    model_name="model",
-    fold=0,
-    labels=("J","K","L","M","N","W"),
-    class_colors=None,
-    score_transform="identity",  # "identity", "sigmoid", or "softmax"
-    mark_argmax_operating_point=False,
-    point_size=80,
-):
-    import os
-    import numpy as np
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    from sklearn.metrics import roc_curve, auc, precision_recall_curve
-    from sklearn.preprocessing import label_binarize
-
-    # Color map
-    default_colors = {
-        "J": "blue", "K": "green", "L": "purple",
-        "M": "pink", "N": "cyan", "W": "orange"
-    }
-    label_to_color = default_colors if class_colors is None else class_colors
-
-    # ---- collect y and scores ----
-    y_true_labels = []
-    score_frames = []
-    for df, logits in zip(test_data, all_logits):
-        y_true_labels.extend(df["labels"].astype(str).values)
-        score_frames.append(pd.DataFrame(logits, columns=labels))
-    scores = pd.concat(score_frames, ignore_index=True).astype(float)  # shape [N, C]
-
-    # ---- score transforms ----
-    if score_transform == "sigmoid":
-        x = scores.values
-        scores = pd.DataFrame(1.0 / (1.0 + np.exp(-x)), columns=labels)
-    elif score_transform == "softmax":
-        x = scores.values
-        x = x - x.max(axis=1, keepdims=True)         # numerical stability
-        ex = np.exp(x)
-        scores = pd.DataFrame(ex / ex.sum(axis=1, keepdims=True), columns=labels)
-    # else: identity (raw logits)
-
-    # ---- binarize y (OvR) ----
-    y_test = label_binarize(y_true_labels, classes=list(labels))  # shape [N, C]
-    y_score = scores.values
-    n_classes = y_test.shape[1]
-    N = y_score.shape[0]
-
-    # ---- per-class curves ----
-    fpr, tpr, roc_auc = {}, {}, {}
-    precision, recall, pr_auc = {}, {}, {}
-
-    valid_class_idx = []
-    for i in range(n_classes):
-        # need at least one positive and one negative to compute curve
-        has_pos = (y_test[:, i].sum() > 0)
-        has_neg = ((1 - y_test[:, i]).sum() > 0)
-        if not (has_pos and has_neg):
-            continue
-        valid_class_idx.append(i)
-
-        fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
-        precision[i], recall[i], _ = precision_recall_curve(y_test[:, i], y_score[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-        pr_auc[i] = auc(recall[i], precision[i])
-
-    # ---- micro averages ----
-    if len(valid_class_idx) > 0:
-        fpr["micro"], tpr["micro"], _ = roc_curve(y_test[:, valid_class_idx].ravel(),
-                                                  y_score[:, valid_class_idx].ravel())
-        precision["micro"], recall["micro"], _ = precision_recall_curve(
-            y_test[:, valid_class_idx].ravel(), y_score[:, valid_class_idx].ravel()
-        )
-        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-        pr_auc["micro"] = auc(recall["micro"], precision["micro"])
-
-        # ---- macro averages (simple interpolation) ----
-        all_fpr = np.unique(np.concatenate([fpr[i] for i in valid_class_idx]))
-        mean_tpr = np.zeros_like(all_fpr)
-        for i in valid_class_idx:
-            mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
-        mean_tpr /= len(valid_class_idx)
-        fpr["macro"], tpr["macro"] = all_fpr, mean_tpr
-        roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
-
-        all_recall = np.unique(np.concatenate([recall[i] for i in valid_class_idx]))
-        mean_precision = np.zeros_like(all_recall)
-        for i in valid_class_idx:
-            mean_precision += np.interp(all_recall, recall[i], precision[i])
-        mean_precision /= len(valid_class_idx)
-        recall["macro"], precision["macro"] = all_recall, mean_precision
-        pr_auc["macro"] = auc(recall["macro"], precision["macro"])
-
-    # ---- default argmax operating point (per class) ----
-    # This is the discrete classifier that predicts argmax across classes.
-    # For each class i, compute its OvR confusion stats under argmax.
-    argmax_idx = y_score.argmax(axis=1)  # predicted class per sample
-    op_points = {}  # i -> dict with fpr,tpr,prec,recall,f1
-    for i in range(n_classes):
-        y_true_i = (y_test[:, i] == 1)
-        y_pred_i = (argmax_idx == i)
-
-        tp = np.sum(y_pred_i & y_true_i)
-        fp = np.sum(y_pred_i & (~y_true_i))
-        fn = np.sum((~y_pred_i) & y_true_i)
-        tn = N - tp - fp - fn
-
-        # metrics with safe division
-        tpr_i = tp / (tp + fn) if (tp + fn) > 0 else 0.0
-        fpr_i = fp / (fp + tn) if (fp + tn) > 0 else 0.0
-        prec_i = tp / (tp + fp) if (tp + fp) > 0 else 0.0
-        rec_i = tpr_i
-        f1_i = (2 * prec_i * rec_i / (prec_i + rec_i)) if (prec_i + rec_i) > 0 else 0.0
-        op_points[i] = dict(fpr=fpr_i, tpr=tpr_i, prec=prec_i, rec=rec_i, f1=f1_i)
-
-    # ---- ensure output dir ----
-    if save_path is not None:
-        os.makedirs(save_path, exist_ok=True)
-
-    lw = 3
-
-    # ===================== ROC plot =====================
-    plt.figure()
-    if "micro" in fpr:
-        plt.plot(fpr["micro"], tpr["micro"],
-                 label=f"micro-average ROC (AUC = {roc_auc['micro']:.2f})",
-                 linestyle=":", linewidth=lw, color="deeppink")
-    if "macro" in fpr:
-        plt.plot(fpr["macro"], tpr["macro"],
-                 label=f"macro-average ROC (AUC = {roc_auc['macro']:.2f})",
-                 linestyle=":", linewidth=lw, color="navy")
-
-    for i, lab in enumerate(labels):
-        if i in valid_class_idx:
-            plt.plot(fpr[i], tpr[i], label=f"{lab} (AUC = {roc_auc[i]:.2f})",
-                     lw=lw, color=label_to_color.get(lab, None))
-
-        if mark_argmax_operating_point:
-            pt = op_points[i]
-            plt.scatter(pt["fpr"], pt["tpr"], s=point_size,
-                        edgecolor="k", linewidths=0.7,
-                        color=label_to_color.get(lab, None), alpha=0.9,
-                        label=None)
-            # Annotate with F1 near the point
-            plt.annotate(f"F1={pt['f1']:.2f}", (pt["fpr"], pt["tpr"]),
-                         xytext=(5, -10), textcoords="offset points", fontsize=8)
-
-    plt.plot([0, 1], [0, 1], "k--", lw=2)
-    plt.xlim(0, 1); plt.ylim(0, 1.05)
-    plt.xlabel("False Positive Rate"); plt.ylabel("True Positive Rate")
-    plt.title("ROC curves")
-    plt.legend(loc="lower right", ncol=2, fontsize=8)
-    if save_path is not None:
-        plt.tight_layout()
-        plt.savefig(os.path.join(save_path, f"{model_name}_ROC_Fold{fold}.png"), dpi=200)
-        plt.close()
-    else:
-        plt.show()
-
-    # ===================== PR plot =====================
-    plt.figure()
-    if "micro" in precision:
-        plt.plot(recall["micro"], precision["micro"],
-                 label=f"Average PR (AUC = {pr_auc['micro']:.2f})",
-                 linestyle=":", linewidth=lw, color="deeppink")
-    # if "macro" in precision:
-    #     plt.plot(recall["macro"], precision["macro"],
-    #              label=f"macro-average PR (AUC = {pr_auc['macro']:.2f})",
-    #              linestyle=":", linewidth=lw, color="navy")
-
-    for i, lab in enumerate(labels):
-        if i in valid_class_idx:
-            plt.plot(recall[i], precision[i], label=f"{lab} (AUC = {pr_auc[i]:.2f})",
-                     lw=lw, color=label_to_color.get(lab, None))
-
-        if mark_argmax_operating_point:
-            pt = op_points[i]
-            plt.scatter(pt["rec"], pt["prec"], s=point_size,
-                        edgecolor="k", linewidths=0.7,
-                        color=label_to_color.get(lab, None), alpha=0.9,
-                        label=None)
-            plt.annotate(f"F1={pt['f1']:.2f}", (pt["rec"], pt["prec"]),
-                         xytext=(5, -10), textcoords="offset points", fontsize=8)
-
-    plt.xlim(0, 1); plt.ylim(0, 1.05)
-    plt.xlabel("Recall"); plt.ylabel("Precision")
-    plt.title("Precision–Recall curves")
-    plt.legend(loc="lower left", ncol=2, fontsize=8)
-    if save_path is not None:
-        plt.tight_layout()
-        plt.savefig(os.path.join(save_path, f"{model_name}_PR_Fold{fold}.png"), dpi=200)
-        plt.close()
-    else:
-        plt.show()
-
-def apply_best_params_to_kwargs(best_params: dict, kwargs: dict) -> dict:
-    """
-    Overwrite model kwargs with Optuna best_params, with a small amount of
-    key-aliasing to match your non-optuna kwargs naming.
-    """
-    new_kwargs = dict(kwargs)
-
-    # direct overwrite when keys already exist in kwargs
-    for k, v in best_params.items():
-        if k in new_kwargs:
-            new_kwargs[k] = v
-
-    # common aliases between optuna params and your kwargs naming
-    if "dropout" in best_params and "dropout_rate" in new_kwargs:
-        new_kwargs["dropout_rate"] = best_params["dropout"]
-    if "dropout_rate" in best_params and "dropout" in new_kwargs:
-        new_kwargs["dropout"] = best_params["dropout_rate"]
-
-    return new_kwargs
-
-def optuna_objective(data, args, trial, outer_train_index, outer_fold, inner_folds=5, **kwargs):
-    """
-    Nested CV objective:
-      - outer_train_index is the *outer* fold train split (indices into data.raw_dfs)
-      - runs an inner KFold over outer_train_index
-      - returns macro-F1 aggregated across inner validation folds
-    """
+def optuna_objective(data, args, trial, **kwargs):
     labels_true = []
     labels_pred = []
-    
+    for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
+        train_data = [data.raw_dfs[i] for i in train_index]
+        test_data = [data.raw_dfs[i] for i in test_index]
+        train_data, _ = data.get_probes(train_data) #why are train names seemingly not defined here?
+        test_data, test_names = data.get_probes(test_data)
 
-    augment_factor = 1 #trial.suggest_categorical("augment_factor", [1, 2, 4, 8])
+        augment_factor = trial.suggest_categorical(
+            "augment_factor", [0.25, 0.5, 0.75, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128]
+        )
 
-    # Inner CV over the outer-train set only
-    inner_kf = KFold(
-        n_splits=inner_folds,
-        random_state=data.random_state + outer_fold,  # deterministic per outer fold
-        shuffle=True,
-    )
+        if args.augment:
+            aug_size = max(1, int(round(len(train_data) * float(augment_factor))))
+            train_data = build_augmented_dataset(train_data, size=aug_size)
+            #making an augmented dataset?
 
-    outer_train_index = np.array(list(outer_train_index))
+        model_import = dynamic_importer(args.model_path)
+        
+        model = model_import.Model(trial = trial, **kwargs)
+        model.train(train_data, test_data, fold)
+            
+        predicted_labels = model.predict(test_data)
 
-    for inner_fold, (inner_train_pos, inner_val_pos) in enumerate(inner_kf.split(outer_train_index)):
-        inner_train_idx = outer_train_index[inner_train_pos]
-        inner_val_idx   = outer_train_index[inner_val_pos]
-
-        train_dfs = [data.raw_dfs[i] for i in inner_train_idx]
-        val_dfs   = [data.raw_dfs[i] for i in inner_val_idx]
-
-        train_data, _ = data.get_probes(train_dfs)
-        val_data, _   = data.get_probes(val_dfs)
-
-        if args.train.augment:
-            train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
-
-        model = build_model(args.model)
-        model.train(train_data, val_data, inner_fold)
-
-        predicted_labels = model.predict(val_data)
-
-        # Flatten everything (same as your original objective)
-        for df, preds in zip(val_data, predicted_labels):
+        # Flatten everything
+        for df, preds in zip(test_data, predicted_labels):
             labels_true.extend(df["labels"].values)
             labels_pred.extend(preds)
-        break
 
     f1 = f1_score(labels_true, labels_pred, average="macro")
     print(f1_score(labels_true, labels_pred, average=None))
-
-    with open(f"{HydraConfig.get().runtime.choices['model']}_optuna.txt", "a") as f:
-        print("outer_fold", outer_fold, trial.datetime_start, trial.number, trial.params, f1, file=f)
-
-    # trial.params is now fully populated (suggest_* was called inside Model.__init__).
-    # Spread as **kwargs so each param becomes its own column in the Weave trace list.
-    log_optuna_trial_snapshot(
-        outer_fold=outer_fold,
-        trial_number=trial.number,
-        macro_f1=f1,
-        **trial.params,
-    )
-
+    with open(f"{args.model_name}_optuna.txt", "a") as f:
+        print(trial.datetime_start, trial.number, trial.params, f1, file=f)
     return f1
 
-
-@weave.op
-def log_optuna_trial_snapshot(outer_fold: int, trial_number: int, macro_f1: float, **trial_params):
-    """
-    Logged after each trial completes, each Optuna-suggested hyperparam
-    appears as its own input.* column in the Weave trace list.
-    Returning only macro_f1 avoids duplicating columns as output.*.
-    """
-    return macro_f1
-
-@hydra.main(version_base=None, config_path="conf", config_name="config") 
-def main(args:DictConfig):
-    # parser = argparse.ArgumentParser(
-    #     prog = "Model Performance Evaluator",
-    #     description = "This program takes in EPG data and a \
-    #                     labeler program, trains it, and then \
-    #                     generates statistics and figures to \
-    #                     characterize the model's performance."
-    # )
-    # parser.add_argument("--data_path", type = str, required = True)
-    # parser.add_argument("--model_path", type = str, required = True)
-    # parser.add_argument("--save_path", type = str, required = True)
-    # parser.add_argument("--model_name", type = str, required = True)
-    # parser.add_argument("--augment", action="store_true")
-    # parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
-    # parser.add_argument("--epochs", type = int, required=False)
-    # parser.add_argument("--optuna", action="store_true")
-    # parser.add_argument("--attention", action="store_true") # can only be used with UNet
-    # parser.add_argument("--fold", type = int, required = False, default = -1) 
-    # args = parser.parse_args()
-
-    run_group_id = wandb.util.generate_id()
-    weave.init("hmc-epg-mosquito")
+def main():
+    parser = argparse.ArgumentParser(
+        prog = "Model Performance Evaluator",
+        description = "This program takes in EPG data and a \
+                        labeler program, trains it, and then \
+                        generates statistics and figures to \
+                        characterize the model's performance."
+    )
+    parser.add_argument("--data_path", type = str, required = True)
+    parser.add_argument("--model_path", type = str, required = True)
+    parser.add_argument("--save_path", type = str, required = True)
+    parser.add_argument("--model_name", type = str, required = True)
+    parser.add_argument("--augment", action="store_true")
+    parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
+    parser.add_argument("--epochs", type = int, required=False)
+    parser.add_argument("--optuna", action="store_true")
+    parser.add_argument("--attention", action="store_true") # can only be used with UNet 
+    args = parser.parse_args()
 
     print("Loading Data...")
-    data = DataImport(args.data.data_path, 5)
-
-    summary_data = []
-    labels_true = []
-    labels_pred = []
-    logits_pred = []
-    all_test = []
-    model_name = HydraConfig.get().runtime.choices["model"]
-    print("args.train.folds =", args.train.folds, type(args.train.folds))
-    print("num cv folds =", len(data.cross_val_iter))   
-    optuna_group = f"{model_name}_optuna_study_{run_group_id}"
-    optuna_fold_best_rows = []
-    for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
-        if args.train.folds != -1 and fold != args.train.folds:
-            continue
-        print(f"Evaluating Fold {fold}")
-
-
-        # ---- base kwargs: KEEP EXACTLY YOUR NON-OPTUNA DEFAULTS ----
-        kwargs = dict()
-        # if args.model_path == "unet.py" or args.model_path == "unet_crf.py":
-        #     if args.attention:
-        #         # expected f1: 0.7402015172114621
-        #         kwargs['bottleneck_type'] = 'attention'
-        #         kwargs = kwargs | {
-        #             'epochs': 128,
-        #             'lr': 0.0005,
-        #             'dropout_rate': 0.,
-        #             'weight_decay': 1e-07,
-        #             'num_layers': 8,
-        #             'features': 64,
-        #             'transformer_window_size': 200,
-        #             'transformer_layers': 2,
-        #             'loss_gamma': 1.5
-        #         }
-        #         heads_per_channel = 16
-        #         kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
-        #         kwargs['embed_dim'] = kwargs['features']
-        #     else:
-        #         # expected f1: 0.694895
-        #         kwargs['bottleneck_type'] = 'block'
-        #         kwargs = kwargs | {
-        #             'epochs': 64,
-        #             'lr': 0.0005,
-        #             'dropout_rate': 0.1,
-        #             'weight_decay': 1e-06,
-        #             'num_layers': 8,
-        #             'features': 32
-        #         }
-
-        #     if args.epochs:
-        #         kwargs['epochs'] = args.epochs
-        # else:
-        #     kwargs = {}
-
-        # ---- NESTED OPTUNA: inner 5-fold CV on outer-train to overwrite kwar  gs ----
-        augment_factor = 1
-        if args.model.model.trial:
-            print(f"Running nested Optuna for outer fold {fold} (inner 5-fold on outer-train)...")
-            study = optuna.create_study(direction='maximize')
-            
-            wandb_kwargs = {
-                "project": "hmc-epg-mosquito",
-                "group": f"{model_name}_optuna_eval_{run_group_id}",
-                "name": f"outer_fold_{fold}_study",
-                "tags": ["optuna", "study"]
-            }
-            wandbc = WeightsAndBiasesCallback(metric_name="macro_f1", wandb_kwargs=wandb_kwargs)
-
-            study.optimize(
-                lambda t: optuna_objective(
-                    data,
-                    args,
-                    t,
-                    outer_train_index=train_index,
-                    outer_fold=fold,
-                    inner_folds=5,
-                    **kwargs
-                ),
-                n_trials=50,
-                show_progress_bar=True,
-                callbacks=[wandbc],
-            )
-
-            print(f"[Fold {fold}] Best params:", study.best_params)
-            augment_factor = study.best_params.get("augment_factor", 1)
-
-            # Overwrite kwargs used for the REAL outer-fold training/eval
-            kwargs = apply_best_params_to_kwargs(study.best_params, kwargs)
-
-            # If attention case changes features (etc), recompute dependent args
-            if model_name == "unet" and args.model.bottleneck_type == "attention":
-                heads_per_channel = 16
+    data = DataImport(args.data_path, 5)
+    if args.optuna:
+        study = optuna.create_study(direction='maximize')
+        
+        kwargs = dict() #kwargs?
+        if args.model_path == "unet.py":
+            if args.attention: #what is attention?
+                # expected f1: 0.7402015172114621
+                kwargs['bottleneck_type'] = 'windowed_attention'
+                kwargs = kwargs | {
+                    'epochs': 64, 
+                    'lr': 0.0005, 
+                    'dropout_rate': 1e-05, 
+                    'weight_decay': 1e-05, 
+                    'num_layers': 8, 
+                    'features': 64, 
+                    'transformer_window_size': 150, 
+                    'transformer_layers': 2
+                }
+                heads_per_channel = 32
                 kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
                 kwargs['embed_dim'] = kwargs['features']
+            else:
+                study.enqueue_trial(
+                    {
+                        "epochs" : 64,
+                        "lr": 5e-4,
+                        "dropout": 0.1,
+                        "weight_decay": 1e-6,
+                        "num_layers": 8,
+                        "features": 32,
+                        "augment_factor": 1
+                    }
+                )
 
-            # Save per-fold hyperparam search plot (avoid overwrite) and the current fold best params
-            optuna.visualization.matplotlib.plot_optimization_history(study)
-            hyper_plot_path = f"{model_name}_hyper_outer{fold}.png"
-            plt.savefig(hyper_plot_path)
-            plt.close()
+                # expected f1: 0.694895
+                kwargs['bottleneck_type'] = 'block'
+                kwargs = kwargs | {
+                    'epochs': 64, 
+                    'lr': 0.0005, 
+                    'dropout_rate': 0.1, 
+                    'weight_decay': 1e-06, 
+                    'num_layers': 8, 
+                    'features': 32
+                }
 
-            best_trial = study.best_trial
-            # Expand hyperparams as individual columns so W&B Table is filterable per-param
-            best_row = {
-                "outer_fold": fold,
-                "best_trial_number": best_trial.number,
-                "best_value_macro_f1": study.best_value,
-                "trial_count": len(study.trials),
-                **study.best_params,  # one column per hyperparam, not a JSON string
-            }
-            optuna_fold_best_rows.append(best_row)
+            if args.epochs:
+                kwargs['epochs'] = args.epochs
 
-        #kwargs = {'epochs': 128, 'num_layers': 6, 'n_conv_steps_per_block': 3, 'features': 96, 'embed_dim': 96, 'lr': 0.0001528325773887917, 'dropout_rate': 0.2546315931008927, 'weight_decay': 4.1530388051130336e-08, 'transformer_window_size': 200, 'transformer_layers': 2, 'transformer_nhead': 96 // 16}
+        else:
+            kwargs = {}
 
-        # ---- Now do your ORIGINAL outer fold train/test split + probes ----
+        study.optimize(lambda x : optuna_objective(data, args, x, **kwargs), n_trials = 100, show_progress_bar=True, )
+
+        print(study.best_params)
+        optuna.visualization.matplotlib.plot_optimization_history(study)
+        plt.savefig(f"{args.model_name}_hyper.png")
+        return
+
+    summary_data = [] #?
+    labels_true = []
+    labels_pred = []
+    for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
+        print(f"Evaluating Fold {fold}")
         train_data = [data.raw_dfs[i] for i in train_index]
-        test_data  = [data.raw_dfs[i] for i in test_index]
+        test_data = [data.raw_dfs[i] for i in test_index]
         train_data, _ = data.get_probes(train_data)
         test_data, test_names = data.get_probes(test_data)
 
-        # ---- augmentation: keep original behavior, but in optuna-mode respect tuned augment_factor ----
-        if args.train.augment:
-            if args.model.model.trial:
-                augmented_train_data = build_augmented_dataset(train_data, size=len(train_data) * augment_factor)
-            else:
-                augmented_train_data = build_augmented_dataset(train_data, size=len(train_data))
+        if args.augment:
+            augmented_train_data = build_augmented_dataset(train_data)
             print(f"{len(augmented_train_data)} Training Probes with Augment")
+        
+        model_import = dynamic_importer(args.model_path)
+        
+        kwargs = dict()
+        if args.model_path == "unet.py":
+            if args.attention:
+                # expected f1: 0.7402015172114621
+                kwargs['bottleneck_type'] = 'windowed_attention'
+                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 1e-05, 'weight_decay': 1e-06, 'num_layers': 8, 'features': 32, 'transformer_window_size': 150, 'transformer_layers': 2}
+                heads_per_channel = 32
+                kwargs['transformer_nhead'] = max(kwargs['features'] // heads_per_channel, 1)
+                kwargs['embed_dim'] = kwargs['features']
+            else:
+                # expected f1: 0.694895
+                kwargs['bottleneck_type'] = 'block'
+                kwargs = kwargs | {'epochs': 64, 'lr': 0.0005, 'dropout_rate': 0.1, 'weight_decay': 1e-06, 'num_layers': 8, 'features': 32}
 
-        # ---- Create model with (possibly overwritten) kwargs and run your original training ----
-        # Initialize wandb for standalone evaluation runs
-        is_optuna = args.model.model.trial
-        run_group_name = f"{model_name}_optuna_eval_{run_group_id}" if is_optuna else f"{model_name}_eval_{run_group_id}"
-        run_tags = ["evaluation", "optuna"] if is_optuna else ["evaluation"]
-        run = wandb.init(
-            project="hmc-epg-mosquito",
-            group=run_group_name,
-            name=f"fold_{fold}",
-            config={"fold": fold, "model": model_name, "augment_factor": augment_factor, "optuna": is_optuna},
-            reinit=True,
-            tags=run_tags
-        )
+            if args.epochs:
+                kwargs['epochs'] = args.epochs
 
-        model = build_model(args.model)
+        model = model_import.Model(save_path = args.save_path, **kwargs)
         print("Training Model...")
-
-        if args.train.augment:
-            final_train_data = augmented_train_data
+        
+        if args.augment:
+            final_train_data = augmented_train_data #how does this work? resampling? or new data generated entirely somehow?
         else:
             final_train_data = train_data
-
         print(final_train_data[0].columns)
-        model.train(final_train_data, test_data, **args.train)
-
-        # ---- EVERYTHING BELOW HERE: keep your original evaluation/report code unchanged ----
+        model.train(final_train_data, test_data, fold)
+            
         print("Evaluating Model...")
+        
+        if args.post_process is None:
+            predicted_labels = model.predict(test_data)
 
-        if args.run.post_process is None:
-            predicted_labels = model.predict(test_data, args.train.batch_size)
-
-        elif args.run.post_process.lower() == "viterbi" or args.run.post_process.lower() == "v":
-            _, logits = model.predict(test_data, args.train.batch_size, return_logits=args.run.return_logits, preprocess = args.run.preprocess)
-            logits = [l.transpose() for l in logits]
+        elif args.post_process.lower() == "viterbi" or args.post_process.lower() == "v":
+            _, logits = model.predict(test_data, return_logits=True)
+            logits = [l.squeeze(0).detach().numpy() for l in logits]
             post_process = PostProcessor(train_data, model.inv_label_map)
             predicted_labels = [post_process.postprocess_viterbi(logit) for logit in logits]
 
-        elif args.run.post_process.lower() == "smooth" or args.run.post_process.lower() == "s":
-            _, logits = model.predict(test_data, args.train.batch_size, return_logits=args.run.return_logits, preprocess = args.run.preprocess)
+        elif args.post_process.lower() == "smooth" or args.post_process.lower() == "s":
+            _, logits = model.predict(test_data, return_logits=True)
             post_process = PostProcessor(train_data, model.inv_label_map)
-            predicted_labels = [post_process.postprocess_smooth(logit.transpose()) for logit in logits]
-
+            predicted_labels = [post_process.postprocess_smooth(logit.squeeze(0).detach().numpy()) for logit in logits]
+        elif args.post_process.lower() == "smooth" or args.post_process.lower() == "s":
+            _, logits = model.predict(test_data, return_logits=True)
+            logits = [l.squeeze(0).detach().numpy() for l in logits]
+            post_process = PostProcessor(train_data, model.inv_label_map)
+            predicted_labels = [post_process.postprocess_smooth(logit) for logit in logits]
         else:
             print("Choose a valid (case insensitive) post-processing arguement: either V/Viterbi or S/Smooth. Terminating program")
-            assert False
-
-        _, logits = model.predict(test_data, args.train.batch_size, return_logits=args.run.return_logits, preprocess = args.run.preprocess)
-        print("Logits shape:", logits[0].shape)
-        logits_pred.extend([l for l in logits])
-        all_test.extend(test_data)
-
+            assert False #TODO: make this better
+            #make what batter? how?
+            
         print("Generating Report...")
-        true, pred, stats = generate_report(
-            test_data,
-            predicted_labels,
-            test_names,
-            args.run.save_path,
-            model_name,
-            fold,
-        )
+        true, pred, stats = generate_report(test_data, predicted_labels, test_names, args.save_path, args.model_name, fold)
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
-
-        if run is not None:
-            # We already track the epoch loss in model_eval, we can track the final macro-f1 here
-            f1 = f1_score(true, pred, average="macro")
-            acc = accuracy_score(true, pred)
-            run.log({"eval/macro_f1": f1, "eval/accuracy": acc})
-            run.finish()
-
         
     out_summary_data = pd.concat(summary_data)
-    out_summary_data.to_csv(f"{args.run.save_path}/{model_name}_SummaryStats_by_fold.csv")
 
     # Calculate statistics across every dataset
+
+    #by every dataset they mean every fold?
     labels = sorted(np.unique(labels_true))
     all_precision, all_recall, all_fscore, _ = precision_recall_fscore_support(labels_true, labels_pred, 
                                                             labels=labels, average = None, zero_division=0)
@@ -790,54 +429,17 @@ def main(args:DictConfig):
     out_dataframe.index = out_dataframe.index.map('{0[1]}_{0[0]}'.format)
     out_dataframe = out_dataframe.to_frame().T
     out_dataframe["accuracy"] = accuracy_score(labels_true, labels_pred)
-    all_precision_micro, all_recall_micro, all_fscore_micro, _ = precision_recall_fscore_support(labels_true, labels_pred, 
-                                                            labels=labels, average = "micro", zero_division=0)
-    all_precision_macro, all_recall_macro, all_fscore_macro, _ = precision_recall_fscore_support(labels_true, labels_pred, 
-                                                            labels=labels, average = "macro", zero_division=0)
-    out_dataframe["precision_micro"] = all_precision_micro
-    out_dataframe["recall_micro"] = all_recall_micro
-    out_dataframe["fscore_micro"] = all_fscore_micro
-    out_dataframe["precision_macro"] = all_precision_macro
-    out_dataframe["recall_macro"] = all_recall_macro
-    out_dataframe["fscore_macro"] = all_fscore_macro
-    out_dataframe.to_csv(f"{args.run.save_path}/{model_name}_SummaryStats.csv")
+
+    out_summary_data = pd.concat([out_summary_data, out_dataframe])
+    out_summary_data.to_csv(f"{args.save_path}/{args.model_name}_SummaryStats.csv")
 
     overall = ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    overall_cm_path = rf"{args.run.save_path}/{model_name}_OverallConfusionMatrix.png"
-    overall.plot().figure_.savefig(overall_cm_path)
+    overall.plot().figure_.savefig(rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png")
 
     all_data = pd.DataFrame({'labels_true': labels_true,
                              'labels_pred': labels_pred})
-    all_data.to_csv(f"{args.run.save_path}/{model_name}_allpredictions.csv")
-
-    # Log overall summary to W&B
-    summary_run = wandb.init(
-        project="hmc-epg-mosquito",
-        group=run_group_name if is_optuna else f"{model_name}_eval_{run_group_id}",
-        name="overall",
-        config={"model": model_name, "optuna": is_optuna},
-        reinit=True,
-        tags=["summary"],
-    )
-    summary_run.summary["overall/macro_f1"] = all_fscore_macro
-    summary_run.summary["overall/accuracy"] = out_dataframe["accuracy"].values[0]
-
-    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
-
-
-    if is_optuna and len(optuna_fold_best_rows) > 0:
-        fold_best_df = pd.DataFrame(optuna_fold_best_rows).sort_values("outer_fold").reset_index(drop=True)
-        summary_run.log({"overall/optuna_fold_best_table": wandb.Table(dataframe=fold_best_df)})
-
-        global_best_idx = fold_best_df["best_value_macro_f1"].idxmax()
-        global_best = fold_best_df.loc[global_best_idx]
-        summary_run.summary["overall/optuna_global_best_outer_fold"] = int(global_best["outer_fold"])
-        summary_run.summary["overall/optuna_global_best_trial_number"] = int(global_best["best_trial_number"])
-        summary_run.summary["overall/optuna_global_best_value_macro_f1"] = float(global_best["best_value_macro_f1"])
-
-    summary_run.finish()
-
+    all_data.to_csv(f"{args.save_path}/{args.model_name}_allpredictions.csv")
 
 if __name__ == "__main__":
     main()

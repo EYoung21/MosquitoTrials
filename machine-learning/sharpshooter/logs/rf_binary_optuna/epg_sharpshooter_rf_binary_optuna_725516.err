@@ -1,0 +1,527 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:00<00:13,  4.34it/s]Reading 58 .parquet files:   7%|▋         | 4/58 [00:00<00:04, 12.10it/s]Reading 58 .parquet files:  10%|█         | 6/58 [00:00<00:04, 12.08it/s]Reading 58 .parquet files:  21%|██        | 12/58 [00:00<00:01, 24.79it/s]Reading 58 .parquet files:  28%|██▊       | 16/58 [00:00<00:01, 25.84it/s]Reading 58 .parquet files:  36%|███▌      | 21/58 [00:00<00:01, 28.74it/s]Reading 58 .parquet files:  43%|████▎     | 25/58 [00:01<00:01, 31.47it/s]Reading 58 .parquet files:  50%|█████     | 29/58 [00:01<00:00, 32.52it/s]Reading 58 .parquet files:  57%|█████▋    | 33/58 [00:01<00:00, 27.56it/s]Reading 58 .parquet files:  62%|██████▏   | 36/58 [00:01<00:00, 24.34it/s]Reading 58 .parquet files:  71%|███████   | 41/58 [00:01<00:00, 30.01it/s]Reading 58 .parquet files:  78%|███████▊  | 45/58 [00:01<00:00, 23.96it/s]Reading 58 .parquet files:  90%|████████▉ | 52/58 [00:02<00:00, 30.44it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:02<00:00, 27.64it/s]
+[I 2026-02-19 07:39:44,448] A new study created in memory with name: rf_subwindow_smote_binary_hyperparameter_tuning
+  0%|          | 0/100 [00:00<?, ?it/s]
+[A
+Initializing Trial 0 Fold 0[A
+                           [A
+Training Trial 0 Fold 0[A
+                       [A
+Predicting Trial 0 Fold 0[A
+                         [A
+Initializing Trial 0 Fold 1[A
+                           [A
+Training Trial 0 Fold 1[A
+                       [A
+Predicting Trial 0 Fold 1[A
+                         [A
+Initializing Trial 0 Fold 2[A
+                           [A
+Training Trial 0 Fold 2[A
+                       [A
+Predicting Trial 0 Fold 2[A
+                         [A
+Initializing Trial 0 Fold 3[A
+                           [A
+Training Trial 0 Fold 3[A
+                       [A
+Predicting Trial 0 Fold 3[A
+                         [A
+Initializing Trial 0 Fold 4[A
+                           [A
+Training Trial 0 Fold 4[A
+                       [A
+Predicting Trial 0 Fold 4[A
+                         [A
+Evaluating Trial 0...[A
+                     [A                                       
+[A  0%|          | 0/100 [23:56:38<?, ?it/s]
+[A                                          
+[A  0%|          | 0/100 [23:56:38<?, ?it/s]
+[A
+[A                                            0%|          | 0/100 [23:56:38<?, ?it/s]Best trial: 0. Best value: 0.933095:   0%|          | 0/100 [23:56:38<?, ?it/s]Best trial: 0. Best value: 0.933095:   1%|          | 1/100 [23:56:38<2370:27:50, 86198.69s/it]
+[A
+Initializing Trial 1 Fold 0[A
+                           [A
+Training Trial 1 Fold 0[A
+                       [A
+Predicting Trial 1 Fold 0[A
+                         [A
+Initializing Trial 1 Fold 1[A
+                           [A
+Training Trial 1 Fold 1[A
+                       [A
+Predicting Trial 1 Fold 1[A
+                         [A
+Initializing Trial 1 Fold 2[A
+                           [A
+Training Trial 1 Fold 2[A
+                       [A
+Predicting Trial 1 Fold 2[A
+                         [A
+Initializing Trial 1 Fold 3[A
+                           [A
+Training Trial 1 Fold 3[A
+                       [A
+Predicting Trial 1 Fold 3[A
+                         [A
+Initializing Trial 1 Fold 4[A
+                           [A
+Training Trial 1 Fold 4[A
+                       [A
+Predicting Trial 1 Fold 4[A
+                         [A
+Evaluating Trial 1...[A
+                     [A                                                                                               
+[ABest trial: 0. Best value: 0.933095:   1%|          | 1/100 [38:04:56<2370:27:50, 86198.69s/it]
+[A                                                                                               
+[ABest trial: 0. Best value: 0.933095:   1%|          | 1/100 [38:04:56<2370:27:50, 86198.69s/it]
+[A
+[A                                                                                               Best trial: 0. Best value: 0.933095:   1%|          | 1/100 [38:04:56<2370:27:50, 86198.69s/it]Best trial: 1. Best value: 0.941254:   1%|          | 1/100 [38:04:56<2370:27:50, 86198.69s/it]Best trial: 1. Best value: 0.941254:   2%|▏         | 2/100 [38:04:56<1781:14:55, 65433.63s/it]
+[A
+Initializing Trial 2 Fold 0[A
+                           [A
+Training Trial 2 Fold 0[A
+                       [A
+Predicting Trial 2 Fold 0[A
+                         [A
+Initializing Trial 2 Fold 1[A
+                           [A
+Training Trial 2 Fold 1[A
+                       [A
+Predicting Trial 2 Fold 1[A
+                         [A
+Initializing Trial 2 Fold 2[A
+                           [A
+Training Trial 2 Fold 2[A
+                       [A
+Predicting Trial 2 Fold 2[A
+                         [A
+Initializing Trial 2 Fold 3[A
+                           [A
+Training Trial 2 Fold 3[A
+                       [A
+Predicting Trial 2 Fold 3[A
+                         [A
+Initializing Trial 2 Fold 4[A
+                           [A
+Training Trial 2 Fold 4[A
+                       [A
+Predicting Trial 2 Fold 4[A
+                         [A
+Evaluating Trial 2...[A
+                     [A                                                                                               
+[ABest trial: 1. Best value: 0.941254:   2%|▏         | 2/100 [39:47:12<1781:14:55, 65433.63s/it]
+[A                                                                                               
+[ABest trial: 1. Best value: 0.941254:   2%|▏         | 2/100 [39:47:12<1781:14:55, 65433.63s/it]
+[A
+[A                                                                                               Best trial: 1. Best value: 0.941254:   2%|▏         | 2/100 [39:47:12<1781:14:55, 65433.63s/it]Best trial: 1. Best value: 0.941254:   2%|▏         | 2/100 [39:47:12<1781:14:55, 65433.63s/it]Best trial: 1. Best value: 0.941254:   3%|▎         | 3/100 [39:47:12<1033:30:33, 38357.05s/it]
+[A
+Initializing Trial 3 Fold 0[A
+                           [A
+Training Trial 3 Fold 0[A
+                       [A
+Predicting Trial 3 Fold 0[A
+                         [A
+Initializing Trial 3 Fold 1[A
+                           [A
+Training Trial 3 Fold 1[A
+                       [A
+Predicting Trial 3 Fold 1[A
+                         [A
+Initializing Trial 3 Fold 2[A
+                           [A
+Training Trial 3 Fold 2[A
+                       [A
+Predicting Trial 3 Fold 2[A
+                         [A
+Initializing Trial 3 Fold 3[A
+                           [A
+Training Trial 3 Fold 3[A
+                       [A
+Predicting Trial 3 Fold 3[A
+                         [A
+Initializing Trial 3 Fold 4[A
+                           [A
+Training Trial 3 Fold 4[A
+                       [A
+Predicting Trial 3 Fold 4[A
+                         [A
+Evaluating Trial 3...[A
+                     [A                                                                                               
+[ABest trial: 1. Best value: 0.941254:   3%|▎         | 3/100 [42:08:16<1033:30:33, 38357.05s/it]
+[A                                                                                               
+[ABest trial: 1. Best value: 0.941254:   3%|▎         | 3/100 [42:08:16<1033:30:33, 38357.05s/it]
+[A
+[A                                                                                               Best trial: 1. Best value: 0.941254:   3%|▎         | 3/100 [42:08:16<1033:30:33, 38357.05s/it]Best trial: 3. Best value: 0.947042:   3%|▎         | 3/100 [42:08:16<1033:30:33, 38357.05s/it]Best trial: 3. Best value: 0.947042:   4%|▍         | 4/100 [42:08:16<708:08:39, 26555.41s/it] 
+[A
+Initializing Trial 4 Fold 0[A
+                           [A
+Training Trial 4 Fold 0[A
+                       [A
+Predicting Trial 4 Fold 0[A
+                         [A
+Initializing Trial 4 Fold 1[A
+                           [A
+Training Trial 4 Fold 1[A
+                       [A
+Predicting Trial 4 Fold 1[A
+                         [A
+Initializing Trial 4 Fold 2[A
+                           [A
+Training Trial 4 Fold 2[A
+                       [A
+Predicting Trial 4 Fold 2[A
+                         [A
+Initializing Trial 4 Fold 3[A
+                           [A
+Training Trial 4 Fold 3[A
+                       [A
+Predicting Trial 4 Fold 3[A
+                         [A
+Initializing Trial 4 Fold 4[A
+                           [A
+Training Trial 4 Fold 4[A
+                       [A
+Predicting Trial 4 Fold 4[A
+                         [A
+Evaluating Trial 4...[A
+                     [A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   4%|▍         | 4/100 [43:22:43<708:08:39, 26555.41s/it]
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   4%|▍         | 4/100 [43:22:43<708:08:39, 26555.41s/it]
+[A
+[A                                                                                              Best trial: 3. Best value: 0.947042:   4%|▍         | 4/100 [43:22:43<708:08:39, 26555.41s/it]Best trial: 3. Best value: 0.947042:   4%|▍         | 4/100 [43:22:43<708:08:39, 26555.41s/it]Best trial: 3. Best value: 0.947042:   5%|▌         | 5/100 [43:22:43<490:34:25, 18590.16s/it]
+[A
+Initializing Trial 5 Fold 0[A
+                           [A
+Training Trial 5 Fold 0[A
+                       [A
+Predicting Trial 5 Fold 0[A
+                         [A
+Initializing Trial 5 Fold 1[A
+                           [A
+Training Trial 5 Fold 1[A
+                       [A
+Predicting Trial 5 Fold 1[A
+                         [A
+Initializing Trial 5 Fold 2[A
+                           [A
+Training Trial 5 Fold 2[A
+                       [A
+Predicting Trial 5 Fold 2[A
+                         [A
+Initializing Trial 5 Fold 3[A
+                           [A
+Training Trial 5 Fold 3[A
+                       [A
+Predicting Trial 5 Fold 3[A
+                         [A
+Initializing Trial 5 Fold 4[A
+                           [A
+Training Trial 5 Fold 4[A
+                       [A
+Predicting Trial 5 Fold 4[A
+                         [A
+Evaluating Trial 5...[A
+                     [A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   5%|▌         | 5/100 [45:10:26<490:34:25, 18590.16s/it]
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   5%|▌         | 5/100 [45:10:26<490:34:25, 18590.16s/it]
+[A
+[A                                                                                              Best trial: 3. Best value: 0.947042:   5%|▌         | 5/100 [45:10:26<490:34:25, 18590.16s/it]Best trial: 3. Best value: 0.947042:   5%|▌         | 5/100 [45:10:26<490:34:25, 18590.16s/it]Best trial: 3. Best value: 0.947042:   6%|▌         | 6/100 [45:10:26<377:45:12, 14467.16s/it]
+[A
+Initializing Trial 6 Fold 0[A
+                           [A
+Training Trial 6 Fold 0[A
+                       [A
+Predicting Trial 6 Fold 0[A
+                         [A
+Initializing Trial 6 Fold 1[A
+                           [A
+Training Trial 6 Fold 1[A
+                       [A
+Predicting Trial 6 Fold 1[A
+                         [A
+Initializing Trial 6 Fold 2[A
+                           [A
+Training Trial 6 Fold 2[A
+                       [A
+Predicting Trial 6 Fold 2[A
+                         [A
+Initializing Trial 6 Fold 3[A
+                           [A
+Training Trial 6 Fold 3[A
+                       [A
+Predicting Trial 6 Fold 3[A
+                         [A
+Initializing Trial 6 Fold 4[A
+                           [A
+Training Trial 6 Fold 4[A
+                       [A
+Predicting Trial 6 Fold 4[A
+                         [A
+Evaluating Trial 6...[A
+                     [A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   6%|▌         | 6/100 [51:58:02<377:45:12, 14467.16s/it]
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   6%|▌         | 6/100 [51:58:02<377:45:12, 14467.16s/it]
+[A
+[A                                                                                              Best trial: 3. Best value: 0.947042:   6%|▌         | 6/100 [51:58:02<377:45:12, 14467.16s/it]Best trial: 3. Best value: 0.947042:   6%|▌         | 6/100 [51:58:02<377:45:12, 14467.16s/it]Best trial: 3. Best value: 0.947042:   7%|▋         | 7/100 [51:58:02<458:05:37, 17732.67s/it]
+[A
+Initializing Trial 7 Fold 0[A
+                           [A
+Training Trial 7 Fold 0[A
+                       [A
+Predicting Trial 7 Fold 0[A
+                         [A
+Initializing Trial 7 Fold 1[A
+                           [A
+Training Trial 7 Fold 1[A
+                       [A
+Predicting Trial 7 Fold 1[A
+                         [A
+Initializing Trial 7 Fold 2[A
+                           [A
+Training Trial 7 Fold 2[A
+                       [A
+Predicting Trial 7 Fold 2[A
+                         [A
+Initializing Trial 7 Fold 3[A
+                           [A
+Training Trial 7 Fold 3[A
+                       [A
+Predicting Trial 7 Fold 3[A
+                         [A
+Initializing Trial 7 Fold 4[A
+                           [A
+Training Trial 7 Fold 4[A
+                       [A
+Predicting Trial 7 Fold 4[A
+                         [A
+Evaluating Trial 7...[A
+                     [A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   7%|▋         | 7/100 [55:24:16<458:05:37, 17732.67s/it]
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   7%|▋         | 7/100 [55:24:16<458:05:37, 17732.67s/it]
+[A
+[A                                                                                              Best trial: 3. Best value: 0.947042:   7%|▋         | 7/100 [55:24:16<458:05:37, 17732.67s/it]Best trial: 3. Best value: 0.947042:   7%|▋         | 7/100 [55:24:16<458:05:37, 17732.67s/it]Best trial: 3. Best value: 0.947042:   8%|▊         | 8/100 [55:24:16<409:34:04, 16026.57s/it]
+[A
+Initializing Trial 8 Fold 0[A
+                           [A
+Training Trial 8 Fold 0[A
+                       [A
+Predicting Trial 8 Fold 0[A
+                         [A
+Initializing Trial 8 Fold 1[A
+                           [A
+Training Trial 8 Fold 1[A
+                       [A
+Predicting Trial 8 Fold 1[A
+                         [A
+Initializing Trial 8 Fold 2[A
+                           [A
+Training Trial 8 Fold 2[A
+                       [A
+Predicting Trial 8 Fold 2[A
+                         [A
+Initializing Trial 8 Fold 3[A
+                           [A
+Training Trial 8 Fold 3[A
+                       [A
+Predicting Trial 8 Fold 3[A
+                         [A
+Initializing Trial 8 Fold 4[A
+                           [A
+Training Trial 8 Fold 4[A
+                       [A
+Predicting Trial 8 Fold 4[A
+                         [A
+Evaluating Trial 8...[A
+                     [A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   8%|▊         | 8/100 [56:19:27<409:34:04, 16026.57s/it]
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   8%|▊         | 8/100 [56:19:27<409:34:04, 16026.57s/it]
+[A
+[A                                                                                              Best trial: 3. Best value: 0.947042:   8%|▊         | 8/100 [56:19:27<409:34:04, 16026.57s/it]Best trial: 3. Best value: 0.947042:   8%|▊         | 8/100 [56:19:27<409:34:04, 16026.57s/it]Best trial: 3. Best value: 0.947042:   9%|▉         | 9/100 [56:19:27<304:38:10, 12051.54s/it]
+[A
+Initializing Trial 9 Fold 0[A
+                           [A
+Training Trial 9 Fold 0[A
+                       [A
+Predicting Trial 9 Fold 0[A
+                         [A
+Initializing Trial 9 Fold 1[A
+                           [A
+Training Trial 9 Fold 1[A
+                       [A
+Predicting Trial 9 Fold 1[A
+                         [A
+Initializing Trial 9 Fold 2[A
+                           [A
+Training Trial 9 Fold 2[A
+                       [A
+Predicting Trial 9 Fold 2[A
+                         [A
+Initializing Trial 9 Fold 3[A
+                           [A
+Training Trial 9 Fold 3[A
+                       [A
+Predicting Trial 9 Fold 3[A
+                         [A
+Initializing Trial 9 Fold 4[A
+                           [A
+Training Trial 9 Fold 4[A
+                       [A
+Predicting Trial 9 Fold 4[A
+                         [A
+Evaluating Trial 9...[A
+                     [A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   9%|▉         | 9/100 [60:37:38<304:38:10, 12051.54s/it]
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:   9%|▉         | 9/100 [60:37:38<304:38:10, 12051.54s/it]
+[A
+[A                                                                                              Best trial: 3. Best value: 0.947042:   9%|▉         | 9/100 [60:37:38<304:38:10, 12051.54s/it]Best trial: 3. Best value: 0.947042:   9%|▉         | 9/100 [60:37:38<304:38:10, 12051.54s/it]Best trial: 3. Best value: 0.947042:  10%|█         | 10/100 [60:37:38<327:50:10, 13113.45s/it]
+[A
+Initializing Trial 10 Fold 0[A
+                            [A
+Training Trial 10 Fold 0[A
+                        [A
+Predicting Trial 10 Fold 0[A
+                          [A
+Initializing Trial 10 Fold 1[A
+                            [A
+Training Trial 10 Fold 1[A
+                        [A
+Predicting Trial 10 Fold 1[A
+                          [A
+[A                                                                                               
+[ABest trial: 3. Best value: 0.947042:  10%|█         | 10/100 [60:54:00<327:50:10, 13113.45s/it]
+[ABest trial: 3. Best value: 0.947042:  10%|█         | 10/100 [60:54:00<327:50:10, 13113.45s/it]Best trial: 3. Best value: 0.947042:  11%|█         | 11/100 [60:54:00<232:24:23, 9400.71s/it] 
+[A
+Initializing Trial 11 Fold 0[A
+                            [A
+Training Trial 11 Fold 0[A
+[A
+                        [A
+Predicting Trial 11 Fold 0[A
+                          [A
+Initializing Trial 11 Fold 1[A
+                            [A
+Training Trial 11 Fold 1[A
+                        [A
+Predicting Trial 11 Fold 1[A
+                          [A
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:  11%|█         | 11/100 [61:45:53<232:24:23, 9400.71s/it]
+[ABest trial: 3. Best value: 0.947042:  11%|█         | 11/100 [61:45:53<232:24:23, 9400.71s/it]Best trial: 3. Best value: 0.947042:  12%|█▏        | 12/100 [61:45:53<183:01:56, 7487.68s/it]
+[A
+Initializing Trial 12 Fold 0[A
+                            [A
+Training Trial 12 Fold 0[A
+[A
+                        [A
+Predicting Trial 12 Fold 0[A
+                          [A
+Initializing Trial 12 Fold 1[A
+                            [A
+Training Trial 12 Fold 1[A
+                        [A
+Predicting Trial 12 Fold 1[A
+                          [A
+Initializing Trial 12 Fold 2[A
+                            [A
+Training Trial 12 Fold 2[A
+                        [A
+Predicting Trial 12 Fold 2[A
+                          [A
+Initializing Trial 12 Fold 3[A
+                            [A
+Training Trial 12 Fold 3[A
+                        [A
+Predicting Trial 12 Fold 3[A
+                          [A
+Initializing Trial 12 Fold 4[A
+                            [A
+Training Trial 12 Fold 4[A
+                        [A
+Predicting Trial 12 Fold 4[A
+                          [A
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:  12%|█▏        | 12/100 [64:28:35<183:01:56, 7487.68s/it]
+[ABest trial: 3. Best value: 0.947042:  12%|█▏        | 12/100 [64:28:35<183:01:56, 7487.68s/it]Best trial: 3. Best value: 0.947042:  13%|█▎        | 13/100 [64:28:35<197:36:29, 8176.89s/it]
+[A
+Initializing Trial 13 Fold 0[A
+                            [A
+Training Trial 13 Fold 0[A
+[A
+                        [A
+Predicting Trial 13 Fold 0[A
+                          [A
+Initializing Trial 13 Fold 1[A
+                            [A
+Training Trial 13 Fold 1[A
+                        [A
+Predicting Trial 13 Fold 1[A
+                          [A
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:  13%|█▎        | 13/100 [65:55:53<197:36:29, 8176.89s/it]
+[ABest trial: 3. Best value: 0.947042:  13%|█▎        | 13/100 [65:55:53<197:36:29, 8176.89s/it]Best trial: 3. Best value: 0.947042:  14%|█▍        | 14/100 [65:55:53<174:07:30, 7288.96s/it]
+[A
+Initializing Trial 14 Fold 0[A
+                            [A
+Training Trial 14 Fold 0[A
+[A
+                        [A
+Predicting Trial 14 Fold 0[A
+                          [A
+Initializing Trial 14 Fold 1[A
+                            [A
+Training Trial 14 Fold 1[A
+                        [A
+Predicting Trial 14 Fold 1[A
+                          [A
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:  14%|█▍        | 14/100 [66:28:05<174:07:30, 7288.96s/it]
+[ABest trial: 3. Best value: 0.947042:  14%|█▍        | 14/100 [66:28:05<174:07:30, 7288.96s/it]Best trial: 3. Best value: 0.947042:  15%|█▌        | 15/100 [66:28:05<133:58:45, 5674.42s/it]
+[A
+Initializing Trial 15 Fold 0[A
+                            [A
+Training Trial 15 Fold 0[A
+[A
+                        [A
+Predicting Trial 15 Fold 0[A
+                          [A
+Initializing Trial 15 Fold 1[A
+                            [A
+Training Trial 15 Fold 1[A
+                        [A
+Predicting Trial 15 Fold 1[A
+                          [A
+[A                                                                                              
+[ABest trial: 3. Best value: 0.947042:  15%|█▌        | 15/100 [67:10:58<133:58:45, 5674.42s/it]
+[ABest trial: 3. Best value: 0.947042:  15%|█▌        | 15/100 [67:10:58<133:58:45, 5674.42s/it]Best trial: 3. Best value: 0.947042:  16%|█▌        | 16/100 [67:10:58<110:37:12, 4740.86s/it]
+[A
+Initializing Trial 16 Fold 0[A
+                            [A
+Training Trial 16 Fold 0[A
+[A
+                        [A
+Predicting Trial 16 Fold 0[A
+                          [A
+Initializing Trial 16 Fold 1[A
+                            [A
+Training Trial 16 Fold 1[A
+                        [A
+Predicting Trial 16 Fold 1[A
+                          [A
+Initializing Trial 16 Fold 2[A
+                            [A
+Training Trial 16 Fold 2[A
+                        [A
+Predicting Trial 16 Fold 2[A
+                          [A
+Initializing Trial 16 Fold 3[A
+                            [A
+Training Trial 16 Fold 3[A
+                        [A
+Predicting Trial 16 Fold 3[Aslurmstepd: error: *** JOB 725516 ON gpu04 CANCELLED AT 2026-02-22T07:39:15 DUE TO TIME LIMIT ***

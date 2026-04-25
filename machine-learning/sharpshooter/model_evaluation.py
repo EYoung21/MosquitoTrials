@@ -21,11 +21,13 @@ from sklearn.metrics import (
     ConfusionMatrixDisplay, accuracy_score, f1_score
 )
 
-import wandb
-import weave
-from optuna.integration.wandb import WeightsAndBiasesCallback
-
 from data_loader import import_data
+
+
+def first_letter_label(x):
+    """Map a label to a single coarse class: e.g. F1, F2, F3 -> F. Empty strings unchanged."""
+    s = str(x).strip()
+    return s[0].upper() if s else str(x)
 
 
 class DataImport:
@@ -41,7 +43,7 @@ class DataImport:
     cross_val_iter : list[tuple]
         A list of (train_index, test_index) tuples for K-fold cross-validation splits.
     """
-    def __init__(self, data_path, filetype: str, exclude=[], folds=5):
+    def __init__(self, data_path, filetype: str, exclude=[], folds=5, binary=False, coarse_first_letter_labels=False):
         """
         Initializes the DataImport class.
 
@@ -55,8 +57,23 @@ class DataImport:
             Substrings; any file whose name contains one will be excluded.
         folds : int, optional
             Number of folds to use for K-fold cross-validation (default is 5).
+        binary : bool, optional
+            If True, map labels to P (probing) vs NP (non-probing) for probe-splitter use.
+            N and Z become NP; all other labels become P.
+        coarse_first_letter_labels : bool, optional
+            If True, collapse each label to its first character (uppercase), e.g. F1,F2->F.
+            Use with models trained on the same scheme (e.g. rf_samchan_labels_combined).
         """
         self.df_list = import_data(data_path, filetype, exclude)
+        self.binary = binary
+        self.coarse_first_letter_labels = coarse_first_letter_labels
+        if binary:
+            for df in self.df_list:
+                upper = df["labels"].astype(str).str.upper()
+                df["labels"] = np.where(upper.isin(["N", "Z"]), "NP", "P")
+        if coarse_first_letter_labels:
+            for df in self.df_list:
+                df["labels"] = df["labels"].map(first_letter_label)
         self.random_state = 42
         kf = KFold(n_splits=folds, random_state=self.random_state, shuffle=True)
         self.cross_val_iter = list(kf.split(self.df_list))
@@ -111,7 +128,7 @@ class DataImport:
         Returns (start, end) index tuples for contiguous probe segments
         with labels not in NON_PROBING_LABELS.
         """
-        NON_PROBING_LABELS = {"N", "Z"}
+        NON_PROBING_LABELS = {"NP"} if self.binary else {"N", "Z"}
 
         upper_labels = np.char.upper(labels.astype(str))
         mask = ~np.isin(upper_labels, list(NON_PROBING_LABELS))
@@ -146,18 +163,23 @@ def optuna_objective(data, args, trial, **kwargs):
     def clear_msg():
         msg_bar.set_description_str("")
 
+    # Accumulate labels across folds so the final objective
+    # reflects performance over the full cross-validation split.
+    all_labels_true = []
+    all_labels_pred = []
 
     for fold, (train_index, test_index) in enumerate(data.cross_val_iter):
         show_msg(f"Initializing Trial {trial.number} Fold {fold}")
         train_data = [data.df_list[i] for i in train_index]
         test_data = [data.df_list[i] for i in test_index]
-        train_data, _ = data.get_probes(train_data)
-        test_data, _ = data.get_probes(test_data)
+        if not getattr(data, "binary", False):
+            train_data, _ = data.get_probes(train_data)
+            test_data, _ = data.get_probes(test_data)
         clear_msg()
 
         show_msg(f"Training Trial {trial.number} Fold {fold}")
         model_import = dynamic_importer(args.model_path)
-        model = model_import.Model(trial = trial, enable_wandb_logging=False, **kwargs)
+        model = model_import.Model(trial = trial, **kwargs)
         model.train(train_data, test_data, fold)
         clear_msg()
 
@@ -165,8 +187,32 @@ def optuna_objective(data, args, trial, **kwargs):
         predicted_labels = model.predict(test_data)
         clear_msg()
 
-        labels_true = np.concatenate([df["labels"].values for df in test_data])
-        labels_pred = np.concatenate(predicted_labels)
+        labels_true_fold = np.concatenate([df["labels"].values for df in test_data])
+        labels_pred_fold = np.concatenate(predicted_labels)
+
+        # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+        labels_true_fold = np.asarray(labels_true_fold).astype(str)
+        labels_pred_fold = np.asarray(labels_pred_fold).astype(str)
+
+        # Store for final full-CV metrics
+        all_labels_true.append(labels_true_fold)
+        all_labels_pred.append(labels_pred_fold)
+
+        # Per-fold metric, used both for logging and pruning.
+        weighted_f1_fold = f1_score(labels_true_fold, labels_pred_fold, average="weighted")
+
+        # Report intermediate value so the pruner can stop bad trials early.
+        trial.report(weighted_f1_fold, step=fold)
+        if trial.should_prune():
+            clear_msg()
+            raise optuna.TrialPruned()
+
+    # Concatenate across folds for overall metrics.
+    labels_true = np.concatenate(all_labels_true)
+    labels_pred = np.concatenate(all_labels_pred)
+
+    labels_true = np.asarray(labels_true).astype(str)
+    labels_pred = np.asarray(labels_pred).astype(str)
 
     show_msg(f"Evaluating Trial {trial.number}...")
     weighted_f1 = f1_score(labels_true, labels_pred, average="weighted")
@@ -180,24 +226,7 @@ def optuna_objective(data, args, trial, **kwargs):
     with open(f"{args.model_name}_optuna.txt", "a") as f:
         print(trial.datetime_start, trial.number, trial.params, weighted_f1, file=f)
 
-    # trial.params is fully populated here — spread as kwargs so each param
-    # appears as its own column in the Weave trace list.
-    log_optuna_trial_snapshot(
-        trial_number=trial.number,
-        macro_f1=weighted_f1,
-        **trial.params,
-    )
-
     return weighted_f1
-
-
-@weave.op
-def log_optuna_trial_snapshot(trial_number: int, macro_f1: float, **trial_params):
-    """
-    Logged after each trial completes — each Optuna-suggested hyperparam
-    appears as its own input.* column in the Weave trace list.
-    """
-    return macro_f1
 
 def plot_labels(time, voltage, true_labels, pred_labels, probs = None):
     """
@@ -260,6 +289,10 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
         labels_true.extend(df["labels"].values)
         labels_pred.extend(preds)
 
+    # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+    labels_true = np.asarray(labels_true).astype(str).tolist()
+    labels_pred = np.asarray(labels_pred).astype(str).tolist()
+
     # Make sure we have a place to save everything
     if not os.path.isdir(save_path):
         os.mkdir(save_path)
@@ -282,26 +315,12 @@ def generate_report(test_data, predicted_labels, test_names, save_path, model_na
     accuracy = accuracy_score(labels_true, labels_pred)
     out_dataframe["accuracy"] = accuracy
 
-    # Per-class metrics as a wandb.Table so they're chartable and filterable
-    if wandb.run is not None:
-        per_class_table = wandb.Table(
-            columns=["class", "precision", "recall", "f1"],
-            data=[[label, float(precision[i]), float(recall[i]), float(fscore[i])]
-                  for i, label in enumerate(labels)]
-        )
-        wandb.log({f"Fold_{fold}/per_class_metrics": per_class_table})
-
     # confusion matrix
-    ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred,
-                                            normalize='true')
-    cm_path = rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png"
-    plt.savefig(cm_path)
-    plt.close()
+    ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
+                                            normalize = 'true')
+    plt.savefig(rf"{save_path}/{model_name}_ConfusionMatrix_Fold{fold}.png")
 
-    if wandb.run is not None:
-        wandb.log({f"Fold_{fold}/Confusion_Matrix": wandb.Image(cm_path)})
-
-    # difference plots (saved locally only)
+    # difference plots
     base_name = Path(model_name).name
     for df, preds, name in zip(test_data, predicted_labels, test_names):
         fig = plot_labels(
@@ -336,11 +355,14 @@ def main():
     #parser.add_argument("--post_process", type = str, required = False) # can either be s/smooth or viterbi/m
     parser.add_argument("--epochs", type = int, required=False)
     parser.add_argument("--optuna", action="store_true")
+    parser.add_argument("--binary", action="store_true", help="P (probing) vs NP (non-probing) only for probe splitter")
+    parser.add_argument(
+        "--coarse_first_letter_labels",
+        action="store_true",
+        help="Collapse each label to its first letter (e.g. F1,F2->F) for train/eval; use with first-letter RF models.",
+    )
     parser.add_argument("--attention", action="store_true") # can only be used with UNet 
     args = parser.parse_args()
-
-    run_group_id = wandb.util.generate_id()
-    weave.init("hmc-epg-sharpshooter")
 
     EXCLUDE = {
         "a01", "a02", "a03", "a10", "a15",
@@ -349,16 +371,32 @@ def main():
         "d01", "d03", "d056", "d058", "d12",
     }
 
-    data = DataImport(args.data_path, filetype = ".parquet", exclude=EXCLUDE, folds = 5)
+    data = DataImport(
+        args.data_path,
+        filetype=".parquet",
+        exclude=EXCLUDE,
+        folds=5,
+        binary=args.binary,
+        coarse_first_letter_labels=args.coarse_first_letter_labels,
+    )
 
     if args.optuna:
-        def progress_bar_callback(total_trials):
-            pbar = tqdm(total=total_trials, desc="Optuna Trials", position=0)
-            return lambda s, t: pbar.update(1)
-        
-        trial_count = 25
+        # Optuna hyperparameter search: keep 100 trials (full search).
+        trial_count = 100
 
-        study = optuna.create_study(study_name=f"{args.model_name}_hyperparameter_tuning", direction='maximize')
+        # Use a pruner so clearly bad trials are stopped early.
+        # - n_startup_trials: run the first few trials fully to get a baseline.
+        # - n_warmup_steps: require at least one fold metric before pruning.
+        pruner = optuna.pruners.MedianPruner(
+            n_startup_trials=10,
+            n_warmup_steps=1,
+        )
+
+        study = optuna.create_study(
+            study_name=f"{args.model_name}_hyperparameter_tuning",
+            direction='maximize',
+            pruner=pruner,
+        )
 
         kwargs = dict()
         if "unet" in args.model_path:
@@ -391,29 +429,15 @@ def main():
         else:
             kwargs = {}
 
-        wandb_kwargs = {
-            "project": "hmc-epg-sharpshooter",
-            "group": f"{args.model_name}_optuna_study_{run_group_id}",
-            "name": f"{args.model_name}_study",
-            "tags": ["optuna", "study"]
-        }
-        wandbc = WeightsAndBiasesCallback(metric_name="weighted_f1", wandb_kwargs=wandb_kwargs)
-
         study.optimize(
-            lambda x : optuna_objective(data, args, x, **kwargs), 
-            n_trials = trial_count, 
-            show_progress_bar=False,
-            callbacks=[progress_bar_callback(trial_count), wandbc] # add custom progress bar
+            lambda x: optuna_objective(data, args, x, **kwargs),
+            n_trials=trial_count,
+            show_progress_bar=True,
         )
 
         print(study.best_params)
         optuna.visualization.matplotlib.plot_optimization_history(study)
-        hyper_plot_path = f"{args.model_name}_hyper.png"
-        plt.savefig(hyper_plot_path)
-        plt.close()
-        if wandb.run is not None:
-            wandb.log({"optuna_optimization_history": wandb.Image(hyper_plot_path)})
-            wandb.finish()
+        plt.savefig(f"{args.model_name}_hyper.png")
         return
     
     summary_data = []
@@ -423,8 +447,11 @@ def main():
         print(f"=== Evaluating Fold {fold} ===")
         train_data = [data.df_list[i] for i in train_index]
         test_data = [data.df_list[i] for i in test_index]
-        train_data, _ = data.get_probes(train_data)
-        test_data, test_names = data.get_probes(test_data)
+        if not getattr(data, "binary", False):
+            train_data, _ = data.get_probes(train_data)
+            test_data, test_names = data.get_probes(test_data)
+        else:
+            test_names = [Path(df.attrs["file"]).stem for df in test_data]
 
         model_import = dynamic_importer(args.model_path)
 
@@ -447,18 +474,6 @@ def main():
 
         model = model_import.Model(save_path = args.save_path, **kwargs)
 
-        # Initialize wandb for standalone evaluation runs
-        run = None
-        if not args.optuna:
-            run = wandb.init(
-                project="hmc-epg-sharpshooter",
-                group=f"{args.model_name}_eval_{run_group_id}",
-                name=f"fold_{fold}",
-                config={"fold": fold, "model": args.model_name, **kwargs},
-                reinit=True,
-                tags=["evaluation"]
-            )
-
         print("Training Model...")
         model.train(train_data)
 
@@ -471,14 +486,12 @@ def main():
         summary_data.append(stats)
         labels_true.extend(true)
         labels_pred.extend(pred)
-
-        if run is not None:
-            f1 = f1_score(true, pred, average="macro")
-            acc = accuracy_score(true, pred)
-            run.log({"eval/macro_f1": f1, "eval/accuracy": acc})
-            run.finish()
         
     out_summary_data = pd.concat(summary_data)
+
+    # Ensure same type (str) so sklearn metrics don't fail on str vs int mix
+    labels_true = np.asarray(labels_true).astype(str)
+    labels_pred = np.asarray(labels_pred).astype(str)
 
     # Calculate statistics across every dataset
     labels = sorted(np.unique(labels_true))
@@ -497,28 +510,11 @@ def main():
 
     overall = ConfusionMatrixDisplay.from_predictions(labels_true, labels_pred, \
                                             normalize = 'true')
-    overall_cm_path = rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png"
-    overall.plot().figure_.savefig(overall_cm_path)
+    overall.plot().figure_.savefig(rf"{args.save_path}/{args.model_name}_OverallConfusionMatrix.png")
 
     all_data = pd.DataFrame({'labels_true': labels_true,
                              'labels_pred': labels_pred})
     all_data.to_csv(f"{args.save_path}/{args.model_name}_allpredictions.csv")
-
-    # Log overall summary to W&B
-    overall_f1 = f1_score(labels_true, labels_pred, average="macro")
-    overall_acc = accuracy_score(labels_true, labels_pred)
-    summary_run = wandb.init(
-        project="hmc-epg-sharpshooter",
-        group=f"{args.model_name}_eval_{run_group_id}",
-        name="overall_summary",
-        config={"model": args.model_name, "optuna": args.optuna},
-        reinit=True,
-        tags=["summary"],
-    )
-    summary_run.summary["overall/macro_f1"] = overall_f1
-    summary_run.summary["overall/accuracy"] = overall_acc
-    summary_run.log({"overall/Confusion_Matrix": wandb.Image(overall_cm_path)})
-    summary_run.finish()
 
 if __name__ == "__main__":
     main() 

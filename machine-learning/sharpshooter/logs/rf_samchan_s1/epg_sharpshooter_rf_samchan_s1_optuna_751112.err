@@ -1,0 +1,13 @@
+Reading 58 .parquet files:   0%|          | 0/58 [00:00<?, ?it/s]Reading 58 .parquet files:   2%|▏         | 1/58 [00:00<00:20,  2.73it/s]Reading 58 .parquet files:  12%|█▏        | 7/58 [00:00<00:03, 16.82it/s]Reading 58 .parquet files:  19%|█▉        | 11/58 [00:00<00:02, 21.69it/s]Reading 58 .parquet files:  28%|██▊       | 16/58 [00:00<00:01, 25.82it/s]Reading 58 .parquet files:  36%|███▌      | 21/58 [00:00<00:01, 25.10it/s]Reading 58 .parquet files:  47%|████▋     | 27/58 [00:01<00:01, 27.02it/s]Reading 58 .parquet files:  57%|█████▋    | 33/58 [00:01<00:00, 27.80it/s]Reading 58 .parquet files:  66%|██████▌   | 38/58 [00:01<00:00, 31.03it/s]Reading 58 .parquet files:  72%|███████▏  | 42/58 [00:01<00:00, 30.09it/s]Reading 58 .parquet files:  79%|███████▉  | 46/58 [00:01<00:00, 29.85it/s]Reading 58 .parquet files:  86%|████████▌ | 50/58 [00:01<00:00, 30.92it/s]Reading 58 .parquet files:  93%|█████████▎| 54/58 [00:02<00:00, 27.98it/s]Reading 58 .parquet files: 100%|██████████| 58/58 [00:02<00:00, 27.78it/s]
+[I 2026-04-10 13:14:00,068] A new study created in memory with name: rf_samchan_s1_hyperparameter_tuning
+  0%|          | 0/100 [00:00<?, ?it/s]
+[A
+Initializing Trial 0 Fold 0[A
+
+Getting probes:   0%|          | 0/46 [00:00<?, ?it/s][A[A
+
+Getting probes:  54%|█████▍    | 25/46 [00:00<00:00, 38.95it/s][A[A
+
+Getting probes:  63%|██████▎   | 29/46 [00:01<00:01, 12.09it/s][A[A
+
+                                                               [A[A
