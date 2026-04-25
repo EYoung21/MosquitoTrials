@@ -235,7 +235,7 @@ def optuna_objective(data, args, trial, **kwargs):
         test_data, test_names = data.get_probes(test_data)
 
         augment_factor = trial.suggest_categorical(
-            "augment_factor", [0.5, 0.75, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128]
+            "augment_factor", [0.25, 0.5, 0.75, 1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128]
         )
 
         if args.augment:

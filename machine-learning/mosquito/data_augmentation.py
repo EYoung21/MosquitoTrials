@@ -5,6 +5,9 @@ from collections import defaultdict
 import random
 from transition_matrix import transition_matrix_dict
 
+# Granular probing states in transition_matrix_dict (labels collapse to "P" in binary NP/P runs).
+_PROBING_MATRIX_STATES = frozenset({"J", "K", "L", "M", "N", "W"})
+
 '''
 data object to hold probe dataframe as class object to avoid duplicating work when splitting states
 '''
@@ -236,23 +239,32 @@ class DataAugmentor:
         iterations = 0
         state_dfs = []
         state_names = []
+        max_iterations = 100_000
         while (state_name != self.ending_state) or (iterations ==0):
+            if iterations >= max_iterations:
+                raise RuntimeError(
+                    "augment_franken exceeded max_iterations; check transition matrix / data_by_state."
+                )
             state_name = np.random.choice(self.states, 1, p=self.transition_matrix.T[state_name])[0]
+            emit_name = state_name
             if len(self.data_by_state[state_name]) == 0:
-                # quick check that the code as intended should only be missing NPs
-                if state_name != "NP":
-                    print(state_name, self.data_by_state[state_name], iterations)
-                    print({k:len(v) for k,v in self.data_by_state.items()})
-                    assert False
-                # if we are missing, then just skip when constructing the new probe
-                state_seq = None
+                # NP may be absent for some probes; skip that segment.
+                # Binary NP/P: probing segments are labeled "P" but the walk still visits J,K,L,M,N,W.
+                if (
+                    state_name in _PROBING_MATRIX_STATES
+                    and "P" in self.data_by_state
+                    and len(self.data_by_state["P"]) > 0
+                ):
+                    state_seq = random.choice(self.data_by_state["P"])
+                    emit_name = "P"
+                else:
+                    state_seq = None
             else:
                 state_seq = random.choice(self.data_by_state[state_name])
-            
-            
+
             if state_seq is not None:
                 state_dfs.append(state_seq)
-                state_names.append(state_name)
+                state_names.append(emit_name)
 
             iterations += 1
         synthetic_probe = Probe().init_states(state_names, state_dfs)

@@ -1,0 +1,3 @@
+dataset,num_files,total_samples,num_unique_labels,num_total_probes,probe_len_mean,probe_len_std,probe_len_p25,probe_len_p50,probe_len_p75,probe_len_p95
+mosquito,62,6282024,7,94,42083.04255319149,31110.866485985687,21878.75,34818.0,55825.25,108636.45
+sharpshooter,81,292752244,15,640,153872.45625,436476.57040162385,5224.75,12028.0,78617.75,764080.0499999989
